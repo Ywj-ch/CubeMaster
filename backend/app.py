@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# 👇 直接 import 你的算法流水线
 from convert_cube_state import solve_cube_pipeline
 
 app = FastAPI()
@@ -15,6 +13,9 @@ app.add_middleware(
 
 @app.get("/api/ping")
 def ping():
+    """
+    测试接口
+    """
     return {"msg": "backend is alive"}
 
 @app.post("/api/solve")

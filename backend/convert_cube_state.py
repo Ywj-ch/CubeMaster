@@ -2,6 +2,7 @@
 import twophase.solver as sv
 import os
 import json
+import re
 
 def parse_cube_state_from_file(filename='cube_results/cube_state.txt'):
     """
@@ -112,52 +113,16 @@ def validate_kociemba_state(kociemba_string):
     return True, "状态有效"
 
 
-def save_solution_results(solution, kociemba_code, output_dir='cube_results'):
-    """保存求解结果到文件"""
-    os.makedirs(output_dir, exist_ok=True)
-
-    # 1. 保存原始kociemba求解结果（给3D模块用）
-    raw_file = os.path.join(output_dir, 'solution_raw.txt')
-    with open(raw_file, 'w', encoding='utf-8') as f:
-        f.write(f"Kociemba编码: {kociemba_code}\n")
-        f.write(f"求解结果: {solution}\n")
-
-    # 2. 转换为人类可读格式
-    readable_solution = convert_to_readable(solution)
-
-    # 保存可读格式
-    readable_file = os.path.join(output_dir, 'solution_readable.txt')
-    with open(readable_file, 'w', encoding='utf-8') as f:
-        f.write("=== 魔方求解步骤 ===\n")
-        f.write(f"原始编码: {kociemba_code}\n")
-        f.write(f"原始解法: {solution}\n\n")
-        f.write("=== 详细步骤说明 ===\n")
-        for i, step in enumerate(readable_solution, 1):
-            f.write(f"步骤{i}: {step}\n")
-
-    # 3. 保存为JSON格式（方便程序读取）
-    json_file = os.path.join(output_dir, 'solution.json')
-    with open(json_file, 'w', encoding='utf-8') as f:
-        json.dump({
-            'kociemba_code': kociemba_code,
-            'raw_solution': solution,
-            'readable_solution': readable_solution,
-            'step_count': len(readable_solution)
-        }, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ 原始解法已保存: {raw_file}")
-    print(f"✅ 可读解法已保存: {readable_file}")
-    print(f"✅ JSON格式已保存: {json_file}")
-
-    return readable_solution
-
-
 def convert_to_readable(kociemba_solution):
-    """将kociemba解法转换为人类可读格式"""
-    # 移除换行和空格
-    solution = kociemba_solution.replace("\n", "").replace(" ", "")
+    """
+    将 kociemba 解法转换为人类可读格式
+    自动忽略 (19f) 等统计信息
+    """
 
-    # 映射字典
+    # 提取合法的魔方步骤
+    # 匹配 U D L R F B + 可选的 1/2/3/'
+    moves = re.findall(r"[UDLRFB][123']?", kociemba_solution)
+
     face_map = {
         'U': '上', 'D': '下', 'F': '前',
         'B': '后', 'L': '左', 'R': '右'
@@ -165,29 +130,20 @@ def convert_to_readable(kociemba_solution):
 
     direction_map = {
         '1': '顺时针90°',
-        '2': '顺时针180°',
+        '2': '旋转180°',
         '3': '逆时针90°',
         "'": '逆时针90°'
     }
 
     readable_steps = []
-    i = 0
-    while i < len(solution):
-        face = solution[i]
-        i += 1
 
-        # 检查是否有数字或撇号
-        if i < len(solution) and solution[i] in "123'":
-            direction = solution[i]
-            i += 1
-        else:
-            direction = '1'  # 默认顺时针90°
+    for move in moves:
+        face = move[0]
+        direction = move[1] if len(move) > 1 else '1'
 
-        # 转换为中文描述
-        face_cn = face_map.get(face, face)
-        direction_cn = direction_map.get(direction, f"方向{direction}")
+        face_cn = face_map[face]
+        direction_cn = direction_map[direction]
 
-        # 特殊处理180度
         if direction == '2':
             readable_steps.append(f"{face_cn}面旋转180°")
         else:
@@ -196,10 +152,56 @@ def convert_to_readable(kociemba_solution):
     return readable_steps
 
 
+def parse_raw_solution(raw_solution: str):
+    """
+    把 'F3 D3 L3 ... (19f)'
+    转成 ['F'', 'D'', 'L'', 'U', ...]
+    方便前端解析
+    """
+
+    # 去掉 (19f)
+    raw_solution = re.sub(r"\(.*?\)", "", raw_solution).strip()
+
+    moves = []
+    tokens = raw_solution.split()
+
+    for t in tokens:
+        face = t[0]
+        suffix = t[1:] if len(t) > 1 else "1"
+
+        if suffix == "1":
+            moves.append(face)
+        elif suffix == "2":
+            moves.append(face + "2")
+        elif suffix == "3":
+            moves.append(face + "'")
+
+    return moves
+
+
+def save_solution_results(solution, kociemba_code, output_dir='cube_results'):
+    os.makedirs(output_dir, exist_ok=True)
+
+    # 解析
+    readable_solution = convert_to_readable(solution)
+    moves = parse_raw_solution(solution)
+
+    json_file = os.path.join(output_dir, 'solution.json')
+    with open(json_file, 'w', encoding='utf-8') as f:
+        json.dump({
+            'kociemba_code': kociemba_code,
+            'raw_solution': solution,
+            'moves': moves,
+            'readable_solution': readable_solution,
+            'step_count': len(moves)
+        }, f, indent=2, ensure_ascii=False)
+
+    print(f"✅ JSON格式已保存: {json_file}")
+
+    return readable_solution, moves
+
+
 def solve_cube_pipeline():
-    """
-    给 FastAPI / 其他模块调用的统一求解接口
-    """
     cube_state = parse_cube_state_from_file('cube_results/cube_state.txt')
     kociemba_code = convert_to_kociemba_format(cube_state)
 
@@ -210,13 +212,14 @@ def solve_cube_pipeline():
     solution = sv.solve(kociemba_code, 20, 2)
     solution = solution.replace("\n", "").strip()
 
-    readable_steps = save_solution_results(solution, kociemba_code)
+    readable_solution, moves = save_solution_results(solution, kociemba_code)
 
     return {
         "kociemba_code": kociemba_code,
         "raw_solution": solution,
-        "readable_solution": readable_steps,
-        "step_count": len(readable_steps)
+        "moves": moves,
+        "readable_solution": readable_solution,
+        "step_count": len(moves)
     }
 
 

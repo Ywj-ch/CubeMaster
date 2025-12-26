@@ -1,6 +1,27 @@
 {
   "kociemba_code": "DUBLUFBDLUULRRLDBBDRFRFFFBRULFRDDFFUBDRBLULBRULLFBURDD",
   "raw_solution": "F3 D3 L3 U1 B3 U3 F2 R3 U3 L2 U1 F2 L2 U2 B3 L2 U2 R2 D2 (19f)",
+  "moves": [
+    "F'",
+    "D'",
+    "L'",
+    "U",
+    "B'",
+    "U'",
+    "F2",
+    "R'",
+    "U'",
+    "L2",
+    "U",
+    "F2",
+    "L2",
+    "U2",
+    "B'",
+    "L2",
+    "U2",
+    "R2",
+    "D2"
+  ],
   "readable_solution": [
     "前面逆时针90°",
     "下面逆时针90°",
@@ -20,11 +41,7 @@
     "左面旋转180°",
     "上面旋转180°",
     "右面旋转180°",
-    "下面旋转180°",
-    "(面顺时针90°",
-    "9面顺时针90°",
-    "f面顺时针90°",
-    ")面顺时针90°"
+    "下面旋转180°"
   ],
-  "step_count": 23
+  "step_count": 19
 }
