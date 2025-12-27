@@ -1,7 +1,23 @@
 <template>
   <div class="container">
     <h1>魔方求解演示</h1>
-    <pre>{{ cubeState }}</pre>
+    <!-- 模型区 -->
+    <div class="cube-net">
+      <div class="row">
+        <FaceView :face="cubeState.U" />
+      </div>
+
+      <div class="row middle-row">
+        <FaceView :face="cubeState.L" />
+        <FaceView :face="cubeState.F" />
+        <FaceView :face="cubeState.R" />
+        <FaceView :face="cubeState.B" />
+      </div>
+
+      <div class="row">
+        <FaceView :face="cubeState.D" />
+      </div>
+    </div>
     <!-- 控制区 -->
     <div class="controls">
       <button @click="fetchSolution" :disabled="loading">
@@ -19,6 +35,11 @@
         下一步
       </button>
     </div>
+
+    <!-- 测试公式按钮 -->
+    <button @click="testMoves" :disabled="loading">
+      测试公式
+    </button>
 
     <!-- 进度 -->
     <div v-if="steps.length" class="progress">
@@ -43,13 +64,14 @@ import { ref } from "vue";
 import { solveCube } from "../api/cube";
 import { createInitialCube } from "../utils/cubeState";
 import { applyMove } from "../utils/cubeMoves";
+import FaceView from "../components/FaceView.vue";
 
 // 状态
 const loading = ref(false);
 const steps = ref([]);
 const currentStep = ref(0);
 const cubeState = ref(createInitialCube());
-const moves = ref(["U", "U'", "U2"]); // 临时测试
+const moves = ref(["R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'"]); // 临时测试
 
 // 请求后端
 async function fetchSolution() {
@@ -72,7 +94,6 @@ async function fetchSolution() {
 // 控制步骤
 function nextStep() {
   if (currentStep.value < moves.value.length) {
-    applyMove(cubeState.value, moves.value[currentStep.value]);
     currentStep.value++;
   }
 }
@@ -82,9 +103,33 @@ function prevStep() {
     currentStep.value--;
   }
 }
+
+// 测试按钮的控制步骤
+function testMoves() {
+  if (currentStep.value < moves.value.length) {
+    applyMove(cubeState.value, moves.value[currentStep.value]);
+    currentStep.value++;
+  } else {
+    alert("公式已执行完毕");
+  }
+}
 </script>
 
 <style scoped>
+.cube-net {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.row {
+  display: flex;
+}
+
+.middle-row {
+  margin-left: 130px;
+}
+
 .container {
   max-width: 600px;
   margin: 40px auto;
