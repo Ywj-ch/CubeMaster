@@ -117,3 +117,4 @@ export function invertMove(move) {
   if (suffix === "2") return move;       // X2 → X2
   return face + "'";                     // X → X'
 }
+
