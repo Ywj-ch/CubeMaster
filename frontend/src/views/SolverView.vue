@@ -30,7 +30,7 @@
 
       <button
         @click="nextStep"
-        :disabled="currentStep >= steps.length - 1"
+        :disabled="currentStep >= steps.length"
       >
         下一步
       </button>
@@ -43,7 +43,7 @@
 
     <!-- 进度 -->
     <div v-if="steps.length" class="progress">
-      当前步骤：{{ currentStep + 1 }} / {{ steps.length }}
+      已执行步骤：{{ currentStep }} / {{ steps.length }}
     </div>
 
     <!-- 步骤列表 -->
@@ -61,27 +61,48 @@
 
 <script setup>
 import { ref } from "vue";
-import { solveCube } from "../api/cube";
-import { createInitialCube } from "../utils/cubeState";
-import { applyMove } from "../utils/cubeMoves";
+import {getCubeState, solveCube} from "../api/cube";
+import { createCubeFromJson } from "../utils/cubeState";
+import {applyMove, invertMove} from "../utils/cubeMoves";
 import FaceView from "../components/FaceView.vue";
 
 // 状态
 const loading = ref(false);
 const steps = ref([]);
 const currentStep = ref(0);
-const cubeState = ref(createInitialCube());
-const moves = ref(["R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'","R", "U", "R'", "U'"]); // 临时测试
+const testStep = ref(0);
+const cubeState = ref(createCubeFromJson());
+const solutionMoves = ref([]);
+const testMovesArray = ref([
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'"
+]);
 
 // 请求后端
 async function fetchSolution() {
   loading.value = true;
   try {
+    // 先获取当前魔方状态 JSON
+    const stateRes = await getCubeState();
+    if (stateRes.data.success) {
+      // 初始化 cubeState
+      cubeState.value = createCubeFromJson(stateRes.data.data);
+    } else {
+      console.error("获取魔方状态失败:", stateRes.data.error);
+      alert("获取魔方状态失败");
+      return;
+    }
+    // 再请求求解步骤
     const res = await solveCube();
     console.log("后端返回：", res.data);
 
     const payload = res.data;
     steps.value = payload.data?.readable_solution || [];
+    solutionMoves.value = payload.data?.moves || [];
     currentStep.value = 0;
   } catch (e) {
     console.error(e);
@@ -93,7 +114,8 @@ async function fetchSolution() {
 
 // 控制步骤
 function nextStep() {
-  if (currentStep.value < moves.value.length) {
+  if (currentStep.value < solutionMoves.value.length) {
+    applyMove(cubeState.value, solutionMoves.value[currentStep.value]);
     currentStep.value++;
   }
 }
@@ -101,14 +123,17 @@ function nextStep() {
 function prevStep() {
   if (currentStep.value > 0) {
     currentStep.value--;
+    const move = solutionMoves.value[currentStep.value];
+    const reverseMove = invertMove(move);
+    applyMove(cubeState.value, reverseMove);
   }
 }
 
 // 测试按钮的控制步骤
 function testMoves() {
-  if (currentStep.value < moves.value.length) {
-    applyMove(cubeState.value, moves.value[currentStep.value]);
-    currentStep.value++;
+  if (testStep.value < testMovesArray.value.length) {
+    applyMove(cubeState.value, testMovesArray.value[testStep.value]);
+    testStep.value++;
   } else {
     alert("公式已执行完毕");
   }

@@ -61,11 +61,11 @@ def convert_to_kociemba_format(cube_state):
     # 颜色映射到kociemba字符
     color_mapping = {
         'white': 'U',  # 上
+        'red': 'R',  # 右
+        'green': 'F',  # 前
         'yellow': 'D',  # 下
-        'red': 'F',  # 前
-        'orange': 'B',  # 后
-        'blue': 'R',  # 右
-        'green': 'L'  # 左
+        'orange': 'L',  # 左
+        'blue': 'B'  # 后
     }
 
     # kociemba要求的顺序：U, R, F, D, L, B

@@ -8,15 +8,6 @@ function rotateFaceCW(face) {
   ];
 }
 
-// 逆时针旋转一个面（3x3）
-function rotateFaceCCW(face) {
-  return [
-    face[2], face[5], face[8],
-    face[1], face[4], face[7],
-    face[0], face[3], face[6],
-  ];
-}
-
 // F 面旋转
 function moveF(cube) {
   cube.F = rotateFaceCW(cube.F);
@@ -79,20 +70,50 @@ function moveR(cube) {
 
 
 export function applyMove(cube, move) {
-  const moves = {
-    "F": moveF, "B": moveB, "U": moveU, "D": moveD, "L": moveL, "R": moveR,
-    "F2": c => { moveF(c); moveF(c); }, "B2": c => { moveB(c); moveB(c); },
-    "U2": c => { moveU(c); moveU(c); }, "D2": c => { moveD(c); moveD(c); },
-    "L2": c => { moveL(c); moveL(c); }, "R2": c => { moveR(c); moveR(c); },
-    "F'": c => moveF(c), "B'": c => moveB(c),
-    "U'": c => moveU(c), "D'": c => moveD(c),
-    "L'": c => moveL(c), "R'": c => moveR(c),
+  if (!move || typeof move !== "string") {
+    console.warn("非法 move:", move);
+    return;
+  }
+
+  const baseMoves = {
+    F: moveF,
+    B: moveB,
+    U: moveU,
+    D: moveD,
+    L: moveL,
+    R: moveR,
   };
 
-  if (moves[move]) {
-    if (move.endsWith("'")) moves[move] = c => { moves[move[0]](c); moves[move[0]](c); moves[move[0]](c); };
-    moves[move](cube);
-  } else {
+  const face = move[0];        // F / B / U ...
+  const suffix = move.slice(1); // "", "2", "'"
+
+  const fn = baseMoves[face];
+  if (!fn) {
     console.warn("未实现的 move:", move);
+    return;
   }
+
+  if (suffix === "") {
+    fn(cube);
+  } else if (suffix === "2") {
+    fn(cube);
+    fn(cube);
+  } else if (suffix === "'") {
+    fn(cube);
+    fn(cube);
+    fn(cube);
+  } else {
+    console.warn("非法 move 格式:", move);
+  }
+}
+
+export function invertMove(move) {
+  if (!move || typeof move !== "string") return move;
+
+  const suffix = move.slice(1);
+  const face = move[0];
+
+  if (suffix === "'") return face;       // X' → X
+  if (suffix === "2") return move;       // X2 → X2
+  return face + "'";                     // X → X'
 }

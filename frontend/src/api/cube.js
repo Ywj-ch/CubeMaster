@@ -9,3 +9,7 @@ export function pingBackend() {
 export function solveCube() {
   return axios.post(`${BASE_URL}/api/solve`);
 }
+
+export function getCubeState() {
+  return axios.get(`${BASE_URL}/api/cube_state`);
+}

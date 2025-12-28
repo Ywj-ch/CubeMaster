@@ -2,6 +2,7 @@
 import cv2
 import numpy as np
 import os
+import json
 
 class CubeDetector:
     def __init__(self):
@@ -12,14 +13,14 @@ class CubeDetector:
         # 定义魔方六个面的标准颜色
         self.color_names = ['white', 'yellow', 'red', 'orange', 'blue', 'green']
 
-        # 中心颜色到面名称的映射（根据你的命名）
+        # 中心颜色到面名称的映射
         self.center_to_face = {
             'white': 'U',   # 上面
+            'red': 'R',     # 右面
+            'green': 'F',   # 前面
             'yellow': 'D',  # 下面
-            'red': 'F',     # 前面
-            'orange': 'B',   # 后面
-            'blue': 'R',    # 左面
-            'green': 'L'    # 右面
+            'orange': 'L',  # 左面
+            'blue': 'B'     # 后面
         }
 
     # TODO：识别算法目前不是很稳定，后序可以在这里提升优化
@@ -148,11 +149,11 @@ class CubeDetector:
 
         face_descriptions = {
             'U': '上面 (UP - 白色中心)',
-            'R': '右面 (RIGHT - 蓝色中心)',
-            'F': '前面 (FRONT - 红色中心)',
+            'R': '右面 (RIGHT - 红色中心)',
+            'F': '前面 (FRONT - 绿色中心)',
             'D': '下面 (DOWN - 黄色中心)',
-            'L': '左面 (LEFT - 绿色中心)',
-            'B': '后面 (BACK - 橙色中心)'
+            'L': '左面 (LEFT - 橙色中心)',
+            'B': '后面 (BACK - 蓝色中心)'
         }
 
         for face_name in ['U', 'R', 'F', 'D', 'L', 'B']:
@@ -176,11 +177,11 @@ class CubeDetector:
 
             face_descriptions = {
                 'U': '上面 (UP - 白色中心)',
-                'R': '右面 (RIGHT - 蓝色中心)',
-                'F': '前面 (FRONT - 红色中心)',
+                'R': '右面 (RIGHT - 红色中心)',
+                'F': '前面 (FRONT - 绿色中心)',
                 'D': '下面 (DOWN - 黄色中心)',
-                'L': '左面 (LEFT - 绿色中心)',
-                'B': '后面 (BACK - 橙色中心)'
+                'L': '左面 (LEFT - 橙色中心)',
+                'B': '后面 (BACK - 蓝色中心)'
             }
 
             for face_name in ['U', 'R', 'F', 'D', 'L', 'B']:
@@ -191,6 +192,12 @@ class CubeDetector:
                     f.write("\n")
 
         print(f"✅ 魔方状态已保存到: {filename}")
+
+    def save_cube_state_json(self, cube_state, filename='cube_state.json'):
+        filepath = os.path.join(self.results_dir, filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(cube_state, f, ensure_ascii=False, indent=2)
+        print(f"✅ 魔方状态 JSON 已保存到: {filename}")
 
 
 def main():
@@ -206,6 +213,7 @@ def main():
 
         # 保存结果
         detector.save_cube_state(cube_state)
+        detector.save_cube_state_json(cube_state)
 
         print("🎉 魔方六面识别完成！")
         print("📁 每个面的标记图像已保存为 result_面名_中心颜色.jpg")

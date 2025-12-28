@@ -1,11 +1,24 @@
 // 定义魔方状态
-export function createInitialCube() {
+export function createCubeFromJson(cubeJson = null) {
+  const flatten = (face) => face.flat();
+
+  if (!cubeJson) {
+    return {
+      U: Array(9).fill("white"),
+      D: Array(9).fill("yellow"),
+      L: Array(9).fill("orange"),
+      R: Array(9).fill("red"),
+      F: Array(9).fill("green"),
+      B: Array(9).fill("blue"),
+    };
+  }
+
   return {
-    U: ["U0","U1","U2","U3","U4","U5","U6","U7","U8"],
-    D: ["D0","D1","D2","D3","D4","D5","D6","D7","D8"],
-    L: ["L0","L1","L2","L3","L4","L5","L6","L7","L8"],
-    R: ["R0","R1","R2","R3","R4","R5","R6","R7","R8"],
-    F: ["F0","F1","F2","F3","F4","F5","F6","F7","F8"],
-    B: ["B0","B1","B2","B3","B4","B5","B6","B7","B8"],
+    U: flatten(cubeJson.U),
+    D: flatten(cubeJson.D),
+    L: flatten(cubeJson.L),
+    R: flatten(cubeJson.R),
+    F: flatten(cubeJson.F),
+    B: flatten(cubeJson.B),
   };
 }
