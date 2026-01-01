@@ -16,7 +16,7 @@ def verify_solution_data():
             data = json.load(f)
 
         # 验证必要字段
-        required_fields = ['kociemba_code', 'raw_solution', 'readable_solution', 'step_count']
+        required_fields = ['kociemba_code', 'raw_solution', 'moves','readable_solution', 'step_count']
         for field in required_fields:
             if field not in data:
                 print(f"❌ 缺少必要字段: {field}")
@@ -26,6 +26,7 @@ def verify_solution_data():
         print(f"魔方编码: {data['kociemba_code'][:20]}...")
         print(f"解法步骤数: {data['step_count']}")
         print(f"原始解法: {data['raw_solution']}")
+        print(f"旋转操作: {data['moves']}")
         print(f"可读步骤: {data['readable_solution'][:3]}...")
 
         return True

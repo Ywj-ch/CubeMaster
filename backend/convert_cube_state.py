@@ -5,9 +5,7 @@ import json
 import re
 
 def parse_cube_state_from_file(filename='cube_results/cube_state.txt'):
-    """
-    从cube_state.txt文件中解析魔方状态
-    """
+    """cube_state.txt文件中解析魔方状态"""
     cube_state = {}
 
     with open(filename, 'r', encoding='utf-8') as f:
@@ -55,9 +53,7 @@ def parse_cube_state_from_file(filename='cube_results/cube_state.txt'):
 
 
 def convert_to_kociemba_format(cube_state):
-    """
-    将解析的魔方状态转换为kociemba格式
-    """
+    """将解析的魔方状态转换为kociemba格式"""
     # 颜色映射到kociemba字符
     color_mapping = {
         'white': 'U',  # 上
@@ -91,6 +87,7 @@ def validate_kociemba_state(kociemba_string):
     """
     验证kociemba状态字符串的有效性
     """
+
     if len(kociemba_string) != 54:
         return False, f"长度错误: 需要54个字符，实际得到{len(kociemba_string)}个"
 

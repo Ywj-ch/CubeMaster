@@ -10,82 +10,75 @@ function rotateFaceCW(face) {
 
 // F 面旋转
 function moveF(cube) {
-  cube.F = rotateFaceCW(cube.F);
-  const temp = cube.U.slice(6, 9);
-  cube.U[6] = cube.L[8]; cube.U[7] = cube.L[5]; cube.U[8] = cube.L[2];
-  cube.L[2] = cube.D[0]; cube.L[5] = cube.D[1]; cube.L[8] = cube.D[2];
-  cube.D[0] = cube.R[6]; cube.D[1] = cube.R[3]; cube.D[2] = cube.R[0];
-  cube.R[0] = temp[0]; cube.R[3] = temp[1]; cube.R[6] = temp[2];
+  cube.faces.F = rotateFaceCW(cube.faces.F);
+  const temp = cube.faces.U.slice(6, 9);
+  cube.faces.U[6] = cube.faces.L[8]; cube.faces.U[7] = cube.faces.L[5]; cube.faces.U[8] = cube.faces.L[2];
+  cube.faces.L[2] = cube.faces.D[0]; cube.faces.L[5] = cube.faces.D[1]; cube.faces.L[8] = cube.faces.D[2];
+  cube.faces.D[0] = cube.faces.R[6]; cube.faces.D[1] = cube.faces.R[3]; cube.faces.D[2] = cube.faces.R[0];
+  cube.faces.R[0] = temp[0]; cube.faces.R[3] = temp[1]; cube.faces.R[6] = temp[2];
 }
 
 // B 面旋转
 function moveB(cube) {
-  cube.B = rotateFaceCW(cube.B);
-  const temp = cube.U.slice(0, 3);
-  cube.U[0] = cube.R[2]; cube.U[1] = cube.R[5]; cube.U[2] = cube.R[8];
-  cube.R[2] = cube.D[8]; cube.R[5] = cube.D[7]; cube.R[8] = cube.D[6];
-  cube.D[6] = cube.L[0]; cube.D[7] = cube.L[3]; cube.D[8] = cube.L[6];
-  cube.L[0] = temp[2]; cube.L[3] = temp[1]; cube.L[6] = temp[0];
+  cube.faces.B = rotateFaceCW(cube.faces.B);
+  const temp = cube.faces.U.slice(0, 3);
+  cube.faces.U[0] = cube.faces.R[2]; cube.faces.U[1] = cube.faces.R[5]; cube.faces.U[2] = cube.faces.R[8];
+  cube.faces.R[2] = cube.faces.D[8]; cube.faces.R[5] = cube.faces.D[7]; cube.faces.R[8] = cube.faces.D[6];
+  cube.faces.D[6] = cube.faces.L[0]; cube.faces.D[7] = cube.faces.L[3]; cube.faces.D[8] = cube.faces.L[6];
+  cube.faces.L[0] = temp[2]; cube.faces.L[3] = temp[1]; cube.faces.L[6] = temp[0];
 }
 
 // U 面旋转
 function moveU(cube) {
-  cube.U = rotateFaceCW(cube.U);
-  const temp = cube.F.slice(0, 3);
-  cube.F[0] = cube.R[0]; cube.F[1] = cube.R[1]; cube.F[2] = cube.R[2];
-  cube.R[0] = cube.B[0]; cube.R[1] = cube.B[1]; cube.R[2] = cube.B[2];
-  cube.B[0] = cube.L[0]; cube.B[1] = cube.L[1]; cube.B[2] = cube.L[2];
-  cube.L[0] = temp[0]; cube.L[1] = temp[1]; cube.L[2] = temp[2];
+  cube.faces.U = rotateFaceCW(cube.faces.U);
+  const temp = cube.faces.F.slice(0, 3);
+  cube.faces.F[0] = cube.faces.R[0]; cube.faces.F[1] = cube.faces.R[1]; cube.faces.F[2] = cube.faces.R[2];
+  cube.faces.R[0] = cube.faces.B[0]; cube.faces.R[1] = cube.faces.B[1]; cube.faces.R[2] = cube.faces.B[2];
+  cube.faces.B[0] = cube.faces.L[0]; cube.faces.B[1] = cube.faces.L[1]; cube.faces.B[2] = cube.faces.L[2];
+  cube.faces.L[0] = temp[0]; cube.faces.L[1] = temp[1]; cube.faces.L[2] = temp[2];
 }
 
 // D 面旋转
 function moveD(cube) {
-  cube.D = rotateFaceCW(cube.D);
-  const temp = cube.F.slice(6, 9);
-  cube.F[6] = cube.L[6]; cube.F[7] = cube.L[7]; cube.F[8] = cube.L[8];
-  cube.L[6] = cube.B[6]; cube.L[7] = cube.B[7]; cube.L[8] = cube.B[8];
-  cube.B[6] = cube.R[6]; cube.B[7] = cube.R[7]; cube.B[8] = cube.R[8];
-  cube.R[6] = temp[0]; cube.R[7] = temp[1]; cube.R[8] = temp[2];
+  cube.faces.D = rotateFaceCW(cube.faces.D);
+  const temp = cube.faces.F.slice(6, 9);
+  cube.faces.F[6] = cube.faces.L[6]; cube.faces.F[7] = cube.faces.L[7]; cube.faces.F[8] = cube.faces.L[8];
+  cube.faces.L[6] = cube.faces.B[6]; cube.faces.L[7] = cube.faces.B[7]; cube.faces.L[8] = cube.faces.B[8];
+  cube.faces.B[6] = cube.faces.R[6]; cube.faces.B[7] = cube.faces.R[7]; cube.faces.B[8] = cube.faces.R[8];
+  cube.faces.R[6] = temp[0]; cube.faces.R[7] = temp[1]; cube.faces.R[8] = temp[2];
 }
 
 // L 面旋转
 function moveL(cube) {
-  cube.L = rotateFaceCW(cube.L);
-  const temp = [cube.U[0], cube.U[3], cube.U[6]];
-  cube.U[0] = cube.B[8]; cube.U[3] = cube.B[5]; cube.U[6] = cube.B[2];
-  cube.B[2] = cube.D[6]; cube.B[5] = cube.D[3]; cube.B[8] = cube.D[0];
-  cube.D[0] = cube.F[0]; cube.D[3] = cube.F[3]; cube.D[6] = cube.F[6];
-  cube.F[0] = temp[0]; cube.F[3] = temp[1]; cube.F[6] = temp[2];
+  cube.faces.L = rotateFaceCW(cube.faces.L);
+  const temp = [cube.faces.U[0], cube.faces.U[3], cube.faces.U[6]];
+  cube.faces.U[0] = cube.faces.B[8]; cube.faces.U[3] = cube.faces.B[5]; cube.faces.U[6] = cube.faces.B[2];
+  cube.faces.B[2] = cube.faces.D[6]; cube.faces.B[5] = cube.faces.D[3]; cube.faces.B[8] = cube.faces.D[0];
+  cube.faces.D[0] = cube.faces.F[0]; cube.faces.D[3] = cube.faces.F[3]; cube.faces.D[6] = cube.faces.F[6];
+  cube.faces.F[0] = temp[0]; cube.faces.F[3] = temp[1]; cube.faces.F[6] = temp[2];
 }
 
 // R 面旋转
 function moveR(cube) {
-  cube.R = rotateFaceCW(cube.R);
-  const temp = [cube.U[2], cube.U[5], cube.U[8]];
-  cube.U[2] = cube.F[2]; cube.U[5] = cube.F[5]; cube.U[8] = cube.F[8];
-  cube.F[2] = cube.D[2]; cube.F[5] = cube.D[5]; cube.F[8] = cube.D[8];
-  cube.D[2] = cube.B[6]; cube.D[5] = cube.B[3]; cube.D[8] = cube.B[0];
-  cube.B[0] = temp[2]; cube.B[3] = temp[1]; cube.B[6] = temp[0];
+  cube.faces.R = rotateFaceCW(cube.faces.R);
+  const temp = [cube.faces.U[2], cube.faces.U[5], cube.faces.U[8]];
+  cube.faces.U[2] = cube.faces.F[2]; cube.faces.U[5] = cube.faces.F[5]; cube.faces.U[8] = cube.faces.F[8];
+  cube.faces.F[2] = cube.faces.D[2]; cube.faces.F[5] = cube.faces.D[5]; cube.faces.F[8] = cube.faces.D[8];
+  cube.faces.D[2] = cube.faces.B[6]; cube.faces.D[5] = cube.faces.B[3]; cube.faces.D[8] = cube.faces.B[0];
+  cube.faces.B[0] = temp[2]; cube.faces.B[3] = temp[1]; cube.faces.B[6] = temp[0];
 }
 
-
+// 应用 move
 export function applyMove(cube, move) {
   if (!move || typeof move !== "string") {
     console.warn("非法 move:", move);
     return;
   }
 
-  const baseMoves = {
-    F: moveF,
-    B: moveB,
-    U: moveU,
-    D: moveD,
-    L: moveL,
-    R: moveR,
-  };
+  const baseMoves = { F: moveF, B: moveB, U: moveU, D: moveD, L: moveL, R: moveR };
 
-  const face = move[0];        // F / B / U ...
-  const suffix = move.slice(1); // "", "2", "'"
+  const face = move[0];
+  const suffix = move.slice(1);
 
   const fn = baseMoves[face];
   if (!fn) {
@@ -93,28 +86,18 @@ export function applyMove(cube, move) {
     return;
   }
 
-  if (suffix === "") {
-    fn(cube);
-  } else if (suffix === "2") {
-    fn(cube);
-    fn(cube);
-  } else if (suffix === "'") {
-    fn(cube);
-    fn(cube);
-    fn(cube);
-  } else {
-    console.warn("非法 move 格式:", move);
-  }
+  if (suffix === "") fn(cube);
+  else if (suffix === "2") { fn(cube); fn(cube); }
+  else if (suffix === "'") { fn(cube); fn(cube); fn(cube); }
+  else console.warn("非法 move 格式:", move);
 }
 
+// 反向 move
 export function invertMove(move) {
   if (!move || typeof move !== "string") return move;
-
   const suffix = move.slice(1);
   const face = move[0];
-
-  if (suffix === "'") return face;       // X' → X
-  if (suffix === "2") return move;       // X2 → X2
-  return face + "'";                     // X → X'
+  if (suffix === "'") return face;
+  if (suffix === "2") return move;
+  return face + "'";
 }
-

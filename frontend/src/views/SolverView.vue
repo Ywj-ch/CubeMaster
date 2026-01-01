@@ -3,20 +3,29 @@
     <h1>魔方求解演示</h1>
 
     <!-- 模型区 -->
+    <div class="cube3d-wrapper">
+      <Cube3DView ref="cube3dRef" :cubeState="cubeState" />
+    </div>
+
+     <!-- 3D R 面旋转测试按钮 -->
+    <button class="test3d-btn" @click="test3DMove" :disabled="loading">
+      3D旋转测试公式
+    </button>
+
     <div class="cube-net">
       <div class="row">
-        <FaceView :face="cubeState.U" />
+        <Face2DView :face="cubeState.faces.U" />
       </div>
 
       <div class="row middle-row">
-        <FaceView :face="cubeState.L" />
-        <FaceView :face="cubeState.F" />
-        <FaceView :face="cubeState.R" />
-        <FaceView :face="cubeState.B" />
+        <Face2DView :face="cubeState.faces.L" />
+        <Face2DView :face="cubeState.faces.F" />
+        <Face2DView :face="cubeState.faces.R" />
+        <Face2DView :face="cubeState.faces.B" />
       </div>
 
       <div class="row">
-        <FaceView :face="cubeState.D" />
+        <Face2DView :face="cubeState.faces.D" />
       </div>
     </div>
 
@@ -43,7 +52,7 @@
 
     <!-- 测试公式按钮 -->
     <button class="test-btn" @click="testMoves" :disabled="loading">
-      测试公式
+      2D旋转测试公式
     </button>
 
     <!-- 进度 -->
@@ -69,7 +78,8 @@ import { ref } from "vue";
 import {getCubeState, solveCube} from "../api/cube";
 import { createCubeFromJson } from "../utils/cubeState";
 import {applyMove, invertMove} from "../utils/cubeMoves";
-import FaceView from "../components/FaceView.vue";
+import Face2DView from "../components/Face2DView.vue";
+import Cube3DView from "../components/Cube3DView.vue";
 
 // 状态
 const loading = ref(false);
@@ -77,9 +87,19 @@ const hasSolved = ref(false);
 const steps = ref([]);
 const currentStep = ref(0);
 const testStep = ref(0);
+const test3DStep = ref(0);
 const cubeState = ref(createCubeFromJson());
+const cube3dRef = ref(null);
 const solutionMoves = ref([]);
 const testMovesArray = ref([
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'",
+  "R", "U", "R'", "U'"
+]);
+const test3DMovesArray = ref([
   "R", "U", "R'", "U'",
   "R", "U", "R'", "U'",
   "R", "U", "R'", "U'",
@@ -94,7 +114,9 @@ async function fetchSolution() {
   try {
     const stateRes = await getCubeState();
     if (stateRes.data.success) {
-      cubeState.value = createCubeFromJson(stateRes.data.data);
+      const newCube = createCubeFromJson(stateRes.data.data);
+      cubeState.value.cubies = newCube.cubies;
+      cubeState.value.faces = newCube.faces;
     } else {
       alert("获取魔方状态失败");
       return;
@@ -117,7 +139,9 @@ function nextStep() {
   if (!hasSolved.value) return;
 
   if (currentStep.value < solutionMoves.value.length) {
-    applyMove(cubeState.value, solutionMoves.value[currentStep.value]);
+    const move = solutionMoves.value[currentStep.value];
+    applyMove(cubeState.value, move);      // 数据层更新 cubies
+    cube3dRef.value.playMove(move);        // 播放 3D 动画
     currentStep.value++;
   }
 }
@@ -128,18 +152,31 @@ function prevStep() {
   if (currentStep.value > 0) {
     currentStep.value--;
     const move = solutionMoves.value[currentStep.value];
-    const reverseMove = invertMove(move);
+    const reverseMove = invertMove(move);  // 反向 move
     applyMove(cubeState.value, reverseMove);
+    cube3dRef.value.playMove(reverseMove); // 播放反向动画
   }
 }
 
-// 测试按钮
+// 2D测试按钮
 function testMoves() {
   if (testStep.value < testMovesArray.value.length) {
     applyMove(cubeState.value, testMovesArray.value[testStep.value]);
     testStep.value++;
   } else {
-    alert("公式已执行完毕");
+    alert("2D公式已执行完毕");
+  }
+}
+
+// 3D测试按钮
+function test3DMove() {
+  if (test3DMovesArray.value.length > test3DStep.value) {
+    const move = test3DMovesArray.value[test3DStep.value];
+    applyMove(cubeState.value, move); // 更新状态
+    cube3dRef.value.playMove(move);   // 播放动画
+    test3DStep.value++;
+  } else {
+    alert("3D公式已执行完毕");
   }
 }
 
@@ -150,12 +187,13 @@ function resetCube() {
   solutionMoves.value = [];
   currentStep.value = 0;
   testStep.value = 0;
+  test3DStep.value = 0;
   hasSolved.value = false;
 }
 </script>
 
 <style scoped>
-/* ================== 页面整体 ================== */
+/* 页面整体 */
 .container {
   max-width: 680px;
   margin: 40px auto;
@@ -180,7 +218,7 @@ h1 {
   font-weight: 700;
 }
 
-/* ================== 魔方区域 ================== */
+/* 魔方区域 */
 .cube-net {
   display: flex;
   flex-direction: column;
@@ -204,7 +242,7 @@ h1 {
   margin-left: 130px;
 }
 
-/* ================== 控制区 ================== */
+/* 控制区 */
 .controls {
   display: flex;
   flex-direction: column;
@@ -219,7 +257,7 @@ h1 {
   justify-content: center;
 }
 
-/* ================== 控制区按钮 ================== */
+/* 控制区按钮 */
 button {
   padding: 10px 18px;
   border: none;
@@ -274,7 +312,7 @@ button:disabled {
   box-shadow: 0 6px 15px rgba(255, 95, 109, 0.25);
 }
 
-/* 测试按钮 */
+/* 2D测试按钮 */
 .test-btn {
   margin-top: 16px;
   display: block;
@@ -292,6 +330,24 @@ button:disabled {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
 }
 
+/* 3D测试按钮 */
+.test3d-btn {
+  margin-top: 12px;
+  display: block;
+  background: linear-gradient(135deg, #20c997, #0ca678);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.test3d-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+}
+
+.test3d-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
 /* 上一步/下一步按钮 */
 .step-buttons {
   display: flex;
@@ -300,7 +356,7 @@ button:disabled {
   width: 100%;
 }
 
-/* ================== 进度 ================== */
+/* 进度 */
 .progress {
   text-align: center;
   margin-bottom: 12px;
@@ -308,7 +364,7 @@ button:disabled {
   color: #333;
 }
 
-/* ================== 步骤列表 ================== */
+/* 步骤列表 */
 .steps {
   list-style: none;
   padding: 0;
@@ -331,5 +387,11 @@ button:disabled {
   color: #fff;
   font-weight: 700;
   transform: translateX(6px);
+}
+
+.cube3d-wrapper {
+  width: 400px;
+  height: 400px;
+  margin: 20px auto;
 }
 </style>

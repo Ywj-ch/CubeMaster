@@ -6,6 +6,7 @@ import json
 
 app = FastAPI()
 
+# 跨域配置
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,6 +20,7 @@ def ping():
     测试接口
     """
     return {"msg": "backend is alive"}
+
 
 @app.post("/api/solve")
 def solve_cube():
@@ -36,6 +38,7 @@ def solve_cube():
             "success": False,
             "error": str(e)
         }
+
 
 @app.get("/api/cube_state")
 def get_cube_state():

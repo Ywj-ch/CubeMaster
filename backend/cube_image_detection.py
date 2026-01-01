@@ -4,6 +4,7 @@ import numpy as np
 import os
 import json
 
+
 class CubeDetector:
     def __init__(self):
         # 创建结果文件夹
@@ -22,6 +23,7 @@ class CubeDetector:
             'orange': 'L',  # 左面
             'blue': 'B'     # 后面
         }
+
 
     # TODO：识别算法目前不是很稳定，后序可以在这里提升优化
     @staticmethod
@@ -54,8 +56,11 @@ class CubeDetector:
         else:
             return 'unknown'
 
+
     def detect_face_colors(self, image_path):
-        """检测单个魔方面的9个颜色"""
+        """
+        检测单个魔方面的9个颜色
+        """
         # 读取图像
         img = cv2.imread(image_path)
         if img is None:
@@ -108,8 +113,11 @@ class CubeDetector:
 
         return detected_face, img
 
+
     def detect_all_faces(self):
-        """检测所有六个面"""
+        """
+        检测所有六个面
+        """
         images_dir = 'images'
         cube_state = {}
 
@@ -140,9 +148,12 @@ class CubeDetector:
 
         return cube_state
 
+
     @staticmethod
     def display_cube_state(cube_state):
-        """显示魔方状态"""
+        """
+        显示魔方状态
+        """
         print("\n" + "=" * 60)
         print("                 魔方六面状态报告")
         print("=" * 60)
@@ -167,8 +178,11 @@ class CubeDetector:
 
         print("\n" + "=" * 60)
 
+
     def save_cube_state(self, cube_state, filename='cube_state.txt'):
-        """保存魔方状态到文件"""
+        """
+        保存魔方状态到文件
+        """
         # 保存到结果文件夹
         filepath = os.path.join(self.results_dir, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -193,6 +207,7 @@ class CubeDetector:
 
         print(f"✅ 魔方状态已保存到: {filename}")
 
+
     def save_cube_state_json(self, cube_state, filename='cube_state.json'):
         filepath = os.path.join(self.results_dir, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -201,7 +216,9 @@ class CubeDetector:
 
 
 def main():
-    """主函数 - 六面魔方识别"""
+    """
+    主函数 - 六面魔方识别
+    """
     detector = CubeDetector()
 
     # 直接检测images目录下的6张图片
