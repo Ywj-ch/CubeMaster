@@ -4,7 +4,9 @@ import os
 
 
 def verify_solution_data():
-    """验证求解结果数据"""
+    """
+    验证求解结果数据
+    """
     json_file = 'cube_results/solution.json'
 
     if not os.path.exists(json_file):

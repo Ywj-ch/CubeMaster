@@ -1,11 +1,12 @@
-# convert_cube_state.py
 import twophase.solver as sv
 import os
 import json
 import re
 
 def parse_cube_state_from_file(filename='cube_results/cube_state.txt'):
-    """cube_state.txt文件中解析魔方状态"""
+    """
+    cube_state.txt文件中解析魔方状态
+    """
     cube_state = {}
 
     with open(filename, 'r', encoding='utf-8') as f:

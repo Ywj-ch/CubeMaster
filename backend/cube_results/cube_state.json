@@ -1,7 +1,7 @@
 {
   "U": [
     [
-      "green",
+      "blue",
       "white",
       "white"
     ],
@@ -12,93 +12,93 @@
     ],
     [
       "green",
-      "green",
-      "blue"
+      "white",
+      "orange"
     ]
   ],
   "D": [
     [
-      "red",
-      "orange",
-      "white"
-    ],
-    [
       "white",
-      "yellow",
-      "white"
+      "white",
+      "yellow"
     ],
     [
-      "blue",
-      "red",
-      "yellow"
+      "green",
+      "yellow",
+      "green"
+    ],
+    [
+      "orange",
+      "orange",
+      "green"
     ]
   ],
   "R": [
     [
+      "green",
       "yellow",
-      "yellow",
-      "blue"
+      "green"
     ],
     [
+      "blue",
       "red",
-      "red",
-      "blue"
+      "yellow"
     ],
     [
+      "blue",
       "orange",
-      "orange",
-      "blue"
+      "orange"
     ]
   ],
   "L": [
     [
-      "yellow",
-      "white",
+      "red",
+      "blue",
+      "yellow"
+    ],
+    [
+      "blue",
+      "orange",
       "red"
     ],
     [
-      "orange",
-      "orange",
-      "yellow"
-    ],
-    [
-      "white",
       "blue",
-      "yellow"
+      "red",
+      "orange"
     ]
   ],
   "B": [
     [
+      "white",
       "orange",
-      "green",
-      "orange"
+      "red"
     ],
     [
-      "orange",
       "blue",
-      "yellow"
-    ],
-    [
-      "orange",
       "blue",
       "red"
+    ],
+    [
+      "yellow",
+      "yellow",
+      "white"
     ]
   ],
   "F": [
     [
-      "white",
       "red",
-      "red"
+      "orange",
+      "yellow"
+    ],
+    [
+      "yellow",
+      "green",
+      "white"
     ],
     [
       "blue",
       "green",
-      "yellow"
-    ],
-    [
-      "green",
-      "green",
-      "green"
+      "red"
     ]
   ]
 }

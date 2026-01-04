@@ -1,5 +1,4 @@
-# convert_cube_state.py
-import cv2
+import cv2 as cv
 import numpy as np
 import os
 import json
@@ -28,33 +27,84 @@ class CubeDetector:
     # TODO：识别算法目前不是很稳定，后序可以在这里提升优化
     @staticmethod
     def hsv_to_color(h, s, v):
-        """根据HSV值判断颜色"""
-        # 白色检测：低饱和度 + 高亮度
-        if s < 50 and v > 150:
+        """
+        根据HSV值判断颜色
+        """
+        # 白色检测：低饱和度
+        if s < 40 and v > 120:
             return 'white'
 
         # 黄色检测
-        elif 20 <= h <= 35 and s > 100:
+        if 20 <= h <= 35 and s > 100:
             return 'yellow'
 
         # 橙色检测
-        elif 10 <= h < 20 and s > 100:
+        if 5 < h <= 18 and s > 120 and v > 100:
             return 'orange'
 
         # 红色检测（注意红色在HSV环的两端）
-        elif (h < 10 or h > 170) and s > 100:
+        if (h < 10 or h > 170) and s > 100:
             return 'red'
 
         # 绿色检测
-        elif 35 <= h < 85 and s > 100:
+        if 35 <= h < 85 and s > 100:
             return 'green'
 
         # 蓝色检测
-        elif 85 <= h < 130 and s > 100:
+        if 85 <= h < 130 and s > 100:
             return 'blue'
 
         else:
             return 'unknown'
+
+
+    @staticmethod
+    def detect_cube_face_roi(img):
+        """
+        对图片进行处理，定位到魔方面裁掉多余区域
+        :param img:
+        :return:处理后的img
+        """
+
+        hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+        h, s, v = cv.split(hsv)
+
+        # 核心：高饱和区域
+        mask = (s > 60) & (v > 50)
+
+        coords = cv.findNonZero(mask.astype('uint8'))
+        if coords is None:
+            return None
+
+        x, y, w, h = cv.boundingRect(coords)
+        return img[y:y + h, x:x + w]
+
+
+    @staticmethod
+    def sample_cell_color(hsv, cx, cy, cell_size):
+        """
+        检测单个方块颜色
+        """
+        offsets = [
+            (-cell_size // 4, 0),
+            (cell_size // 4, 0),
+            (0, -cell_size // 4),
+            (0, cell_size // 4),
+        ]
+
+        samples = []
+
+        for dx, dy in offsets:
+            x = int(cx + dx)
+            y = int(cy + dy)
+
+            half = cell_size // 8
+            patch = hsv[y - half:y + half, x - half:x + half]
+
+            if patch.size > 0:
+                samples.append(np.mean(patch, axis=(0, 1)))
+
+        return np.mean(samples, axis=0)
 
 
     def detect_face_colors(self, image_path):
@@ -62,15 +112,22 @@ class CubeDetector:
         检测单个魔方面的9个颜色
         """
         # 读取图像
-        img = cv2.imread(image_path)
+        img = cv.imread(image_path)
         if img is None:
             print(f"❌ 无法读取图像: {image_path}")
             return None
 
+        # 魔方面定位
+        roi = self.detect_cube_face_roi(img)
+
+        if roi is None:
+            print("❌ 未检测到魔方面，使用原图")
+            roi = img
+
         # 预处理
-        img = cv2.resize(img, (400, 400))
-        img_blur = cv2.GaussianBlur(img, (5, 5), 0)
-        hsv = cv2.cvtColor(img_blur, cv2.COLOR_BGR2HSV)
+        roi = cv.resize(roi, (400, 400))
+        img_blur = cv.GaussianBlur(roi, (5, 5), 0)
+        hsv = cv.cvtColor(img_blur, cv.COLOR_BGR2HSV)
 
         # 检测3x3网格
         detected_face = []
@@ -97,7 +154,7 @@ class CubeDetector:
                     continue
 
                 # 计算平均HSV
-                avg_hsv = np.mean(sample_region, axis=(0, 1))
+                avg_hsv = self.sample_cell_color(hsv, center_x, center_y, cell_size)
                 h, s, v = avg_hsv
 
                 # 检测颜色
@@ -105,13 +162,14 @@ class CubeDetector:
                 row_colors.append(detected_color)
 
                 # 在图像上标记
-                cv2.putText(img, detected_color, (x1, y1 - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-                cv2.rectangle(img, (x1, y1), (x2, y2), (255, 255, 255), 1)
+                cv.putText(roi, detected_color, (x1, y1 - 5),
+                           cv.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+
+                cv.rectangle(roi, (x1, y1), (x2, y2), (255, 255, 255), 1)
 
             detected_face.append(row_colors)
 
-        return detected_face, img
+        return detected_face, roi
 
 
     def detect_all_faces(self):
@@ -142,7 +200,7 @@ class CubeDetector:
 
                 # 保存到结果文件夹
                 result_path = os.path.join(self.results_dir, f'result_{face_name}_{color_name}.jpg')
-                cv2.imwrite(result_path, marked_img)
+                cv.imwrite(result_path, marked_img)
                 print(f"✅ {face_name}面结果保存: {result_path}")
                 print(f"   检测结果: {face_colors}")
 

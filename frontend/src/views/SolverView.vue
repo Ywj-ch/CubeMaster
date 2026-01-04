@@ -121,14 +121,30 @@ async function fetchSolution() {
       alert("获取魔方状态失败");
       return;
     }
+
     const res = await solveCube();
-    steps.value = res.data.data?.readable_solution || [];
-    solutionMoves.value = res.data.data?.moves || [];
+    const data = res.data.data;
+
+    // 对后端返回的数据再次进行校验
+    if (data?.raw_solution && data.raw_solution.startsWith("Error")) {
+      alert(
+        "魔方状态不合法：可能有某个面拍摄时方向旋转了 90° 或 180°。\n" +
+        "请按照拍摄顺序重新拍摄，或在 2D 展开图中手动修正。"
+      )
+      hasSolved.value = false;
+      return;
+    }
+
+    // 校验通过后才开始赋值
+    steps.value = data.readable_solution;
+    solutionMoves.value = data.moves;
     currentStep.value = 0;
     hasSolved.value = true;
+
   } catch (e) {
     console.error(e);
     alert("请求失败，请检查后端");
+    hasSolved.value = false;
   } finally {
     loading.value = false;
   }
