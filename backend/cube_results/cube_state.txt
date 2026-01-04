@@ -27,7 +27,7 @@
   ['blue', 'red', 'orange']
 
 后面 (BACK - 蓝色中心):
-  ['white', 'orange', 'red']
-  ['blue', 'blue', 'red']
-  ['yellow', 'yellow', 'white']
+  ['red', 'red', 'white']
+  ['orange', 'blue', 'yellow']
+  ['white', 'blue', 'yellow']
 

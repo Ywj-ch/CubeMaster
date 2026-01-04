@@ -69,19 +69,19 @@
   ],
   "B": [
     [
-      "white",
-      "orange",
-      "red"
-    ],
-    [
-      "blue",
-      "blue",
-      "red"
-    ],
-    [
-      "yellow",
-      "yellow",
+      "red",
+      "red",
       "white"
+    ],
+    [
+      "orange",
+      "blue",
+      "yellow"
+    ],
+    [
+      "white",
+      "blue",
+      "yellow"
     ]
   ],
   "F": [
