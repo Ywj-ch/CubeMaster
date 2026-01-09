@@ -4,7 +4,7 @@
 
     <!-- 模型区 -->
     <div class="cube3d-wrapper">
-      <Cube3DView ref="cube3dRef" :cubeState="cubeState" />
+      <Cube3DView ref="cube3dRef" :cubeState="cubeState3D" />
     </div>
 
      <!-- 3D R 面旋转测试按钮 -->
@@ -14,18 +14,18 @@
 
     <div class="cube-net">
       <div class="row">
-        <Face2DView :face="cubeState.faces.U" />
+        <Face2DView :face="cubeState2D.faces.U" />
       </div>
 
       <div class="row middle-row">
-        <Face2DView :face="cubeState.faces.L" />
-        <Face2DView :face="cubeState.faces.F" />
-        <Face2DView :face="cubeState.faces.R" />
-        <Face2DView :face="cubeState.faces.B" />
+        <Face2DView :face="cubeState2D.faces.L" />
+        <Face2DView :face="cubeState2D.faces.F" />
+        <Face2DView :face="cubeState2D.faces.R" />
+        <Face2DView :face="cubeState2D.faces.B" />
       </div>
 
       <div class="row">
-        <Face2DView :face="cubeState.faces.D" />
+        <Face2DView :face="cubeState2D.faces.D" />
       </div>
     </div>
 
@@ -76,10 +76,12 @@
 <script setup>
 import { ref } from "vue";
 import {getCubeState, solveCube} from "../api/cube";
-import { createCubeFromJson } from "../utils/cubeState";
-import {applyMove, invertMove} from "../utils/cubeMoves";
+import { create2DCubeFromJson } from "../utils/cubeState2D.js";
+import {create3DCubeFromJson} from "../utils/cubeState3D.js";
+import {applyMove2D, invertMove2D} from "../utils/cubeMoves2D.js";
 import Face2DView from "../components/Face2DView.vue";
 import Cube3DView from "../components/Cube3DView.vue";
+
 
 // 状态
 const loading = ref(false);
@@ -88,8 +90,8 @@ const steps = ref([]);
 const currentStep = ref(0);
 const testStep = ref(0);
 const test3DStep = ref(0);
-const cubeState = ref(createCubeFromJson());
-const cube3dRef = ref(null);
+const cubeState2D = ref(create2DCubeFromJson());
+const cubeState3D = ref(create3DCubeFromJson());
 const solutionMoves = ref([]);
 const testMovesArray = ref([
   "R", "U", "R'", "U'",
@@ -114,9 +116,9 @@ async function fetchSolution() {
   try {
     const stateRes = await getCubeState();
     if (stateRes.data.success) {
-      const newCube = createCubeFromJson(stateRes.data.data);
-      cubeState.value.cubies = newCube.cubies;
-      cubeState.value.faces = newCube.faces;
+      // 从后端获取到魔方状态的 json 后分别对 2D 和 3D 魔方进行建模
+      cubeState2D.value.faces = create2DCubeFromJson(stateRes.data.data);
+      cubeState3D.value = create3DCubeFromJson(stateRes.data.data)
     } else {
       alert("获取魔方状态失败");
       return;
@@ -156,7 +158,7 @@ function nextStep() {
 
   if (currentStep.value < solutionMoves.value.length) {
     const move = solutionMoves.value[currentStep.value];
-    applyMove(cubeState.value, move);      // 数据层更新 cubies
+    applyMove2D(cubeState2D.value, move);      // 数据层更新 cubies
     cube3dRef.value.playMove(move);        // 播放 3D 动画
     currentStep.value++;
   }
@@ -168,8 +170,8 @@ function prevStep() {
   if (currentStep.value > 0) {
     currentStep.value--;
     const move = solutionMoves.value[currentStep.value];
-    const reverseMove = invertMove(move);  // 反向 move
-    applyMove(cubeState.value, reverseMove);
+    const reverseMove = invertMove2D(move);  // 反向 move
+    applyMove2D(cubeState2D.value, reverseMove);
     cube3dRef.value.playMove(reverseMove); // 播放反向动画
   }
 }
@@ -177,7 +179,7 @@ function prevStep() {
 // 2D测试按钮
 function testMoves() {
   if (testStep.value < testMovesArray.value.length) {
-    applyMove(cubeState.value, testMovesArray.value[testStep.value]);
+    applyMove2D(cubeState2D.value, testMovesArray.value[testStep.value]);
     testStep.value++;
   } else {
     alert("2D公式已执行完毕");
@@ -188,7 +190,7 @@ function testMoves() {
 function test3DMove() {
   if (test3DMovesArray.value.length > test3DStep.value) {
     const move = test3DMovesArray.value[test3DStep.value];
-    applyMove(cubeState.value, move); // 更新状态
+    applyMove3D(cubeState3D.value, move); // 更新状态
     cube3dRef.value.playMove(move);   // 播放动画
     test3DStep.value++;
   } else {

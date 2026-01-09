@@ -1,4 +1,4 @@
-// 控制魔方转动
+// 控制 2D 魔方转动
 // 顺时针旋转一个面（3x3）
 function rotateFaceCW(face) {
   return [
@@ -69,7 +69,7 @@ function moveR(cube) {
 }
 
 // 应用 move
-export function applyMove(cube, move) {
+export function applyMove2D(cube, move) {
   if (!move || typeof move !== "string") {
     console.warn("非法 move:", move);
     return;
@@ -93,7 +93,7 @@ export function applyMove(cube, move) {
 }
 
 // 反向 move
-export function invertMove(move) {
+export function invertMove2D(move) {
   if (!move || typeof move !== "string") return move;
   const suffix = move.slice(1);
   const face = move[0];

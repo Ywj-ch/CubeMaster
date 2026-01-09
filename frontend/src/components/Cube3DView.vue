@@ -167,6 +167,7 @@ function renderCubies(cubies) {
 
   // 渲染角块、棱块和中心块
   [...cubies.corners, ...cubies.edges, ...cubies.centers].forEach(c => {
+    // TODO 这里实际上是在更具 2D 魔方的颜色反推 3D 魔方的颜色 然后渲染到 mesh 上，实际 3D 魔方的状态并没有改变(后期需要解耦)
     const colors = getCubieFaceColors(c, props.cubeState.faces);
     const mesh = createCubieMesh(size, colors);
     mesh.position.set(...c.pos);
