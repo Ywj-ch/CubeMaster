@@ -3,7 +3,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, watch, nextTick} from "vue";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as THREE from "three";
 
 // ========================
@@ -18,24 +19,12 @@ const container = ref(null);
 // ========================
 // Three.js 渲染变量
 // ========================
-/** @type {THREE.Scene} */
 let scene;
-/** @type {THREE.PerspectiveCamera} */
 let camera;
-/** @type {THREE.WebGLRenderer} */
 let renderer;
-/** @type {THREE.Group} */
 let cubeGroup;
-
+let controls;
 let isAnimating = false;
-
-// ========================
-// 鼠标拖拽控制变量
-// ========================
-let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-const rotateSpeed = 0.005;
 
 // ========================
 // 颜色映射配置
@@ -54,22 +43,33 @@ const colorMap = {
 // ========================
 function initThree() {
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x222222);
 
-  const width = container.value.clientWidth || 400;
-  const height = container.value.clientHeight || 400;
+  const width = container.value.clientWidth;
+  const height = container.value.clientHeight;
 
   camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  camera.position.set(5, 5, 5);
+  camera.position.set(6, 6, 6);
   camera.lookAt(0, 0, 0);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true , alpha: true});
   renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
   container.value.appendChild(renderer.domElement);
 
   // 添加光源
-  scene.add(new THREE.DirectionalLight(0xffffff, 0.8));
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(10, 20, 10);
+  scene.add(dirLight);
+
+  // 初始化轨道控制器 (鼠标交互的核心)
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; // 开启阻尼滑动
+  controls.dampingFactor = 0.05;
+  controls.enablePan = false;    // 禁止右键平移
+  controls.minDistance = 3;
+  controls.maxDistance = 15;
 
   // 创建魔方组
   cubeGroup = new THREE.Group();
@@ -158,6 +158,8 @@ function createCubieMesh(size, faceColors) {
 // 渲染所有 Cubies
 // ========================
 function renderCubies(cubies) {
+  if (isAnimating) return;
+
   // 清空现有的 Cubies
   while (cubeGroup.children.length) {
     cubeGroup.remove(cubeGroup.children[0]);
@@ -179,33 +181,9 @@ function renderCubies(cubies) {
 // ========================
 function animate() {
   requestAnimationFrame(animate);
+  // 将控制器绑定到相机上，此时魔方的坐标系是没有变的，改变的只是相机的位置
+  if (controls) controls.update();
   renderer.render(scene, camera);
-}
-
-// ========================
-// 鼠标拖拽事件处理
-// ========================
-function onMouseDown(e) {
-  isDragging = true;
-  lastX = e.clientX;
-  lastY = e.clientY;
-}
-
-function onMouseMove(e) {
-  if (!isDragging) return;
-
-  const dx = e.clientX - lastX;
-  const dy = e.clientY - lastY;
-
-  cubeGroup.rotation.y += dx * rotateSpeed;
-  cubeGroup.rotation.x += dy * rotateSpeed;
-
-  lastX = e.clientX;
-  lastY = e.clientY;
-}
-
-function onMouseUp() {
-  isDragging = false;
 }
 
 // ========================
@@ -277,6 +255,9 @@ function playMove(move) {
       while (rotateGroup.children.length) {
         const m = rotateGroup.children[0];
         m.applyMatrix4(rotateGroup.matrix);
+        m.position.x = Math.round(m.position.x);
+        m.position.y = Math.round(m.position.y);
+        m.position.z = Math.round(m.position.z);
         rotateGroup.remove(m);
         cubeGroup.add(m);
       }
@@ -288,10 +269,13 @@ function playMove(move) {
   requestAnimationFrame(rotate);
 }
 
+function resetView() {
+  if (controls) controls.reset();
+}
 // ========================
 // 暴露方法给父组件
 // ========================
-defineExpose({ playMove });
+defineExpose({ playMove, resetView, renderCubies});
 
 // ========================
 // 组件生命周期
@@ -301,23 +285,22 @@ onMounted(async () => {
   initThree();
   renderCubies(props.cubeState.cubies);
   animate();
-
-  // 绑定鼠标事件
-  const dom = renderer.domElement;
-  dom.addEventListener("mousedown", onMouseDown);
-  window.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseup", onMouseUp);
+  window.addEventListener("resize", onResize);
 });
 
 onUnmounted(() => {
-  // 清理鼠标事件
-  const dom = renderer?.domElement;
-  if (!dom) return;
-  dom.removeEventListener("mousedown", onMouseDown);
-  window.removeEventListener("mousemove", onMouseMove);
-  window.removeEventListener("mouseup", onMouseUp);
+  window.removeEventListener("resize", onResize);
+  if(renderer) renderer.dispose();
 });
 
+function onResize() {
+  if (!container.value || !camera || !renderer) return;
+  const w = container.value.clientWidth;
+  const h = container.value.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
 // ========================
 // 监听数据变化
 // ========================
@@ -332,8 +315,8 @@ watch(
 
 <style scoped>
 .cube-3d-container {
-  width: 400px;
-  height: 400px;
+  width: 100%;
+  height: 100%;
   cursor: grab;
 }
 
