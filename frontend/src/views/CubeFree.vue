@@ -11,14 +11,18 @@
     <div class="header-section">
       <h2 class="mode-title">自由探索</h2>
       <div class="status-indicator">
-        <span class="dot" :class="{ 'is-active': !isAutoOperating }"></span>
-        {{ isAutoOperating ? '正在打乱...' : '实时捕获中' }}
+        <span class="dot" :class="{ 'is-active': isGameStarted && !isAutoOperating }"></span>
+        {{ isAutoOperating ? '正在打乱...' : (isGameStarted ? '挑战进行中' : '准备就绪') }}
       </div>
     </div>
 
     <div class="main-display-area">
       <div class="cube-container-box">
-        <Cube3DView ref="cubeRef" :cubeState="cubeState" />
+        <Cube3DView
+          ref="cubeRef"
+          :cubeState="cubeState"
+          :disabled="!isGameStarted || isAutoOperating || isMoving"
+        />
         <div class="cube-info-overlay">
           <span>MOVE COUNT: {{ history.length }}</span>
         </div>
@@ -28,15 +32,28 @@
     <div class="bottom-controls">
       <div class="action-buttons">
         <el-button
+          v-if="!isGameStarted"
+          type="success"
+          size="large"
+          @click="startChallenge"
+          :disabled="isAutoOperating"
+          :icon="VideoPlay"
+          class="ctrl-btn start-btn"
+        >
+          开始挑战
+        </el-button>
+
+        <el-button
           type="primary"
           size="large"
           @click="scrambleWithAnimation"
-          :loading="isAutoOperating"
+          :disabled="isAutoOperating"
           :icon="Refresh"
           class="ctrl-btn"
         >
           随机打乱
         </el-button>
+
         <el-button
           size="large"
           @click="resetAll"
@@ -56,7 +73,9 @@
                 {{ move }}
               </span>
             </transition-group>
-            <div v-if="history.length === 0" class="seq-empty">等待操作 (U, D, L, R, F, B)...</div>
+            <div v-if="history.length === 0" class="seq-empty">
+              {{ isGameStarted ? '请开始你的操作...' : '点击“开始挑战”进行计时' }}
+            </div>
           </div>
         </el-scrollbar>
       </div>
@@ -69,12 +88,14 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import Cube3DView from '../components/Cube3DView.vue';
 import { createCubeFromJson } from '../utils/cubeState';
 import { applyMove } from '../utils/cubeMoves';
-import { Timer, Refresh, RefreshLeft } from '@element-plus/icons-vue';
+import { Timer, Refresh, RefreshLeft, VideoPlay } from '@element-plus/icons-vue';
 
 const cubeState = ref(createCubeFromJson());
 const cubeRef = ref(null);
 const history = ref([]);
-const isAutoOperating = ref(false);
+const isAutoOperating = ref(false); // 打乱模式锁定
+const isMoving = ref(false);        // 单步动画锁定
+const isGameStarted = ref(false);   // 游戏开始状态
 const scrollRef = ref(null);
 
 const currentTime = ref(0);
@@ -90,6 +111,15 @@ const timeDisplay = computed(() => {
   return `${m}:${s}.${ms}`;
 });
 
+// 开始挑战
+function startChallenge() {
+  if (isAutoOperating.value) return;
+  isGameStarted.value = true;
+  history.value = [];
+  currentTime.value = 0;
+  startTimer();
+}
+
 function startTimer() {
   if (isTimerRunning.value) return;
   isTimerRunning.value = true;
@@ -104,38 +134,57 @@ function stopTimer() {
   if (timerId.value) clearInterval(timerId.value);
 }
 
-async function executeMove(move, skipTimer = false) {
-  if (isAutoOperating.value && !skipTimer) return;
-  // 第一步操作时启动计时
-  if (!skipTimer && !isTimerRunning.value) startTimer();
+/**
+ * 执行转动
+ * @param {string} move 指令
+ * @param {boolean} force 是否强制执行（用于打乱逻辑，绕过开始状态检查）
+ */
+async function executeMove(move, force = false) {
+  // 1. 如果正在自动操作（打乱）且不是强制执行，拦截
+  if (isAutoOperating.value && !force) return;
+  // 2. 如果游戏未开始且不是强制执行，拦截
+  if (!isGameStarted.value && !force) return;
+  // 3. 关键：如果当前 3D 动画正在进行，拦截所有新指令，防止魔方乱掉
+  if (isMoving.value) return;
 
   if (cubeRef.value) {
+    isMoving.value = true; // 锁定
+
     cubeRef.value.playMove(move);
     applyMove(cubeState.value, move);
-    if (!skipTimer) {
+
+    if (!force) {
       history.value.push(move);
       nextTick(() => {
         const inner = scrollRef.value?.$el.querySelector('.el-scrollbar__wrap');
         if (inner) inner.scrollLeft = inner.scrollWidth;
       });
     }
+
+    // 4. 等待动画时长（根据 Cube3DView 的 300ms 设定，给 320ms 缓冲时间）
+    setTimeout(() => {
+      isMoving.value = false; // 解锁
+    }, 320);
   }
 }
 
 async function scrambleWithAnimation() {
   if (isAutoOperating.value) return;
+  isGameStarted.value = false; // 打乱时重置开始状态
   stopTimer();
   currentTime.value = 0;
   history.value = [];
   isAutoOperating.value = true;
 
   const moves = ["R", "L", "U", "D", "F", "B", "R'", "L'", "U'", "D'", "F'", "B'"];
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 50; i++) {
     const randomMove = moves[Math.floor(Math.random() * moves.length)];
+    // 打乱逻辑通过 playMove 和 applyMove 直接执行，不走 executeMove 的锁定逻辑以保证速度
+    // 但为了 3D 表现，我们依然需要微小的等待
     if (cubeRef.value) {
       cubeRef.value.playMove(randomMove);
       applyMove(cubeState.value, randomMove);
-      await new Promise(r => setTimeout(r, 50));
+      await new Promise(r => setTimeout(r, 320)); // 等待 3D 动画完成
     }
   }
   isAutoOperating.value = false;
@@ -143,6 +192,8 @@ async function scrambleWithAnimation() {
 
 function resetAll() {
   stopTimer();
+  isGameStarted.value = false;
+  isMoving.value = false;
   currentTime.value = 0;
   history.value = [];
   cubeState.value = createCubeFromJson();
@@ -153,7 +204,9 @@ function resetAll() {
 }
 
 function handleKeydown(e) {
-  if (isAutoOperating.value) return;
+  // 正在自动打乱、未开始、或者 3D 动画正在执行时，拦截按键
+  if (isAutoOperating.value || !isGameStarted.value || isMoving.value) return;
+
   const key = e.key.toUpperCase();
   const shift = e.shiftKey;
   const validKeys = ['U', 'D', 'L', 'R', 'F', 'B'];
@@ -164,7 +217,6 @@ function handleKeydown(e) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown);
-  // 强制页面高度
   document.body.style.overflow = 'hidden';
 });
 
@@ -176,6 +228,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* 保持原有样式不变 */
 .cube-free-page {
   height: 100vh;
   width: 100vw;
@@ -184,10 +237,9 @@ onUnmounted(() => {
   background-color: #f8fafc;
   padding: 12px 60px;
   box-sizing: border-box;
-  overflow: hidden; /* 彻底禁止滚动 */
+  overflow: hidden;
 }
 
-/* 计时器样式优化 */
 .timer-badge-new {
   position: absolute;
   top: 120px;
@@ -208,7 +260,7 @@ onUnmounted(() => {
   margin-bottom: 5px;
 }
 .timer-label { font-size: 11px; letter-spacing: 1.5px; font-weight: 600; }
-.timer-num { font-size: 36px; font-family: 'JetBrains Mono', 'Courier New', monospace; font-weight: 700; color: #1e293b; }
+.timer-num { font-size: 36px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e293b; }
 
 .header-section { margin-top: 20px; }
 .mode-title { font-size: 32px; color: #1e293b; font-weight: 800; margin-bottom: 10px; }
@@ -216,13 +268,12 @@ onUnmounted(() => {
 .dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; }
 .dot.is-active { background: #10b981; box-shadow: 0 0 8px #10b981; }
 
-/* 魔方展示区：填满剩余空间 */
 .main-display-area {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 0; /* 修复 flex 子元素溢出问题 */
+  min-height: 0;
   transform: translateY(-20px);
 }
 
@@ -231,16 +282,12 @@ onUnmounted(() => {
   height: 58vh;
   max-width: 720px;
   max-height: 720px;
-
-  background: rgba(255, 255, 255, 0.4); /* 极淡的白色透明 */
-  backdrop-filter: blur(8px); /* 磨砂玻璃效果 */
-  -webkit-backdrop-filter: blur(8px);
-
-  border: 1px solid rgba(255, 255, 255, 0.6); /* 增加一丝边界感 */
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 40px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
   position: relative;
-  transition: all 0.3s ease;
 }
 
 .cube-info-overlay {
@@ -250,10 +297,8 @@ onUnmounted(() => {
   font-weight: 700;
   color: #1dc5b9;
   font-size: 24px;
-  letter-spacing: 1px;
 }
 
-/* 底部操作区 */
 .bottom-controls {
   padding: 100px 0;
   display: flex;
@@ -265,6 +310,13 @@ onUnmounted(() => {
 .action-buttons { display: flex; gap: 24px; }
 .ctrl-btn { padding: 25px 40px; font-size: 16px; border-radius: 15px; }
 
+/* 开始按钮特别样式 */
+.start-btn {
+  background: #10b981;
+  border-color: #10b981;
+  box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+}
+
 .sequence-display {
   width: 100%;
   max-width: 1200px;
@@ -275,7 +327,7 @@ onUnmounted(() => {
   align-items: center;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
-.seq-label { font-weight: 800; color: #94a3b8; margin-right: 25px; font-size: 12px; letter-spacing: 1px; }
+.seq-label { font-weight: 800; color: #94a3b8; margin-right: 25px; font-size: 12px; }
 .seq-items { display: flex; align-items: center; gap: 10px; min-height: 44px; }
 .seq-tag {
   background: #f1f5f9;
@@ -286,5 +338,4 @@ onUnmounted(() => {
   font-weight: 700;
 }
 .seq-empty { color: #cbd5e1; font-size: 14px; }
-
 </style>

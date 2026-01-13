@@ -61,7 +61,7 @@
             size="large"
             :icon="ArrowLeft"
             @click="prevStep"
-            :disabled="currentStep === 0"
+            :disabled="currentStep === 0 || is3DBusy"
           >
             上一步
           </el-button>
@@ -70,7 +70,7 @@
             size="large"
             :icon="ArrowRight"
             @click="nextStep"
-            :disabled="currentStep >= steps.length || !hasSolved"
+            :disabled="currentStep >= steps.length || !hasSolved || is3DBusy"
           >
             下一步
           </el-button>
@@ -120,22 +120,7 @@ const test3DStep = ref(0);
 const cubeState = ref(createCubeFromJson());
 const cube3dRef = ref(null);
 const solutionMoves = ref([]);
-const testMovesArray = ref([
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'"
-]);
-const test3DMovesArray = ref([
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'",
-  "R", "U", "R'", "U'"
-]);
+const is3DBusy = ref(false);
 
 // 请求后端
 async function fetchSolution() {
@@ -181,13 +166,19 @@ async function fetchSolution() {
 
 // 控制步骤
 function nextStep() {
-  if (!hasSolved.value) return;
+  if (!hasSolved.value || is3DBusy.value) return;
 
   if (currentStep.value < solutionMoves.value.length) {
     const move = solutionMoves.value[currentStep.value];
+    is3DBusy.value = true;                 // 魔方旋转式暂时锁定按钮
     applyMove(cubeState.value, move);      // 数据层更新 cubies
     cube3dRef.value.playMove(move);        // 播放 3D 动画
     currentStep.value++;
+
+    setTimeout(() => {
+      is3DBusy.value = false;
+    }, 350); // 动画时长 300ms，预留 50ms 缓冲
+
     // 自动滚动到底部步骤条
     nextTick(() => {
       const activeNode = document.querySelector('.step-node.is-active');
@@ -197,14 +188,18 @@ function nextStep() {
 }
 
 function prevStep() {
-  if (!hasSolved.value) return;
+  if (!hasSolved.value || is3DBusy.value) return;
 
   if (currentStep.value > 0) {
+    is3DBusy.value = true;
     currentStep.value--;
     const move = solutionMoves.value[currentStep.value];
     const reverseMove = invertMove(move);  // 反向 move
     applyMove(cubeState.value, reverseMove);
     cube3dRef.value.playMove(reverseMove); // 播放反向动画
+    setTimeout(() => {
+      is3DBusy.value = false;
+    }, 350); // 动画时长 300ms，预留 50ms 缓冲
   }
 }
 
