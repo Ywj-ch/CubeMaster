@@ -24,7 +24,7 @@
           :icon="RefreshLeft"
           round
         >
-          重置
+          重置魔方
         </el-button>
       </div>
     </div>

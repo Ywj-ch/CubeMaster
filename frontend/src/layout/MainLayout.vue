@@ -2,7 +2,9 @@
   <div class="layout-container">
     <header class="header">
       <div class="header-left">
-        <div class="logo-container">♦</div>
+        <div class="logo-container">
+          <img src="/icons/logo_icon.svg" alt="CubeMaster Logo" width="30" height="30" />
+        </div>
         <span class="site-name">CubeMaster</span>
       </div>
 
@@ -57,13 +59,13 @@
 .logo-container {
   width: 45px;
   height: 45px;
-  background: #4299E1;
+  background: #edf0f3;
   color: white;
   border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  overflow: hidden;
 }
 
 .site-name {

@@ -177,7 +177,7 @@ async function scrambleWithAnimation() {
   isAutoOperating.value = true;
 
   const moves = ["R", "L", "U", "D", "F", "B", "R'", "L'", "U'", "D'", "F'", "B'"];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 40; i++) {
     const randomMove = moves[Math.floor(Math.random() * moves.length)];
     // 打乱逻辑通过 playMove 和 applyMove 直接执行，不走 executeMove 的锁定逻辑以保证速度
     // 但为了 3D 表现，我们依然需要微小的等待
