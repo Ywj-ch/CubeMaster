@@ -144,9 +144,9 @@
       <div class="container">
         <el-row :gutter="60" justify="center">
           <el-col :xs="24" :md="16">
-            <h2 class="section-title text-center">常见问题</h2>
+            <h2 class="section-title">常见问题</h2>
 
-            <el-collapse v-model="activeNames" class="custom-collapse">
+            <el-collapse v-model="activeNames" class="custom-collapse" accordion>
               <el-collapse-item title="Q1: 识别魔方需要特殊的摄像头吗？" name="1">
                 <div>不需要。使用电脑自带的摄像头即可。为了获得最佳效果，建议在光线均匀的环境下拍摄，避免魔方表面产生强烈反光。</div>
               </el-collapse-item>
@@ -185,7 +185,7 @@ import {
 
 const router = useRouter();
 const loading = ref(false);
-const activeNames = ref();
+const activeNames = ref("1");
 
 // --- 优化后的 3D 魔方交互逻辑 ---
 const rotateX = ref(-25);
@@ -521,18 +521,35 @@ onUnmounted(() => {
 }
 
 /* --- FAQ / About --- */
-.section-faq { background: white; border-top: 1px solid #ffffff; }
-.custom-collapse { border-top: none; }
-:deep(.el-collapse-item__header) {
+.section-faq {
+  background: white;
+  border-top: 1px solid #f0f0f0;
+}
+.custom-collapse {
+  border-top: none;
+  border-bottom: none;
+}
+.custom-collapse :deep(.el-collapse-item__header) {
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #edf2f7;
+  padding: 10px 0;
+}
+.custom-collapse :deep(.el-collapse-item.is-active) .el-collapse-item__header {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #2d3748;
-  padding: 15px 0;
+  color: #428be8; /* 使用你项目中的魔方蓝色 */
+  padding-left: 15px; /* 为侧边条腾出空间 */
+  border-left: 4px solid #0051BA; /* 魔方主题色高亮条 */
+  background-color: #f8fbff; /* 淡淡的蓝色背景 */
 }
-:deep(.el-collapse-item__content) {
+.custom-collapse :deep(.el-collapse-item__content) {
   font-size: 0.95rem;
   color: #718096;
   line-height: 1.6;
+  padding: 20px 15px;
+  background-color: #f8fbff;
+  border-bottom: 1px solid #edf2f7;
 }
 
 .about-link-wrapper {
