@@ -3,59 +3,102 @@ import os
 import cv2
 import numpy as np
 
+# ================= 配置区 =================
 
-def save_base64_images(images_dict, output_dir='images'):
+# 前端面标识 -> 后端文件名
+FACE_TO_FILENAME = {
+    'U': 'white',    # 上
+    'R': 'red',      # 右
+    'F': 'green',    # 前
+    'D': 'yellow',   # 下
+    'L': 'orange',   # 左
+    'B': 'blue'      # 后
+}
+
+# 图像最大尺寸（等比缩放）
+MAX_IMAGE_SIZE = 640
+
+
+# ================= 工具函数 =================
+
+def _safe_base64_decode(base64_str: str) -> bytes | None:
     """
-    接收前端传来的图片字典，解码并保存为本地文件。
+    安全解码 base64 字符串，自动处理 data:image/... 头
+    """
+    try:
+        if ',' in base64_str:
+            base64_str = base64_str.split(',', 1)[1]
+        return base64.b64decode(base64_str, validate=True)
+    except Exception:
+        return None
+
+
+def _resize_keep_ratio(img: np.ndarray, max_size: int) -> np.ndarray:
+    """
+    等比缩放图片，使最长边不超过 max_size
+    """
+    h, w = img.shape[:2]
+    scale = max_size / max(h, w)
+
+    if scale >= 1.0:
+        return img  # 不需要放大
+
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+
+# ================= 主函数 =================
+
+def save_base64_images(images_dict: dict, output_dir: str = 'images') -> dict:
+    """
+    接收前端 Base64 图片并保存为本地文件
 
     Args:
-        images_dict (dict): { 'F': 'base64str...', 'B': '...' }
-        output_dir (str): 保存目录，默认为 'images'
+        images_dict: { 'U': 'base64...', 'F': 'base64...' }
+        output_dir: 保存目录
+
+    Returns:
+        dict: { 'U': True, 'F': False } 表示各面是否保存成功
     """
-    # 确保目录存在
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
+    print(f"📂 正在保存图片到 {output_dir} ...")
 
-    # 关键映射：前端发来的面(U/D...) -> 后端识别器需要的文件名(颜色.png)
-    # 依据是你在 cube_image_detection.py 里的定义：
-    # 'white': 'U', 'red': 'R', 'green': 'F', 'yellow': 'D', 'orange': 'L', 'blue': 'B'
-    # 所以我们需要反向映射，把 U 面存为 white.png，这样检测器才能工作
-    FACE_TO_FILENAME = {
-        'U': 'white',  # 上面 -> 存为 white.png
-        'R': 'red',  # 右面 -> 存为 red.png
-        'F': 'green',  # 前面 -> 存为 green.png
-        'D': 'yellow',  # 下面 -> 存为 yellow.png
-        'L': 'orange',  # 左面 -> 存为 orange.png
-        'B': 'blue'  # 后面 -> 存为 blue.png
-    }
-
-    print(f"📂 正在保存图片到 {output_dir}...")
+    save_results = {}
 
     for face_key, base64_str in images_dict.items():
         if face_key not in FACE_TO_FILENAME:
             continue
 
-        target_filename = f"{FACE_TO_FILENAME[face_key]}.png"
-        save_path = os.path.join(output_dir, target_filename)
+        filename = FACE_TO_FILENAME[face_key] + '.png'
+        save_path = os.path.join(output_dir, filename)
 
+        # ---------- Base64 解码 ----------
+        img_bytes = _safe_base64_decode(base64_str)
+        if img_bytes is None:
+            print(f"  ❌ Base64 解码失败: {face_key}")
+            save_results[face_key] = False
+            continue
+
+        # ---------- 转 OpenCV 图像 ----------
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        if img is None:
+            print(f"  ❌ 图像解析失败: {face_key}")
+            save_results[face_key] = False
+            continue
+
+        # ---------- 尺寸控制 ----------
+        img = _resize_keep_ratio(img, MAX_IMAGE_SIZE)
+
+        # ---------- 保存 ----------
         try:
-            # 1. 清理 Base64 头部 (data:image/jpeg;base64,...)
-            if ',' in base64_str:
-                base64_str = base64_str.split(',')[1]
-
-            # 2. 解码
-            img_bytes = base64.b64decode(base64_str)
-            nparr = np.frombuffer(img_bytes, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-            # 3. 保存文件
-            if img is not None:
-                # 可以在这里做 resize，保证图片不用太大
-                img = cv2.resize(img, (640, 640))
-                cv2.imwrite(save_path, img)
-                print(f"  ✅ 已保存: {face_key} -> {target_filename}")
-            else:
-                print(f"  ❌ 解码失败: {face_key}")
-
+            cv2.imwrite(save_path, img)
+            print(f"  ✅ 已保存: {face_key} -> {filename}")
+            save_results[face_key] = True
         except Exception as e:
-            print(f"  ❌ 保存出错 {face_key}: {str(e)}")
+            print(f"  ❌ 保存失败 {face_key}: {e}")
+            save_results[face_key] = False
+
+    return save_results

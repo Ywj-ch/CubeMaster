@@ -3,389 +3,218 @@ import os
 import json
 import re
 
+# =========================
+# 通用工具函数
+# =========================
+
+def normalize_color_list(raw_list):
+    """
+    将各种异常格式的颜色数据统一修复为颜色单词列表
+    返回形如: ['white', 'red', ...]
+    """
+    if not raw_list:
+        return []
+
+    valid_colors = ['white', 'yellow', 'red', 'orange', 'blue', 'green']
+
+    # 已经是正常的颜色单词列表
+    if isinstance(raw_list, list) and len(raw_list) == 9 and len(str(raw_list[0])) > 1:
+        return raw_list
+
+    # 被拆成字符列表 ['g','r','e','e','n', ...]
+    if isinstance(raw_list, list) and len(raw_list) > 9 and len(str(raw_list[0])) == 1:
+        combined = ''.join(raw_list)
+        return re.findall('|'.join(valid_colors), combined.lower())
+
+    # 长字符串 "greenredblue..."
+    if isinstance(raw_list, str):
+        return re.findall('|'.join(valid_colors), raw_list.lower())
+
+    return []
+
+
+def parse_solution_moves(raw_solution: str):
+    """统一解析 Kociemba 解法中的动作序列"""
+    raw_solution = re.sub(r"\(.*?\)", "", raw_solution).strip()
+    return re.findall(r"[UDLRFB][123']?", raw_solution)
+
+
+# =========================
+# 状态解析与转换
+# =========================
 
 def parse_cube_state_from_file(filename='cube_results/cube_state.json'):
-    """从 JSON 文件解析魔方状态
-
-    读取由 CubeDetector 生成的 JSON 文件，并将嵌套的 3x3 矩阵转换为
-    原函数要求的 9 元素扁平列表格式。
-
-    Args:
-        filename: 魔方状态 JSON 文件路径
-
-    Returns:
-        dict: 魔方状态字典，键为面标识(U/R/F/D/L/B)，值为该面9个色块的颜色列表
-
-    """
-    cube_state = {}
-
-    # 检查文件是否存在
+    """从 JSON 文件解析魔方状态"""
     if not os.path.exists(filename):
-        print(f"❌ 错误: 找不到文件 {filename}")
-        return cube_state
+        raise FileNotFoundError(f"找不到文件: {filename}")
 
-    try:
-        with open(filename, 'r', encoding='utf-8') as f:
-            # 直接将 JSON 解析为 Python 字典
-            raw_data = json.load(f)
+    with open(filename, 'r', encoding='utf-8') as f:
+        raw_data = json.load(f)
 
-        # 遍历 JSON 中的每一个面 (U, D, R, L, B, F)
-        for face, matrix in raw_data.items():
-            # 原函数返回格式要求是 9 个颜色的扁平列表 [color1, color2, ..., color9]
-            # 这里使用嵌套列表推导式将 3x3 矩阵拍平
-            flat_list = [color for row in matrix for color in row]
-            cube_state[face] = flat_list
-
-    except Exception as e:
-        print(f"❌ 解析 JSON 时出错: {e}")
+    cube_state = {}
+    for face, matrix in raw_data.items():
+        flat = [c for row in matrix for c in row]
+        cube_state[face] = flat
 
     return cube_state
 
 
 def convert_to_kociemba_format(cube_state):
-    """
-    将魔方状态转换为 Kociemba 字符串，并修复颜色单词被拆分成字母的问题
-    """
+    """将魔方状态转换为 Kociemba 54 字符串"""
     color_mapping = {
         'white': 'U', 'yellow': 'D', 'red': 'R',
         'orange': 'L', 'green': 'F', 'blue': 'B'
     }
-    kociemba_order = ['U', 'R', 'F', 'D', 'L', 'B']
-    res = ""
+    order = ['U', 'R', 'F', 'D', 'L', 'B']
+    result = ''
 
-    for face in kociemba_order:
+    for face in order:
         raw_list = cube_state.get(face, [])
+        colors = normalize_color_list(raw_list)
 
-        # --- 核心修复逻辑 ---
-        # 如果 raw_list 的第一个元素长度为 1 (比如 'o')，说明列表被拆散了
-        # 我们需要通过 join 把它们重新组合，再根据颜色关键词切分
-        if len(raw_list) > 0 and len(str(raw_list[0])) == 1:
-            combined = "".join(raw_list)
-            # 重新寻找颜色单词
-            fixed_list = []
-            possible_colors = ['white', 'yellow', 'red', 'orange', 'blue', 'green']
-
-            # 使用简单的滑动窗口提取单词
-            temp_str = combined
-            while temp_str:
-                found = False
-                for color in possible_colors:
-                    if temp_str.startswith(color):
-                        fixed_list.append(color)
-                        temp_str = temp_str[len(color):]
-                        found = True
-                        break
-                if not found:  # 无法匹配则跳过1位
-                    temp_str = temp_str[1:]
-            raw_list = fixed_list
-
-        # 现在 raw_list 应该是 ['orange', 'orange', ...]
-        if len(raw_list) < 9:
-            print(f"❌ 错误: {face} 面有效颜色不足9个 (当前: {len(raw_list)})")
-            res += "?" * 9
+        if len(colors) < 9:
+            print(f"❌ {face} 面颜色不足 9 个")
+            result += '?' * 9
             continue
 
-        # 取前9个有效颜色
-        for i in range(9):
-            color = str(raw_list[i]).strip().lower()
-            if color in color_mapping:
-                res += color_mapping[color]
-            else:
-                print(f"⚠️ 无法识别颜色: {color} (位于 {face} 面)")
-                res += "?"
+        for c in colors[:9]:
+            result += color_mapping.get(c, '?')
 
-    return res
+    return result
 
 
 def validate_kociemba_state(kociemba_string):
-    """验证Kociemba状态字符串的有效性
-
-    检查字符串长度是否为54，并验证每个面的中心块是否正确。
-
-    Args:
-        kociemba_string: Kociemba格式的状态字符串
-
-    Returns:
-        tuple: (是否有效, 验证消息)
-    """
-    # 检查字符串长度
+    """验证 Kociemba 状态合法性"""
     if len(kociemba_string) != 54:
-        return False, f"长度错误: 需要54个字符，实际得到{len(kociemba_string)}个"
+        return False, f"长度错误: {len(kociemba_string)} / 54"
 
-    # 检查每个面的中心块（标准位置）
     centers = {
-        'U': kociemba_string[4],  # U面中心位置（索引4）
-        'R': kociemba_string[13],  # R面中心位置（索引13）
-        'F': kociemba_string[22],  # F面中心位置（索引22）
-        'D': kociemba_string[31],  # D面中心位置（索引31）
-        'L': kociemba_string[40],  # L面中心位置（索引40）
-        'B': kociemba_string[49]  # B面中心位置（索引49）
+        'U': kociemba_string[4],
+        'R': kociemba_string[13],
+        'F': kociemba_string[22],
+        'D': kociemba_string[31],
+        'L': kociemba_string[40],
+        'B': kociemba_string[49]
     }
 
-    # 预期的中心块字母
-    expected_centers = {'U': 'U', 'R': 'R', 'F': 'F', 'D': 'D', 'L': 'L', 'B': 'B'}
+    for face, val in centers.items():
+        if face != val:
+            return False, f"{face} 面中心错误，应为 {face}，检测为 {val}"
 
-    # 验证每个中心块
-    for face, actual in centers.items():
-        if actual != expected_centers[face]:
-            return False, f"面{face}的中心应该是{expected_centers[face]}，但检测到{actual}"
-
-    return True, "状态有效"
+    return True, '状态有效'
 
 
-def convert_to_readable(kociemba_solution):
-    """将Kociemba解法转换为人类可读的中文步骤
+# =========================
+# 解法解析与保存
+# =========================
 
-    自动忽略(19f)等统计信息，将符号表示转换为中文描述。
+def convert_to_readable(raw_solution):
+    moves = parse_solution_moves(raw_solution)
 
-    Args:
-        kociemba_solution: Kociemba求解器返回的原始解法字符串
-
-    Returns:
-        list: 人类可读的中文解法步骤列表
-    """
-    # 提取合法的魔方步骤（匹配U, D, L, R, F, B及可能的数字或'后缀）
-    moves = re.findall(r"[UDLRFB][123']?", kociemba_solution)
-
-    # 面标识到中文的映射
     face_map = {
         'U': '上', 'D': '下', 'F': '前',
         'B': '后', 'L': '左', 'R': '右'
     }
 
-    # 方向后缀到中文描述的映射
     direction_map = {
-        '1': '顺时针90°',  # 默认方向，通常省略
-        '2': '旋转180°',  # 180度旋转
-        '3': '逆时针90°',  # 逆时针旋转
-        "'": '逆时针90°'  # 另一种逆时针表示
+        '1': '顺时针90°',
+        '2': '旋转180°',
+        '3': '逆时针90°',
+        "'": '逆时针90°'
     }
 
-    readable_steps = []
-
-    for move in moves:
-        face = move[0]  # 面标识
-        direction = move[1] if len(move) > 1 else '1'  # 旋转方向（默认为1）
-
-        face_cn = face_map[face]
-        direction_cn = direction_map[direction]
-
-        # 特殊处理180度旋转
-        if direction == '2':
-            readable_steps.append(f"{face_cn}面旋转180°")
+    readable = []
+    for m in moves:
+        face = m[0]
+        suffix = m[1] if len(m) > 1 else '1'
+        if suffix == '2':
+            readable.append(f"{face_map[face]}面旋转180°")
         else:
-            readable_steps.append(f"{face_cn}面{direction_cn}")
+            readable.append(f"{face_map[face]}面{direction_map[suffix]}")
 
-    return readable_steps
+    return readable
 
 
-def parse_raw_solution(raw_solution: str):
-    """将原始解法字符串解析为标准化步骤列表
+def parse_raw_solution(raw_solution):
+    moves = parse_solution_moves(raw_solution)
+    result = []
 
-    将如"F3 D3 L3 ... (19f)"转换为['F'', 'D'', 'L'', 'U', ...]格式，
-    便于前端或其他程序处理。
+    for m in moves:
+        face = m[0]
+        suffix = m[1:] if len(m) > 1 else '1'
+        if suffix == '1':
+            result.append(face)
+        elif suffix == '2':
+            result.append(face + '2')
+        elif suffix in ('3', "'"):
+            result.append(face + "'")
 
-    Args:
-        raw_solution: Kociemba求解器返回的原始解法字符串
-
-    Returns:
-        list: 标准化步骤列表
-    """
-    # 移除(19f)等统计信息
-    raw_solution = re.sub(r"\(.*?\)", "", raw_solution).strip()
-
-    moves = []
-    tokens = raw_solution.split()
-
-    for t in tokens:
-        face = t[0]  # 面标识
-        suffix = t[1:] if len(t) > 1 else "1"  # 旋转方向后缀
-
-        # 转换为标准表示法
-        if suffix == "1":
-            moves.append(face)  # 顺时针90°
-        elif suffix == "2":
-            moves.append(face + "2")  # 180°
-        elif suffix == "3":
-            moves.append(face + "'")  # 逆时针90°
-
-    return moves
+    return result
 
 
 def save_solution_results(solution, kociemba_code, output_dir='cube_results'):
-    """保存求解结果到JSON文件
-
-    将原始解法、标准化步骤和可读步骤保存为结构化JSON。
-
-    Args:
-        solution: 原始解法字符串
-        kociemba_code: Kociemba格式的状态字符串
-        output_dir: 输出目录
-
-    Returns:
-        tuple: (可读步骤列表, 标准化步骤列表)
-    """
     os.makedirs(output_dir, exist_ok=True)
 
-    # 转换格式
-    readable_solution = convert_to_readable(solution)
+    readable = convert_to_readable(solution)
     moves = parse_raw_solution(solution)
 
-    # 保存到JSON文件
-    json_file = os.path.join(output_dir, 'solution.json')
-    with open(json_file, 'w', encoding='utf-8') as f:
+    path = os.path.join(output_dir, 'solution.json')
+    with open(path, 'w', encoding='utf-8') as f:
         json.dump({
-            'kociemba_code': kociemba_code,  # 魔方状态编码
-            'raw_solution': solution,  # 原始解法字符串
-            'moves': moves,  # 标准化步骤列表
-            'readable_solution': readable_solution,  # 中文可读步骤
-            'step_count': len(moves)  # 总步数
-        }, f, indent=2, ensure_ascii=False)
+            'kociemba_code': kociemba_code,
+            'raw_solution': solution,
+            'moves': moves,
+            'readable_solution': readable,
+            'step_count': len(moves)
+        }, f, ensure_ascii=False, indent=2)
 
-    print(f"✅ JSON格式已保存: {json_file}")
+    return readable, moves
 
-    return readable_solution, moves
 
+# =========================
+# 求解主流程（供 API 调用）
+# =========================
 
 def solve_cube_pipeline():
-    """魔方求解完整流程（前端调用接口函数）
-
-    从文件解析魔方状态，转换为Kociemba格式，验证并求解。
-
-    Returns:
-        dict: 包含求解结果的完整信息字典
-
-    Raises:
-        RuntimeError: 当魔方状态无效时抛出
-    """
-    # 1. 从文件解析魔方状态
     cube_state = parse_cube_state_from_file('cube_results/cube_state.json')
-
-    # 2. 转换为Kociemba格式
     kociemba_code = convert_to_kociemba_format(cube_state)
 
-    # 3. 验证状态有效性
-    is_valid, msg = validate_kociemba_state(kociemba_code)
-    if not is_valid:
+    valid, msg = validate_kociemba_state(kociemba_code)
+    if not valid:
         raise RuntimeError(msg)
 
-    # 4. 调用Kociemba求解器（最大深度20，超时2秒）
-    solution = sv.solve(kociemba_code, 20, 2)
-    solution = solution.replace("\n", "").strip()
+    solution = sv.solve(kociemba_code, 20, 2).replace('\n', '').strip()
+    readable, moves = save_solution_results(solution, kociemba_code)
 
-    # 5. 保存求解结果
-    readable_solution, moves = save_solution_results(solution, kociemba_code)
-
-    # 6. 返回完整结果
     return {
-        "kociemba_code": kociemba_code,
-        "raw_solution": solution,
-        "moves": moves,
-        "readable_solution": readable_solution,
-        "step_count": len(moves)
+        'kociemba_code': kociemba_code,
+        'raw_solution': solution,
+        'moves': moves,
+        'readable_solution': readable,
+        'step_count': len(moves)
     }
 
 
+# =========================
+# CLI 调试入口（可选）
+# =========================
+
 def main():
-    """主函数：执行魔方求解完整流程
-
-    流程步骤：
-    1. 解析魔方状态文件
-    2. 转换为Kociemba格式
-    3. 验证状态有效性
-    4. 显示求解命令（备用）
-    5. 调用求解管道
-    """
     try:
-        # 1. 从文件解析魔方状态
-        print("📖 正在解析cube_state.json文件...")
         cube_state = parse_cube_state_from_file('cube_results/cube_state.json')
-
-        # 2. 显示解析结果
-        print("\n🔍 解析到的魔方状态 (校验中...):")
-
-        # 定义合法的颜色单词
-        valid_color_names = ['white', 'yellow', 'red', 'orange', 'blue', 'green']
-
-        for face, colors in cube_state.items():
-            # --- 步骤 1: 格式预处理 ---
-            processed_colors = []
-
-            if isinstance(colors, str):
-                # 如果是长字符串 "greenred..."
-                processed_colors = re.findall("|".join(valid_color_names), colors.lower())
-            elif isinstance(colors, list):
-                # 检查是否是字母列表 ['g','r','e','e','n', ...]
-                # 判断标准：列表很长且第一个元素长度为1
-                if len(colors) > 9 and len(str(colors[0])) == 1:
-                    combined = "".join(colors)
-                    processed_colors = re.findall("|".join(valid_color_names), combined.lower())
-                else:
-                    # 已经是单词列表 ['green', 'red', ...]
-                    processed_colors = colors
-
-            # --- 步骤 2: 格式化打印 ---
-            count = len(processed_colors)
-            if count == 9:
-                # 只有数量正好为 9 时，才认为是成功的单词列表格式
-                color_str = ", ".join(processed_colors)
-                print(f"  ✅ {face}面 [9个单词]: {color_str}")
-            else:
-                # 否则输出原始数据摘要，提示异常
-                raw_preview = str(colors)[:50] + "..." if len(str(colors)) > 50 else str(colors)
-                print(f"  ❌ {face}面 格式异常! 识别到 {count} 个有效颜色单词")
-                print(f"     原始数据预览: {raw_preview}")
-
-        print("-" * 30)
-
-        # 3. 转换为Kociemba格式
-        print("\n🔄 正在转换为kociemba格式...")
-        kociemba_string = convert_to_kociemba_format(cube_state)
-        print(f"✅ kociemba编码: {kociemba_string}")
-
-        # 4. 验证状态有效性
-        print("\n🔍 验证状态有效性...")
-        is_valid, message = validate_kociemba_state(kociemba_string)
-        if is_valid:
-            print(f"✅ {message}")
-        else:
-            print(f"❌ {message}")
-
-        # 5. 保存Kociemba编码到文件
-        output_filename = 'cube_results/kociemba_state.txt'
-        with open(output_filename, 'w', encoding='utf-8') as f:
-            f.write(kociemba_string)
-        print(f"\n💾 kociemba编码已保存到: {output_filename}")
-
-        # 6. 显示求解命令（供手动调试使用）
-        print(f"\n🎯 求解命令:")
-        print(f"python -c \"import two_phase.solver as sv; print(sv.solve('{kociemba_string}', 20, 2))\"")
-
-        return kociemba_string
-
-    except FileNotFoundError:
-        print("❌ 错误: 找不到cube_state.json文件")
-        return None
+        code = convert_to_kociemba_format(cube_state)
+        print('Kociemba 编码:', code)
+        valid, msg = validate_kociemba_state(code)
+        print('校验结果:', msg)
+        return code
     except Exception as e:
-        print(f"❌ 错误: {e}")
+        print('❌', e)
         return None
 
 
-if __name__ == "__main__":
-    """程序入口点"""
-    # 1. 执行主函数获取Kociemba编码
-    kociemba_code = main()
-
-    if kociemba_code:
-        try:
-            # 2. 执行求解管道
-            print("\n🎯 开始求解...")
-            result = solve_cube_pipeline()
-
-            # 3. 显示求解结果
-            print("\n🎉 求解成功")
-            for i, step in enumerate(result["readable_solution"], 1):
-                print(f"步骤{i}: {step}")
-
-        except Exception as e:
-            print(f"\n❌ 求解失败: {e}")
+if __name__ == '__main__':
+    code = main()
+    if code:
+        result = solve_cube_pipeline()
+        for i, step in enumerate(result['readable_solution'], 1):
+            print(f"步骤{i}: {step}")
