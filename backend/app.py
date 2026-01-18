@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 from convert_cube_state import solve_cube_pipeline
+from cube_image_detection import CubeDetector
+from image_utils import save_base64_images
 import os
 import json
 
@@ -117,3 +119,67 @@ def get_cube_state():
             "error": str(e)
         }
 
+
+@app.post("/api/recognize")
+def recognize_cube_images(payload: dict = Body(...)):
+    """
+    接收图片并识别，直接返回识别结果，不写入 cube_state.json
+    """
+    try:
+        images_data = payload.get("images", {})
+        if not images_data:
+            return {"success": False, "error": "未接收到图片数据"}
+
+        # 保存 Base64 图片到本地 images/ 文件夹
+        save_base64_images(images_data, output_dir='images')
+
+        # 实例化识别器
+        detector = CubeDetector()
+
+        # 调用批量识别 (此函数返回识别结果字典)
+        cube_state = detector.detect_all_faces()
+
+        # 即使只识别了部分面，也将结果返回给前端，方便用户查看哪一面出错了
+        if len(cube_state) == 6:
+            return {
+                "success": True,
+                "data": cube_state  # 此时前端拿到这个数据用于渲染 2D 预览图
+            }
+        else:
+            return {
+                "success": False,
+                "data": cube_state,
+                "error": f"识别不完整 ({len(cube_state)}/6)，请在预览图中修正或重新拍摄"
+            }
+
+    except Exception as e:
+        print(f"识别接口报错: {e}")
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/save_state")
+def save_cube_state(payload: dict = Body(...)):
+    """
+    接收前端用户确认/修改后的魔方状态，并正式保存为 .json 文件
+    payload 格式应为: { "U": [[...], [...], [...]], "R": ... }
+    """
+    try:
+        # 这里的 payload 就是用户在前端 2D 面板调整好的最终状态
+        if not payload:
+            return {"success": False, "error": "接收到的状态数据为空"}
+
+        detector = CubeDetector()
+
+        # 此时才执行写入硬盘的操作
+        detector.save_cube_state_json(payload)
+
+        # 如果你还需要保留 .txt 的逻辑，可以同时调用
+        # detector.save_cube_state(payload)
+
+        return {
+            "success": True,
+            "message": "魔方状态已正式保存，现在可以开始求解"
+        }
+    except Exception as e:
+        print(f"保存状态报错: {e}")
+        return {"success": False, "error": str(e)}

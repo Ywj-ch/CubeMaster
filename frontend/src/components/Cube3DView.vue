@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="cube-3d-container"></div>
+  <div ref="container" class="cube-3d-container" :class="{ 'is-disabled': props.disabled }"></div>
 </template>
 
 <script setup>
@@ -11,12 +11,13 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 // 1. 配置与常量
 // =========================================================
 const props = defineProps({
-  cubeState: { type: Object, required: true }
+  cubeState: { type: Object, required: true },
+  disabled: { type: Boolean, default: false }
 });
 const emit = defineEmits(['move']);
 
 const DRAG_THRESHOLD = 35; // 拖拽触发阈值（像素）
-const ANIMATION_DURATION = 300; // 旋转动画时长（毫秒）
+const ANIMATION_DURATION = 500; // 旋转动画时长（毫秒）
 const CUBIE_SIZE = 0.95; // 小块尺寸
 
 const COLOR_MAP = {
@@ -210,7 +211,7 @@ function playMove(move) {
 // =========================================================
 
 function onMouseDown(event) {
-  if (isAnimating) return;
+  if (isAnimating || props.disabled) return;
   const rect = container.value.getBoundingClientRect();
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -373,5 +374,8 @@ defineExpose({ playMove, resetView: () => controls?.reset(), renderCubies });
 }
 .cube-3d-container:active {
   cursor: grabbing;
+}
+.cube-3d-container.is-disabled {
+  cursor: default; /* 取消抓取手势 */
 }
 </style>

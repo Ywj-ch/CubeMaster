@@ -7,6 +7,15 @@
       </div>
       <div class="header-actions">
         <el-button
+          type="success"
+          size="large"
+          @click="openScanner"
+          :icon="Camera"
+          round
+        >
+          扫描识别
+        </el-button>
+        <el-button
           type="primary"
           size="large"
           @click="fetchSolution"
@@ -31,25 +40,52 @@
 
     <div class="solver-main-content">
       <div class="view-3d-box">
-        <Cube3DView ref="cube3dRef" :cubeState="cubeState" />
+        <Cube3DView ref="cube3dRef" :cubeState="cubeState" :disabled="hasSolved"/>
         <div class="step-counter" v-if="steps.length">
           <span class="curr">{{ currentStep }}</span>
           <span class="total">/ {{ steps.length }}</span>
         </div>
       </div>
 
-      <div class="view-2d-box">
-        <div class="box-label">2D 状态映射</div>
-        <div class="mini-net">
-          <div class="net-row"><Face2DView :face="cubeState.faces.U" /></div>
-          <div class="net-row mid">
-            <Face2DView :face="cubeState.faces.L" />
-            <Face2DView :face="cubeState.faces.F" />
-            <Face2DView :face="cubeState.faces.R" />
-            <Face2DView :face="cubeState.faces.B" />
+      <div class="view-2d-box" :class="{ 'is-solved-locked': hasSolved }">
+        <div class="box-label">2D 状态校准</div>
+
+        <div class="vertical-net">
+          <div class="face-group">
+            <div class="face-wrapper">
+              <span class="face-id">U (顶面)</span>
+              <Face2DView :face="cubeState.faces.U" @cell-click="idx => toggleColor('U', idx)" />
+            </div>
           </div>
-          <div class="net-row"><Face2DView :face="cubeState.faces.D" /></div>
+
+          <div class="face-grid">
+            <div class="face-wrapper">
+              <span class="face-id">L (左)</span>
+              <Face2DView :face="cubeState.faces.L" @cell-click="idx => toggleColor('L', idx)" />
+            </div>
+            <div class="face-wrapper">
+              <span class="face-id">F (前)</span>
+              <Face2DView :face="cubeState.faces.F" @cell-click="idx => toggleColor('F', idx)" />
+            </div>
+            <div class="face-wrapper">
+              <span class="face-id">R (右)</span>
+              <Face2DView :face="cubeState.faces.R" @cell-click="idx => toggleColor('R', idx)" />
+            </div>
+            <div class="face-wrapper">
+              <span class="face-id">B (后)</span>
+              <Face2DView :face="cubeState.faces.B" @cell-click="idx => toggleColor('B', idx)" />
+            </div>
+          </div>
+
+          <div class="face-group">
+            <div class="face-wrapper">
+              <span class="face-id">D (底面)</span>
+              <Face2DView :face="cubeState.faces.D" @cell-click="idx => toggleColor('D', idx)" />
+            </div>
+          </div>
         </div>
+
+        <p class="hint-text"><el-icon><InfoFilled /></el-icon> 点击方块修正识别错误</p>
       </div>
     </div>
 
@@ -97,18 +133,29 @@
       </div>
     </div>
   </div>
+
+  <div class="container">
+    <CubeScanner
+      :visible="isScannerVisible"
+      @close="isScannerVisible = false"
+      @scanned="handleScannedResult"
+    />
+  </div>
 </template>
 
 <script setup>
 import { ref, nextTick } from "vue";
-import {getCubeState, solveCube} from "../api/cube";
+import {solveCube} from "../api/cube";
 import { createCubeFromJson } from "../utils/cubeState";
 import {applyMove, invertMove} from "../utils/cubeMoves";
 import Face2DView from "../components/Face2DView.vue";
 import Cube3DView from "../components/Cube3DView.vue";
+import CubeScanner from '../components/CubeScanner.vue';
 import {
-  Search, RefreshLeft, ArrowLeft, ArrowRight
+  Camera, Search, RefreshLeft, ArrowLeft, ArrowRight, InfoFilled
 } from "@element-plus/icons-vue";
+import axios from "axios";
+import { ElMessage } from 'element-plus';
 
 // 状态
 const loading = ref(false);
@@ -121,44 +168,101 @@ const cubeState = ref(createCubeFromJson());
 const cube3dRef = ref(null);
 const solutionMoves = ref([]);
 const is3DBusy = ref(false);
+const isScannerVisible = ref(false);
+const COLOR_ORDER = ['white', 'yellow', 'red', 'orange', 'blue', 'green'];
+
+
+// 打开扫描器的方法
+const openScanner = () => {
+  isScannerVisible.value = true;
+};
+
+// 处理扫描结果
+const handleScannedResult = (result) => {
+  isScannerVisible.value = false;
+
+  // 这里确保转换后的数据格式正确
+  const newCube = createCubeFromJson(result);
+  cubeState.value.cubies = newCube.cubies;
+  cubeState.value.faces = newCube.faces;
+
+  ElMessage.success('扫描成功，请点击 2D 图纠正可能的识别错误');
+};
+
+/**
+ * 颜色切换逻辑
+ * @param faceKey 面标识 (U, R, F...)
+ * @param index 扁平索引 (0-8)
+ */
+const toggleColor = (faceKey, index) => {
+  if (hasSolved.value) {
+    ElMessage.info("请先完成当前解法或重置魔方后再修改状态");
+    return;
+  }
+  // 1. 获取该面的数据引用
+  const faceData = cubeState.value.faces[faceKey];
+  if (!faceData) return;
+
+  // 2. 确定当前颜色（处理 1D 或 2D 数组的兼容性）
+  let currentColor;
+  let row, col;
+
+  if (Array.isArray(faceData[0])) {
+    // 情况 A: 数据是 3x3 嵌套数组
+    row = Math.floor(index / 3);
+    col = index % 3;
+    currentColor = faceData[row][col];
+  } else {
+    // 情况 B: 数据是 1x9 扁平数组
+    currentColor = faceData[index];
+  }
+
+  // 3. 计算下一个颜色
+  const nextIdx = (COLOR_ORDER.indexOf(currentColor) + 1) % COLOR_ORDER.length;
+  const nextColor = COLOR_ORDER[nextIdx];
+
+  // 4. 执行更新
+  if (Array.isArray(faceData[0])) {
+    faceData[row][col] = nextColor;
+  } else {
+    faceData[index] = nextColor;
+  }
+
+  // 5. 【核心】同步更新 3D 模型
+  // 这里的 createCubeFromJson 必须能接收当前的 faces 结构并返回新的 cubies
+  const updatedCube = createCubeFromJson(cubeState.value.faces);
+  cubeState.value.cubies = updatedCube.cubies;
+
+  // 状态改变，提示需要重新求解
+  hasSolved.value = false;
+};
 
 // 请求后端
 async function fetchSolution() {
   loading.value = true;
   try {
-    const stateRes = await getCubeState();
-    if (stateRes.data.success) {
-      const newCube = createCubeFromJson(stateRes.data.data);
-      cubeState.value.cubies = newCube.cubies;
-      cubeState.value.faces = newCube.faces;
-    } else {
-      alert("获取魔方状态失败");
-      return;
-    }
+    // A. 将前端当前“校准后”的状态发给后端保存
+    await axios.post('http://localhost:8000/api/save_state', cubeState.value.faces);
 
+    // B. 调用原来的求解接口（后端此时读取的是刚存好的最新 json）
     const res = await solveCube();
     const data = res.data.data;
 
-    // 对后端返回的数据再次进行校验
     if (data?.raw_solution && data.raw_solution.startsWith("Error")) {
-      alert(
-        "魔方状态不合法：可能有某个面拍摄时方向旋转了 90° 或 180°。\n" +
-        "请按照拍摄顺序重新拍摄，或在 2D 展开图中手动修正。"
-      )
+      ElMessage.error("颜色布局不合法，请检查是否有重复颜色或方向错误");
       hasSolved.value = false;
       return;
     }
 
-    // 校验通过后才开始赋值
     steps.value = data.readable_solution;
     solutionMoves.value = data.moves;
     currentStep.value = 0;
     hasSolved.value = true;
+    ElMessage.success('求解成功！');
 
   } catch (e) {
     console.error(e);
-    alert("请求失败，请检查后端");
-    hasSolved.value = false;
+    ElMessage.error("请求失败，请检查网络");
   } finally {
     loading.value = false;
   }
@@ -279,28 +383,75 @@ function resetCube() {
 .curr { font-size: 20px; font-weight: 800; color: #3b82f6; }
 .total { color: #94a3b8; font-size: 14px; margin-left: 4px; }
 
-/* 2D 状态概览 */
+/* 优化后的 2D 容器 */
 .view-2d-box {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(12px);
-  border-radius: 28px;
+  flex: 1.2; /* 稍微增加占比以适应垂直布局 */
+  background: white;
+  border-radius: 24px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* 如果内容过多允许内部滚动 */
 }
-.box-label {
-  font-size: 15px;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 30px;
+
+/* 垂直容器 */
+.vertical-net {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+}
+
+/* 2x2 网格处理中间四个面，防止横向溢出 */
+.face-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.face-wrapper {
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+/* 移除那个“蓝色的框”，保持统一的灰色边框，仅在 hover 时反馈 */
+.face-wrapper:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.face-id {
+  font-size: 11px;
   font-weight: 700;
+  color: #64748b;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
-.mini-net { transform: scale(0.8); transform-origin: top center; }
+
+.hint-text {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 当已经有解法时，2D区域的样式 */
+.is-solved-locked {
+  cursor: not-allowed;
+  position: relative;
+}
 
 /* 4. 底部操作区：修复挡住问题 */
 .solver-footer {
