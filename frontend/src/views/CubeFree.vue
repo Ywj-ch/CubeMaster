@@ -23,9 +23,6 @@
           :cubeState="cubeState"
           :disabled="!isGameStarted || isAutoOperating || isMoving"
         />
-        <div class="cube-info-overlay">
-          <span>MOVE COUNT: {{ history.length }}</span>
-        </div>
       </div>
     </div>
 
@@ -288,15 +285,6 @@ onUnmounted(() => {
   border-radius: 40px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
   position: relative;
-}
-
-.cube-info-overlay {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  font-weight: 700;
-  color: #1dc5b9;
-  font-size: 24px;
 }
 
 .bottom-controls {

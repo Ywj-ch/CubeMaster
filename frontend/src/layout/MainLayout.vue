@@ -142,7 +142,7 @@ onUnmounted(() => {
 }
 
 .nav-item:hover {
-  color: #0071e3; /* Apple 官方蓝色 */
+  color: #0071e3;
 }
 
 /* 激活状态：使用极简的微点或短横线 */
@@ -165,7 +165,7 @@ onUnmounted(() => {
 /* 5. 主内容与页脚 */
 .main-content {
   flex: 1;
-  margin-top: 0; /* 配合 padding-top 使用 */
+  margin-top: 0;
   padding-top: 64px;
   background: #ffffff;
 }
@@ -175,7 +175,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f5f5f7; /* Apple 浅灰背景 */
+  background: #f5f5f7;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   color: #86868b;
   font-size: 14px;

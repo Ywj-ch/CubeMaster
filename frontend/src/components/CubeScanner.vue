@@ -67,7 +67,7 @@
 import { ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { Close, Aim } from '@element-plus/icons-vue';
 import { ElMessage, ElLoading } from 'element-plus';
-import axios from 'axios';
+import { recognizeCube } from '../api/cube';
 
 const props = defineProps({ visible: Boolean });
 const emit = defineEmits(['close', 'scanned']);
@@ -186,10 +186,7 @@ const finishScanning = async () => {
     };
 
     // 2. 发送请求给 FastAPI 后端
-    const response = await axios.post('http://localhost:8000/api/recognize', payload, {
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 5000
-    });
+    const response = await recognizeCube(payload);
 
     if (response.data.success) {
       ElMessage.success('识别成功！');

@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from cube_service import solve_cube
 from cube_service import save_cube_state
 from cube_service import recognize_cube
-from cube_service import get_saved_cube_state
 
 # 创建FastAPI应用实例
 app = FastAPI(
@@ -22,6 +21,7 @@ app.add_middleware(
 )
 
 
+# 调用求解魔方接口，并返回求解步骤
 @app.post("/api/solve")
 def solve():
     try:
@@ -30,17 +30,7 @@ def solve():
         return {"success": False, "error": str(e)}
 
 
-@app.get("/api/cube_state")
-def get_cube_state():
-    try:
-        return {
-            "success": True,
-            "data": get_saved_cube_state()
-        }
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-
+# 接收魔方图片数据，识别魔方状态并返回
 @app.post("/api/recognize")
 def recognize_cube_images(payload: dict = Body(...)):
     try:
@@ -59,6 +49,7 @@ def recognize_cube_images(payload: dict = Body(...)):
         return {"success": False, "error": str(e)}
 
 
+# 保存魔方状态到服务器.json文件
 @app.post("/api/save_state")
 def save_state(payload: dict = Body(...)):
     try:

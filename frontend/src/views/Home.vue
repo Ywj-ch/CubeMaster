@@ -178,7 +178,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter, RouterLink} from 'vue-router';
-// Icon 引入
 import {
   Camera, Pointer, ArrowRight, Reading, DataLine, Trophy, Timer, Collection, Unlock, DArrowRight
 } from '@element-plus/icons-vue';

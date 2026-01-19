@@ -145,7 +145,7 @@
 
 <script setup>
 import { ref, nextTick } from "vue";
-import {solveCube} from "../api/cube";
+import {solveCube, saveCubeState} from "../api/cube";
 import { createCubeFromJson } from "../utils/cubeState";
 import {applyMove, invertMove} from "../utils/cubeMoves";
 import Face2DView from "../components/Face2DView.vue";
@@ -154,7 +154,6 @@ import CubeScanner from '../components/CubeScanner.vue';
 import {
   Camera, Search, RefreshLeft, ArrowLeft, ArrowRight, InfoFilled
 } from "@element-plus/icons-vue";
-import axios from "axios";
 import { ElMessage } from 'element-plus';
 
 // 状态
@@ -242,9 +241,9 @@ async function fetchSolution() {
   loading.value = true;
   try {
     // A. 将前端当前“校准后”的状态发给后端保存
-    await axios.post('http://localhost:8000/api/save_state', cubeState.value.faces);
+    await saveCubeState(cubeState.value.faces);
 
-    // B. 调用原来的求解接口（后端此时读取的是刚存好的最新 json）
+    // B. 调用原来求解接口（后端此时读取的是刚存好的最新 json）
     const res = await solveCube();
     const data = res.data.data;
 
