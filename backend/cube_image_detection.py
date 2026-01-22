@@ -1,277 +1,179 @@
-import cv2 as cv
+import cv2
 import numpy as np
 import os
 import json
-from pyciede2000 import ciede2000
+from ultralytics import YOLO
 
 
 class CubeDetector:
     """
-    魔方颜色识别器
-    基于：轮廓检测 + 主色提取 + CIEDE2000 色差匹配
+    魔方颜色识别器 (YOLOv8 智能填充版)
     """
-
-    # ================= 初始化 =================
 
     def __init__(self):
         # ---------- 目录 ----------
-        self.results_dir = "cube_results"
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.results_dir = os.path.join(base_dir, "cube_results")
         self.debug_dir = os.path.join(self.results_dir, "debug_steps")
+        self.models_dir = os.path.join(base_dir, "models")
+
         os.makedirs(self.results_dir, exist_ok=True)
         os.makedirs(self.debug_dir, exist_ok=True)
 
-        # ---------- 颜色与面映射 ----------
-        self.color_names = ["white", "yellow", "red", "orange", "blue", "green"]
+        # ---------- 加载 YOLO 模型 ----------
+        model_path = os.path.join(self.models_dir, "best.pt")
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"❌ 关键缺失：请将训练好的 best.pt 放入 {self.models_dir}")
 
-        self.center_to_face = {
-            "white": "U",
-            "red": "R",
-            "green": "F",
-            "yellow": "D",
-            "orange": "L",
-            "blue": "B",
+        print(f"🚀 加载 YOLO 模型: {model_path}")
+        self.model = YOLO(model_path)
+
+        # ---------- 类别映射 ----------
+        self.id_to_color = {
+            0: 'blue', 1: 'green', 2: 'orange',
+            3: 'red', 4: 'white', 5: 'yellow'
         }
 
-        # ---------- BGR 参考色（可微调） ----------
-        self.bgr_refs = {
-            "red": (0, 0, 200),
-            "orange": (0, 100, 255),
-            "blue": (200, 0, 0),
-            "green": (0, 200, 0),
-            "white": (220, 220, 220),
-            "yellow": (0, 220, 220),
+        # ---------- 文件名映射 ----------
+        self.filename_to_face = {
+            "white": "U", "red": "R", "green": "F",
+            "yellow": "D", "orange": "L", "blue": "B",
         }
-
-        # ---------- 预计算 Lab 参考色 ----------
-        self.lab_refs = {
-            name: self.convert_bgr_to_lab(np.array(bgr))
-            for name, bgr in self.bgr_refs.items()
-        }
-
-        # ================= 可调参数区 =================
-        self.CANNY_LOW = 20
-        self.CANNY_HIGH = 80
-
-        self.DILATE_KERNEL = 9
-
-        self.MIN_AREA_RATIO = 0.005
-        self.MAX_AREA_RATIO = 0.15
-
-        self.SQUARE_RATIO_MIN = 0.7
-        self.SQUARE_RATIO_MAX = 1.4
-
-        self.DELTA_E_THRESHOLD = 60
-
-    # ================= 工具函数 =================
-
-    @staticmethod
-    def get_dominant_colour(roi):
-        """K-Means 提取主色，抗反光"""
-        data = roi.reshape(-1, 3).astype(np.float32)
-        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-
-        try:
-            _, _, centers = cv.kmeans(
-                data, 1, None, criteria, 10, cv.KMEANS_PP_CENTERS
-            )
-            return centers[0].astype(np.uint8)
-        except Exception:
-            return np.mean(data, axis=0).astype(np.uint8)
-
-    @staticmethod
-    def convert_bgr_to_lab(bgr):
-        """手动 BGR -> CIE Lab（标准 Lab 空间）"""
-        b, g, r = bgr / 255.0
-        rgb = [r, g, b]
-
-        for i in range(3):
-            if rgb[i] > 0.04045:
-                rgb[i] = ((rgb[i] + 0.055) / 1.055) ** 2.4
-            else:
-                rgb[i] /= 12.92
-
-        X = rgb[0] * 0.4124 + rgb[1] * 0.3576 + rgb[2] * 0.1805
-        Y = rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722
-        Z = rgb[0] * 0.0193 + rgb[1] * 0.1192 + rgb[2] * 0.9505
-
-        X /= 0.95047
-        Z /= 1.08883
-
-        xyz = [X, Y, Z]
-        for i in range(3):
-            if xyz[i] > 0.008856:
-                xyz[i] = xyz[i] ** (1 / 3)
-            else:
-                xyz[i] = 7.787 * xyz[i] + 16 / 116
-
-        L = 116 * xyz[1] - 16
-        a = 500 * (xyz[0] - xyz[1])
-        b = 200 * (xyz[1] - xyz[2])
-
-        return (L, a, b)
-
-    # ================= 颜色匹配 =================
-
-    def identify_color_ciede2000(self, bgr_sample):
-        lab_sample = self.convert_bgr_to_lab(bgr_sample)
-
-        min_delta = float("inf")
-        best = "unknown"
-
-        for name, lab_ref in self.lab_refs.items():
-            d = ciede2000(lab_sample, lab_ref)["delta_E_00"]
-            if d < min_delta:
-                min_delta = d
-                best = name
-
-        if min_delta < self.DELTA_E_THRESHOLD:
-            return best, min_delta
-        return "unknown", min_delta
-
-    # ================= 核心检测 =================
+        self.target_filenames = ["white", "yellow", "red", "orange", "blue", "green"]
 
     def detect_face_colors(self, image_path):
-        img = cv.imread(image_path)
+        """
+        使用 YOLO 识别单张图片，返回 3x3 颜色矩阵 (支持部分识别)
+        """
+        img = cv2.imread(image_path)
         if img is None:
-            return None, None
+            print(f"❌ 无法读取图片: {image_path}")
+            return [['black'] * 3 for _ in range(3)], None
 
         face_name = os.path.splitext(os.path.basename(image_path))[0]
-        debug_img = img.copy()
-        img_area = img.shape[0] * img.shape[1]
 
-        # ---------- 预处理 ----------
-        try:
-            denoised = cv.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
-        except Exception:
-            denoised = cv.GaussianBlur(img, (5, 5), 0)
-
-        gray = cv.cvtColor(denoised, cv.COLOR_BGR2GRAY)
-        blurred = cv.GaussianBlur(gray, (5, 5), 0)
-
-        edges = cv.Canny(blurred, self.CANNY_LOW, self.CANNY_HIGH)
-        kernel = cv.getStructuringElement(
-            cv.MORPH_RECT, (self.DILATE_KERNEL, self.DILATE_KERNEL)
-        )
-        dilated = cv.dilate(edges, kernel)
-
-        cv.imwrite(
-            os.path.join(self.debug_dir, f"{face_name}_dilated.jpg"), dilated
-        )
-
-        # ---------- 轮廓 ----------
-        contours, _ = cv.findContours(
-            dilated, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE
-        )
+        # 1. YOLO 推理 (开启半精度和尺寸限制，防止显存溢出)
+        results = self.model.predict(
+            img,
+            conf=0.25,
+            iou=0.6,
+            agnostic_nms=True,
+            verbose=False,
+            imgsz=640,
+            half=True
+        )[0]
 
         stickers = []
 
-        for cnt in contours:
-            peri = cv.arcLength(cnt, True)
-            approx = cv.approxPolyDP(cnt, 0.05 * peri, True)
+        # 2. 解析结果
+        for box in results.boxes:
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
+            cls_id = int(box.cls[0])
+            conf = float(box.conf[0])
+            color = self.id_to_color.get(cls_id, 'unknown')
+            cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
 
-            if not (4 <= len(approx) <= 6):
-                continue
+            stickers.append({
+                'x': cx, 'y': cy, 'color': color, 'conf': conf,
+                'box': (int(x1), int(y1), int(x2), int(y2))
+            })
 
-            x, y, w, h = cv.boundingRect(approx)
-            ratio = w / float(h)
-            area = cv.contourArea(cnt)
+        # 3. 智能筛选 (Top 9)
+        if len(stickers) > 9:
+            print(f"⚠️ {face_name} 检测到 {len(stickers)} 个框，选取 Top 9")
+            stickers.sort(key=lambda s: s['conf'], reverse=True)
+            stickers = stickers[:9]
 
-            if not (self.SQUARE_RATIO_MIN < ratio < self.SQUARE_RATIO_MAX):
-                continue
-            if not (self.MIN_AREA_RATIO * img_area < area < self.MAX_AREA_RATIO * img_area):
-                continue
+        # 4. 智能网格填充 (核心修改)
+        # 即使数量 != 9，也尝试把现有的填进去
+        matrix = self._smart_grid_fill(stickers)
 
-            roi = img[y : y + h, x : x + w]
-            dom_bgr = self.get_dominant_colour(roi)
-            color, _ = self.identify_color_ciede2000(dom_bgr)
+        # 5. 保存调试图
+        debug_img = self._draw_debug_boxes(img, stickers)
+        # 如果数量不对，标记为 fail 图，方便查看，但不影响程序运行
+        suffix = "_partial" if len(stickers) != 9 else "_ok"
+        cv2.imwrite(os.path.join(self.debug_dir, f"{face_name}{suffix}.jpg"), debug_img)
 
-            if color == "unknown":
-                continue
+        if len(stickers) != 9:
+            print(f"⚠️ {face_name} 面仅识别 {len(stickers)}/9 个，已自动填充灰色")
 
-            stickers.append(
-                {"x": x, "y": y, "w": w, "h": h, "color": color}
-            )
-            cv.rectangle(debug_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        # ---------- 组装 ----------
-        if len(stickers) == 9:
-            stickers.sort(key=lambda s: s["y"])
-            matrix = []
-
-            for i in range(3):
-                row = sorted(
-                    stickers[i * 3 : (i + 1) * 3], key=lambda s: s["x"]
-                )
-                matrix.append([s["color"] for s in row])
-        else:
-            matrix = self.fallback_grid_detection(img, debug_img)
-
-        cv.imwrite(
-            os.path.join(self.debug_dir, f"{face_name}_result.jpg"), debug_img
-        )
         return matrix, debug_img
 
-    # ================= 降级策略 =================
+    @staticmethod
+    def _smart_grid_fill(stickers):
+        """
+        智能网格映射算法：
+        根据检测到的所有点的边界，划分 3x3 区域，将点落入对应的格子。
+        """
+        # 初始化全灰矩阵
+        matrix = [['black'] * 3 for _ in range(3)]
 
-    def fallback_grid_detection(self, img, debug_img):
-        h, w = img.shape[:2]
-        cube_size = int(min(h, w) * 0.6)
-        sx = (w - cube_size) // 2
-        sy = (h - cube_size) // 2
-        cell = cube_size // 3
+        if not stickers:
+            return matrix
 
-        matrix = []
+        # 1. 计算所有点的边界范围
+        xs = [s['x'] for s in stickers]
+        ys = [s['y'] for s in stickers]
+        min_x, max_x = min(xs), max(xs)
+        min_y, max_y = min(ys), max(ys)
 
-        for i in range(3):
-            row = []
-            for j in range(3):
-                cx = sx + j * cell + cell // 2
-                cy = sy + i * cell + cell // 2
-                sample = img[cy - 10 : cy + 10, cx - 10 : cx + 10]
+        # 2. 计算每个格子的理论宽高
+        # 加一点点 buffer 防止除以 0
+        width = (max_x - min_x) + 1
+        height = (max_y - min_y) + 1
 
-                dom = self.get_dominant_colour(sample)
-                color, _ = self.identify_color_ciede2000(dom)
+        # 3. 映射每个点到 (row, col)
+        for s in stickers:
+            # 计算相对位置 (0.0 ~ 1.0)
+            rel_x = (s['x'] - min_x) / width
+            rel_y = (s['y'] - min_y) / height
 
-                if color == "unknown":
-                    color = self.force_closest_color(dom)
+            # 映射到 0, 1, 2
+            # 理想情况下：0-0.33 -> 0, 0.33-0.66 -> 1, 0.66-1.0 -> 2
+            col = int(rel_x * 3)
+            row = int(rel_y * 3)
 
-                row.append(color)
-                cv.rectangle(
-                    debug_img,
-                    (cx - 15, cy - 15),
-                    (cx + 15, cy + 15),
-                    (0, 0, 255),
-                    2,
-                )
-            matrix.append(row)
+            # 边界保护 (防止算出来是 3)
+            col = min(max(col, 0), 2)
+            row = min(max(row, 0), 2)
+
+            matrix[row][col] = s['color']
 
         return matrix
 
-    def force_closest_color(self, bgr):
-        lab = self.convert_bgr_to_lab(bgr)
-        best, min_d = "white", float("inf")
-
-        for name, lab_ref in self.lab_refs.items():
-            d = ciede2000(lab, lab_ref)["delta_E_00"]
-            if d < min_d:
-                best, min_d = name, d
-
-        return best
-
-    # ================= 流程控制 =================
+    @staticmethod
+    def _draw_debug_boxes(img, stickers):
+        debug_img = img.copy()
+        for s in stickers:
+            x1, y1, x2, y2 = s['box']
+            color = s['color']
+            cv2.rectangle(debug_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(debug_img, color, (x1, y1 - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        return debug_img
 
     def detect_all_faces(self):
-        images_dir = "images"
-        cube_state = {}
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        images_dir = os.path.join(base_dir, "images")
 
-        for name in self.color_names:
-            path = os.path.join(images_dir, f"{name}.png")
+        # 默认全黑色
+        default_matrix = [['black'] * 3 for _ in range(3)]
+        cube_state = {code: default_matrix for code in self.filename_to_face.values()}
+
+        print("🔍 开始 YOLO 识别流程...")
+
+        for filename in self.target_filenames:
+            path = os.path.join(images_dir, f"{filename}.png")
+            face_code = self.filename_to_face[filename]
+
             if not os.path.exists(path):
+                print(f"⚠️ 文件缺失: {path}")
                 continue
 
+            # 这里 matrix 肯定有值（最差也是全灰）
             matrix, _ = self.detect_face_colors(path)
-            if matrix:
-                cube_state[self.center_to_face[name]] = matrix
+            cube_state[face_code] = matrix
+            print(f"✅ {filename} -> {face_code} 处理完毕")
 
         return cube_state
 
@@ -281,15 +183,11 @@ class CubeDetector:
             json.dump(cube_state, f, indent=2)
 
 
-def main():
-    detector = CubeDetector()
-    state = detector.detect_all_faces()
-
-    if len(state) == 6:
-        detector.save_cube_state_json(state)
-    else:
-        print("⚠️ 未完整识别 6 个面")
-
-
 if __name__ == "__main__":
-    main()
+    detector = CubeDetector()
+    try:
+        state = detector.detect_all_faces()
+        detector.save_cube_state_json(state)
+        print("🎉 流程结束，结果已保存！")
+    except Exception as e:
+        print(f"❌ 发生错误: {e}")

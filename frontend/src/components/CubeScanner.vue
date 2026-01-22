@@ -67,7 +67,7 @@
 import { ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { Close, Aim } from '@element-plus/icons-vue';
 import { ElMessage, ElLoading } from 'element-plus';
-import { recognizeCube } from '../api/cube';
+import { recognizeCube } from '../api/cubeService.js';
 
 const props = defineProps({ visible: Boolean });
 const emit = defineEmits(['close', 'scanned']);

@@ -40,7 +40,12 @@
 
     <div class="solver-main-content">
       <div class="view-3d-box">
-        <Cube3DView ref="cube3dRef" :cubeState="cubeState" :disabled="hasSolved"/>
+        <Cube3DView
+          ref="cube3dRef"
+          :cubeState="cubeState"
+          :interactive="!hasSolved"
+          :enableControls="true"
+        />
         <div class="step-counter" v-if="steps.length">
           <span class="curr">{{ currentStep }}</span>
           <span class="total">/ {{ steps.length }}</span>
@@ -90,27 +95,43 @@
     </div>
 
     <div class="solver-footer">
+      <!-- 优化后的播放控制栏 -->
       <div class="playback-controls">
-        <el-button-group>
+        <el-tooltip content="上一步" placement="top">
           <el-button
-            type="info"
+            circle
             size="large"
             :icon="ArrowLeft"
             @click="prevStep"
             :disabled="currentStep === 0 || is3DBusy"
-          >
-            上一步
-          </el-button>
+            class="nav-btn"
+          />
+        </el-tooltip>
+
+        <el-button
+          type="primary"
+          size="large"
+          class="play-btn"
+          @click="toggleAutoPlay"
+          :disabled="!hasSolved || currentStep >= steps.length"
+          round
+        >
+          <el-icon class="el-icon--left">
+            <component :is="isAutoPlaying ? VideoPause : VideoPlay" />
+          </el-icon>
+          {{ isAutoPlaying ? '暂停演示' : '自动演示' }}
+        </el-button>
+
+        <el-tooltip content="下一步" placement="top">
           <el-button
-            type="success"
+            circle
             size="large"
             :icon="ArrowRight"
             @click="nextStep"
             :disabled="currentStep >= steps.length || !hasSolved || is3DBusy"
-          >
-            下一步
-          </el-button>
-        </el-button-group>
+            class="nav-btn"
+          />
+        </el-tooltip>
       </div>
 
       <div class="steps-progress-bar" v-if="steps.length">
@@ -124,6 +145,7 @@
                 'is-active': index === currentStep - 1,
                 'is-past': index < currentStep - 1
               }"
+              @click="jumpToStep(index)"
             >
               <div class="node-idx">{{ index + 1 }}</div>
               <div class="node-move">{{ step }}</div>
@@ -144,15 +166,15 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
-import {solveCube, saveCubeState} from "../api/cube";
+import { ref, nextTick, onUnmounted } from "vue";
+import {solveCube, saveCubeState} from "../api/cubeService.js";
 import { createCubeFromJson } from "../utils/cubeState";
 import {applyMove, invertMove} from "../utils/cubeMoves";
 import Face2DView from "../components/Face2DView.vue";
 import Cube3DView from "../components/Cube3DView.vue";
 import CubeScanner from '../components/CubeScanner.vue';
 import {
-  Camera, Search, RefreshLeft, ArrowLeft, ArrowRight, InfoFilled
+  Camera, Search, RefreshLeft, ArrowLeft, ArrowRight, InfoFilled, VideoPlay, VideoPause
 } from "@element-plus/icons-vue";
 import { ElMessage } from 'element-plus';
 
@@ -161,8 +183,6 @@ const loading = ref(false);
 const hasSolved = ref(false);
 const steps = ref([]);
 const currentStep = ref(0);
-const testStep = ref(0);
-const test3DStep = ref(0);
 const cubeState = ref(createCubeFromJson());
 const cube3dRef = ref(null);
 const solutionMoves = ref([]);
@@ -170,6 +190,10 @@ const is3DBusy = ref(false);
 const isScannerVisible = ref(false);
 const COLOR_ORDER = ['white', 'yellow', 'red', 'orange', 'blue', 'green'];
 
+// 自动播放相关状态
+const isAutoPlaying = ref(false);
+let autoPlayTimer = null;
+const AUTO_PLAY_INTERVAL = 800; // 自动播放间隔 (ms)，需大于动画时长
 
 // 打开扫描器的方法
 const openScanner = () => {
@@ -179,71 +203,55 @@ const openScanner = () => {
 // 处理扫描结果
 const handleScannedResult = (result) => {
   isScannerVisible.value = false;
-
-  // 这里确保转换后的数据格式正确
   const newCube = createCubeFromJson(result);
   cubeState.value.cubies = newCube.cubies;
   cubeState.value.faces = newCube.faces;
-
   ElMessage.success('扫描成功，请点击 2D 图纠正可能的识别错误');
 };
 
-/**
- * 颜色切换逻辑
- * @param faceKey 面标识 (U, R, F...)
- * @param index 扁平索引 (0-8)
- */
 const toggleColor = (faceKey, index) => {
   if (hasSolved.value) {
     ElMessage.info("请先完成当前解法或重置魔方后再修改状态");
     return;
   }
-  // 1. 获取该面的数据引用
   const faceData = cubeState.value.faces[faceKey];
   if (!faceData) return;
 
-  // 2. 确定当前颜色（处理 1D 或 2D 数组的兼容性）
   let currentColor;
   let row, col;
 
   if (Array.isArray(faceData[0])) {
-    // 情况 A: 数据是 3x3 嵌套数组
     row = Math.floor(index / 3);
     col = index % 3;
     currentColor = faceData[row][col];
   } else {
-    // 情况 B: 数据是 1x9 扁平数组
     currentColor = faceData[index];
   }
 
-  // 3. 计算下一个颜色
-  const nextIdx = (COLOR_ORDER.indexOf(currentColor) + 1) % COLOR_ORDER.length;
-  const nextColor = COLOR_ORDER[nextIdx];
+  let nextColor;
+  if (!COLOR_ORDER.includes(currentColor)) {
+    nextColor = COLOR_ORDER[0];
+  } else {
+    const nextIdx = (COLOR_ORDER.indexOf(currentColor) + 1) % COLOR_ORDER.length;
+    nextColor = COLOR_ORDER[nextIdx];
+  }
 
-  // 4. 执行更新
   if (Array.isArray(faceData[0])) {
     faceData[row][col] = nextColor;
   } else {
     faceData[index] = nextColor;
   }
 
-  // 5. 【核心】同步更新 3D 模型
-  // 这里的 createCubeFromJson 必须能接收当前的 faces 结构并返回新的 cubies
   const updatedCube = createCubeFromJson(cubeState.value.faces);
   cubeState.value.cubies = updatedCube.cubies;
-
-  // 状态改变，提示需要重新求解
   hasSolved.value = false;
 };
 
-// 请求后端
 async function fetchSolution() {
   loading.value = true;
+  stopAutoPlay(); // 重新求解前停止播放
   try {
-    // A. 将前端当前“校准后”的状态发给后端保存
     await saveCubeState(cubeState.value.faces);
-
-    // B. 调用原来求解接口（后端此时读取的是刚存好的最新 json）
     const res = await solveCube();
     const data = res.data.data;
 
@@ -267,55 +275,106 @@ async function fetchSolution() {
   }
 }
 
-// 控制步骤
-function nextStep() {
+// --- 自动播放逻辑 ---
+
+function toggleAutoPlay() {
+  if (isAutoPlaying.value) {
+    stopAutoPlay();
+  } else {
+    startAutoPlay();
+  }
+}
+
+function startAutoPlay() {
+  if (currentStep.value >= steps.value.length) return;
+
+  isAutoPlaying.value = true;
+  // 立即执行一步，然后开始循环
+  nextStep(true);
+
+  autoPlayTimer = setInterval(() => {
+    if (currentStep.value >= steps.value.length) {
+      stopAutoPlay();
+    } else {
+      nextStep(true);
+    }
+  }, AUTO_PLAY_INTERVAL);
+}
+
+function stopAutoPlay() {
+  isAutoPlaying.value = false;
+  if (autoPlayTimer) {
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = null;
+  }
+}
+
+// --- 步骤控制 ---
+
+function nextStep(isAuto = false) {
+  if (!isAuto) {
+    stopAutoPlay();
+  }
+
   if (!hasSolved.value || is3DBusy.value) return;
 
   if (currentStep.value < solutionMoves.value.length) {
     const move = solutionMoves.value[currentStep.value];
-    is3DBusy.value = true;                 // 魔方旋转式暂时锁定按钮
-    applyMove(cubeState.value, move);      // 数据层更新 cubies
-    cube3dRef.value.playMove(move);        // 播放 3D 动画
+    is3DBusy.value = true;
+    applyMove(cubeState.value, move);
+    cube3dRef.value.playMove(move);
     currentStep.value++;
 
     setTimeout(() => {
       is3DBusy.value = false;
-    }, 350); // 动画时长 300ms，预留 50ms 缓冲
+    }, 350);
 
-    // 自动滚动到底部步骤条
     nextTick(() => {
       const activeNode = document.querySelector('.step-node.is-active');
       if (activeNode) activeNode.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     });
+  } else {
+    // 如果已经到最后一步，停止自动播放
+    stopAutoPlay();
   }
 }
 
 function prevStep() {
+  stopAutoPlay(); // 手动介入时停止自动播放
   if (!hasSolved.value || is3DBusy.value) return;
 
   if (currentStep.value > 0) {
     is3DBusy.value = true;
     currentStep.value--;
     const move = solutionMoves.value[currentStep.value];
-    const reverseMove = invertMove(move);  // 反向 move
+    const reverseMove = invertMove(move);
     applyMove(cubeState.value, reverseMove);
-    cube3dRef.value.playMove(reverseMove); // 播放反向动画
+    cube3dRef.value.playMove(reverseMove);
     setTimeout(() => {
       is3DBusy.value = false;
-    }, 350); // 动画时长 300ms，预留 50ms 缓冲
+    }, 350);
   }
 }
 
-// 重置状态函数
+// 允许点击步骤条跳转（可选功能，暂未完全实现逻辑，仅作为占位）
+function jumpToStep(index) {
+  // 复杂的跳转逻辑需要计算中间差值，这里暂时只停止播放
+  stopAutoPlay();
+}
+
 function resetCube() {
+  stopAutoPlay();
   cubeState.value = createCubeFromJson();
   steps.value = [];
   solutionMoves.value = [];
   currentStep.value = 0;
-  testStep.value = 0;
-  test3DStep.value = 0;
   hasSolved.value = false;
 }
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+  stopAutoPlay();
+});
 </script>
 
 <style scoped>
@@ -462,10 +521,36 @@ function resetCube() {
   z-index: 10;
 }
 
+/* 播放控制器样式优化 */
 .playback-controls {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 20px; /* 按钮间距 */
   margin-bottom: 24px;
+}
+
+/* 播放按钮突出显示 */
+.play-btn {
+  width: 140px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+}
+.play-btn:not(:disabled):hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
+}
+
+/* 导航按钮样式 */
+.nav-btn {
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+.nav-btn:not(:disabled):hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
 }
 
 /* 5. 步骤条“轨道感”美化 */

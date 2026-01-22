@@ -1,5 +1,10 @@
 <template>
-  <div ref="container" class="cube-3d-container" :class="{ 'is-disabled': props.disabled }"></div>
+  <!-- 动态绑定 cursor 样式：如果允许控制视角，显示 grab；否则显示 default -->
+  <div
+    ref="container"
+    class="cube-3d-container"
+    :class="{ 'can-control': props.enableControls }"
+  ></div>
 </template>
 
 <script setup>
@@ -8,34 +13,50 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 // =========================================================
-// 1. 配置与常量
+// 1. 配置与常量 (Props 重构)
 // =========================================================
 const props = defineProps({
   cubeState: { type: Object, required: true },
-  disabled: { type: Boolean, default: false }
+
+  // 【交互开关】是否允许鼠标拖拽魔方层（拧魔方）
+  // 对应场景：Home=false, Learning=false, Solver/Free=true
+  interactive: { type: Boolean, default: true },
+
+  // 【视角开关】是否允许鼠标拖拽改变视角 (OrbitControls)
+  // 对应场景：Learning=false (固定视角), 其他=true
+  enableControls: { type: Boolean, default: true },
+
+  // 【自转开关】是否自动旋转展示
+  // 对应场景：Home=true, 其他=false
+  autoRotate: { type: Boolean, default: false },
+
+  // 【自转速度】
+  autoRotateSpeed: { type: Number, default: 4.0 },
+
+   // --- 摄像机初始位置 [x, y, z] ---
+  cameraPosition: { type: Array, default: () => [6, 6, 6] },
+
+  // --- 是否允许缩放 ---
+  // 默认开启，保证 Solver 和 Free 模式能缩放
+  enableZoom: { type: Boolean, default: true }
 });
+
 const emit = defineEmits(['move']);
 
-const DRAG_THRESHOLD = 35; // 拖拽触发阈值（像素）
-const ANIMATION_DURATION = 500; // 旋转动画时长（毫秒）
-const CUBIE_SIZE = 0.95; // 小块尺寸
+const DRAG_THRESHOLD = 35;
+const ANIMATION_DURATION = 300;
+const CUBIE_SIZE = 0.95;
 
 const COLOR_MAP = {
-  white: "#FFFFFF",
-  yellow: "#FFD500",
-  red: "#C41E3A",
-  orange: "#FF5800",
-  blue: "#0051BA",
-  green: "#009E60",
-  internal: "#222222"
+  white: "#FFFFFF", yellow: "#FFD500", red: "#C41E3A",
+  orange: "#FF5800", blue: "#0051BA", green: "#009E60",
+  internal: "#222222", black: "#000000"
 };
 
 // =========================================================
 // 2. 响应式引用与全局变量
 // =========================================================
 const container = ref(null);
-
-// Three.js 核心对象
 let scene, camera, renderer, cubeGroup, controls;
 
 // 交互状态
@@ -51,31 +72,26 @@ const raycaster = new THREE.Raycaster();
 // 3. Three.js 初始化与生命周期
 // =========================================================
 
-/** 初始化环境 */
 function initThree() {
   const width = container.value.clientWidth;
   const height = container.value.clientHeight;
 
   scene = new THREE.Scene();
 
-  // 相机设置
   camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  camera.position.set(6, 6, 6);
+  camera.position.set(...props.cameraPosition); // 默认视角
   camera.lookAt(0, 0, 0);
 
-  // 渲染器设置
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(width, height);
   renderer.setPixelRatio(window.devicePixelRatio);
   container.value.appendChild(renderer.domElement);
 
-  // 光照
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
   dirLight.position.set(10, 20, 10);
   scene.add(dirLight);
 
-  // 控制器
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
@@ -83,14 +99,18 @@ function initThree() {
   controls.minDistance = 3;
   controls.maxDistance = 15;
 
-  // 魔方容器
+  controls.enabled = props.enableControls;           // 视角控制开关
+  controls.autoRotate = props.autoRotate;            // 自动旋转开关
+  controls.autoRotateSpeed = props.autoRotateSpeed;  // 旋转速度
+  controls.enableZoom = props.enableZoom;            // 缩放开关
+
   cubeGroup = new THREE.Group();
   scene.add(cubeGroup);
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  if (controls) controls.update();
+  if (controls) controls.update(); // 必须调用 update 才能实现 damping 和 autoRotate
   if (renderer && scene && camera) renderer.render(scene, camera);
 }
 
@@ -104,10 +124,8 @@ function onResize() {
 }
 
 // =========================================================
-// 4. 魔方构建逻辑 (数据 -> 3D 视图)
+// 4. 魔方构建逻辑
 // =========================================================
-
-/** 获取单个面的颜色索引 */
 function getFaceColor(face, x, y, z, faces) {
   let row, col;
   switch (face) {
@@ -121,7 +139,6 @@ function getFaceColor(face, x, y, z, faces) {
   return faces[face][row * 3 + col];
 }
 
-/** 计算小块六个面的颜色数组 [R, L, U, D, F, B] */
 function getCubieFaceColors(cubie, faces) {
   const res = Array(6).fill(null);
   const [x, y, z] = cubie.pos;
@@ -134,7 +151,6 @@ function getCubieFaceColors(cubie, faces) {
   return res;
 }
 
-/** 渲染所有小块 */
 function renderCubies(cubies) {
   if (isAnimating) return;
   while (cubeGroup.children.length) cubeGroup.remove(cubeGroup.children[0]);
@@ -155,14 +171,11 @@ function renderCubies(cubies) {
 // =========================================================
 // 5. 动画引擎
 // =========================================================
-
-/** 播放单步骤旋转动画 */
 function playMove(move) {
   if (isAnimating) return;
   isAnimating = true;
 
   let axis, layerValue, angle;
-  // 指令解析
   const moveMap = {
     "R":  { axis: 'x', lv: 1,  a: -Math.PI/2 }, "R'": { axis: 'x', lv: 1,  a: Math.PI/2 },
     "L":  { axis: 'x', lv: -1, a: Math.PI/2 },  "L'": { axis: 'x', lv: -1, a: -Math.PI/2 },
@@ -211,7 +224,9 @@ function playMove(move) {
 // =========================================================
 
 function onMouseDown(event) {
-  if (isAnimating || props.disabled) return;
+  // 如果 interactive 为 false，则直接返回，不进行射线检测
+  if (isAnimating || !props.interactive) return;
+
   const rect = container.value.getBoundingClientRect();
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -222,14 +237,23 @@ function onMouseDown(event) {
   if (intersects.length > 0) {
     const intersect = intersects[0];
     startCubie = intersect.object;
-    // 转换法向量到世界坐标并规范化
     startNormal = intersect.face.normal.clone().applyQuaternion(startCubie.quaternion);
     ["x", "y", "z"].forEach(a => startNormal[a] = Math.round(startNormal[a]));
 
     startMousePos.set(event.clientX, event.clientY);
     isMouseDown = true;
-    controls.enabled = false;
+
+    // 当开始拖拽魔方层时，暂时禁用视角控制器，避免冲突
+    if (controls) controls.enabled = false;
   }
+}
+
+function onMouseUp() {
+  isMouseDown = false;
+  startCubie = null;
+  startNormal = null;
+  // 鼠标抬起，恢复视角控制器（如果允许的话）
+  if (controls) controls.enabled = props.enableControls;
 }
 
 function onMouseMove(event) {
@@ -244,14 +268,6 @@ function onMouseMove(event) {
   }
 }
 
-function onMouseUp() {
-  isMouseDown = false;
-  startCubie = null;
-  startNormal = null;
-  controls.enabled = true;
-}
-
-/** 处理拖拽触发的旋转 */
 function handleCubeRotation(dragDir) {
   const normal = startNormal;
   let possibleAxes = [];
@@ -283,10 +299,6 @@ function handleCubeRotation(dragDir) {
     }
   }
 }
-
-// =========================================================
-// 7. 核心映射算法 (UI 拖拽 -> 魔方指令)
-// =========================================================
 
 function getMoveCommand(dragAxis, sign, pos, normal) {
   const [x, y, z] = [Math.round(pos.x), Math.round(pos.y), Math.round(pos.z)];
@@ -334,7 +346,7 @@ function getMoveCommand(dragAxis, sign, pos, normal) {
 }
 
 // =========================================================
-// 8. 生命周期与监听
+// 7. 生命周期与监听
 // =========================================================
 
 onMounted(async () => {
@@ -358,9 +370,26 @@ onUnmounted(() => {
   if (renderer) renderer.dispose();
 });
 
+// --- 监听 Props 变化动态更新 Three.js 状态 ---
 watch(() => props.cubeState.cubies, (newC) => {
   if (!isAnimating) renderCubies(newC);
 }, { deep: true });
+
+watch(() => props.enableControls, (val) => {
+  if (controls) controls.enabled = val;
+});
+
+watch(() => props.autoRotate, (val) => {
+  if (controls) controls.autoRotate = val;
+});
+
+watch(() => props.autoRotateSpeed, (val) => {
+  if (controls) controls.autoRotateSpeed = val;
+});
+
+watch(() => props.enableZoom, (val) => {
+  if (controls) controls.enableZoom = val;
+});
 
 defineExpose({ playMove, resetView: () => controls?.reset(), renderCubies });
 </script>
@@ -369,13 +398,16 @@ defineExpose({ playMove, resetView: () => controls?.reset(), renderCubies });
 .cube-3d-container {
   width: 100%;
   height: 100%;
+  /* 默认鼠标样式 */
+  cursor: default;
+  user-select: none;
+}
+
+/* 只有当允许控制视角时，才显示抓手 */
+.cube-3d-container.can-control {
   cursor: grab;
-  user-select: none; /* 防止拖拽时选中文字 */
 }
-.cube-3d-container:active {
+.cube-3d-container.can-control:active {
   cursor: grabbing;
-}
-.cube-3d-container.is-disabled {
-  cursor: default; /* 取消抓取手势 */
 }
 </style>

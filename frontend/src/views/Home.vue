@@ -27,26 +27,33 @@
 
           <div class="tech-badges">
             <span class="tech-label">Powered by:</span>
-            <el-tooltip content="前端框架" placement="top"><img src="/icons/logo_vue.svg" class="tech-icon"  alt="图标显示失败"/></el-tooltip>
-            <el-tooltip content="3D 渲染引擎" placement="top"><img src="/icons/logo_threejs.svg" class="tech-icon"  alt="图标显示失败"/></el-tooltip>
-            <el-tooltip content="计算机视觉" placement="top"><img src="/icons/logo_opencv.svg" class="tech-icon"  alt="图标显示失败"/></el-tooltip>
+            <el-tooltip content="Vue.js" placement="top"><img src="/icons/logo_vue.svg" class="tech-icon"  alt="图标显示失败"/></el-tooltip>
+            <el-tooltip content="Three.js" placement="top"><img src="/icons/logo_threejs.svg" class="tech-icon"  alt="图标显示失败"/></el-tooltip>
+            <el-tooltip content="OpenCV" placement="top"><img src="/icons/logo_opencv.svg" class="tech-icon"  alt="图标显示失败"/></el-tooltip>
           </div>
         </el-col>
 
+        <!-- 3D 魔方展示区域 -->
         <el-col :xs="24" :md="12" class="cube-side">
-          <div class="cube-stage"
-               @mousedown="handleMouseDown"
-               @touchstart="handleTouchStart"
-               @contextmenu.prevent>
-            <div class="cube" :style="cubeStyle">
-              <div v-for="face in ['front', 'back', 'left', 'right', 'top', 'bottom']"
-                   :key="face"
-                   :class="['cube-face', `face-${face}`]">
-                <div v-for="i in 9" :key="i" class="cube-tile">
-                  <div class="sticker"></div>
-                </div>
-              </div>
-            </div>
+          <div class="cube-stage-3d">
+            <!--
+              配置说明：
+              interactive="false"   -> 禁止拧魔方 (防止误触)
+              enableControls="true" -> 允许拖拽视角 (看细节)
+              autoRotate="true"     -> 开启自动旋转 (展厅模式)
+              autoRotateSpeed="1.5" -> 控制旋转速度
+              cameraPosition="[4.5, 4.5, 4.5]" -> 设置初始摄像机位置
+              enableZoom="false"    -> 禁止缩放 (防止误触)
+            -->
+            <Cube3DView
+              :cubeState="homeCubeState"
+              :interactive="false"
+              :enableControls="true"
+              :autoRotate="true"
+              :autoRotateSpeed="1.5"
+              :cameraPosition="[5, 5, 5]"
+              :enableZoom="false"
+            />
           </div>
         </el-col>
       </el-row>
@@ -176,8 +183,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 import { useRouter, RouterLink} from 'vue-router';
+// 1. 引入 3D 组件和状态生成器
+import Cube3DView from '../components/Cube3DView.vue';
+import { createCubeFromJson } from '../utils/cubeState';
+
 import {
   Camera, Pointer, ArrowRight, Reading, DataLine, Trophy, Timer, Collection, Unlock, DArrowRight
 } from '@element-plus/icons-vue';
@@ -186,64 +197,8 @@ const router = useRouter();
 const loading = ref(false);
 const activeNames = ref("1");
 
-// --- 优化后的 3D 魔方交互逻辑 ---
-const rotateX = ref(-25);
-const rotateY = ref(-35);
-let isDragging = false;
-let startX, startY;
-let currentX = -25;
-let currentY = -35;
-let animationId = null;
-
-const cubeStyle = computed(() => ({
-  transform: `rotateX(${rotateX.value}deg) rotateY(${rotateY.value}deg)`
-}));
-
-// 自动旋转：使用增量，而不是绝对时间
-const autoRotate = () => {
-  if (!isDragging) {
-    // 每一帧增加一点点角度，实现平滑自转
-    rotateY.value += 0.2;
-    // 同步更新 current 值，防止下次点击时跳变
-    currentY = rotateY.value;
-    currentX = rotateX.value;
-  }
-  animationId = requestAnimationFrame(autoRotate);
-};
-
-// 鼠标/触摸开始
-const handleInteractionStart = (clientX, clientY) => {
-  isDragging = true;
-  startX = clientX;
-  startY = clientY;
-  // 记录按下时的当前角度，作为拖拽的基准
-  currentX = rotateX.value;
-  currentY = rotateY.value;
-};
-
-// 鼠标/触摸移动
-const handleInteractionMove = (clientX, clientY) => {
-  if (!isDragging) return;
-  const deltaX = clientX - startX;
-  const deltaY = clientY - startY;
-
-  // 更新角度：基准 + 变化量
-  // Y轴移动控制 rotateY, X轴移动控制 rotateX (注意正负号以符合直觉)
-  rotateY.value = currentY + deltaX * 0.5;
-  rotateX.value = currentX - deltaY * 0.5;
-};
-
-// 事件监听包装
-const handleMouseDown = (e) => {
-  if (e.button === 0) handleInteractionStart(e.clientX, e.clientY);
-};
-const handleMouseMove = (e) => handleInteractionMove(e.clientX, e.clientY);
-const handleMouseUp = () => { isDragging = false; };
-
-// 触摸屏支持
-const handleTouchStart = (e) => handleInteractionStart(e.touches[0].clientX, e.touches[0].clientY);
-const handleTouchMove = (e) => handleInteractionMove(e.touches[0].clientX, e.touches[0].clientY);
-const handleTouchEnd = () => { isDragging = false; };
+// 2. 创建一个默认的还原状态供首页展示
+const homeCubeState = ref(createCubeFromJson());
 
 // 路由跳转
 const handleEnterSolver = () => router.push('/solver');
@@ -271,22 +226,6 @@ const features = [
     colorClass: 'icon-green'
   }
 ];
-
-onMounted(() => {
-  autoRotate();
-  window.addEventListener('mousemove', handleMouseMove);
-  window.addEventListener('mouseup', handleMouseUp);
-  window.addEventListener('touchmove', handleTouchMove);
-  window.addEventListener('touchend', handleTouchEnd);
-});
-
-onUnmounted(() => {
-  cancelAnimationFrame(animationId);
-  window.removeEventListener('mousemove', handleMouseMove);
-  window.removeEventListener('mouseup', handleMouseUp);
-  window.removeEventListener('touchmove', handleTouchMove);
-  window.removeEventListener('touchend', handleTouchEnd);
-});
 </script>
 
 <style scoped>
@@ -313,7 +252,7 @@ onUnmounted(() => {
 /* --- Hero Section --- */
 .hero-section-wrapper {
   position: relative;
-  min-height: 85vh; /* 稍微减小高度 */
+  min-height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -338,7 +277,6 @@ onUnmounted(() => {
   padding: 0 20px;
 }
 
-/* 文本区域样式同上个版本，略 */
 .badge-pill {
   display: inline-flex;
   align-items: center;
@@ -381,62 +319,30 @@ onUnmounted(() => {
 .secondary-btn { background: white; border: 1px solid #e2e8f0; color: #4a5568; }
 
 .tech-badges { display: flex; align-items: center; gap: 15px; opacity: 0.8; }
-.tech-label { font-size: 14px; color: rgb(29, 197, 185); font-weight: 600; text-transform: uppercase; }
-.tech-icon { width: 24px; height: 24px; filter: grayscale(100%); transition: 0.3s; cursor: help; }
+.tech-label { font-size: 20px; color: rgb(15, 167, 252); font-weight: 600; text-transform: uppercase; }
+.tech-icon { width: 30px; height: 30px; filter: grayscale(100%); transition: 0.3s; }
 .tech-icon:hover { filter: grayscale(0%); transform: scale(1.1); }
 
-/* --- Cube Stage (交互修复版) --- */
-.cube-stage {
-  width: 100%;
-  height: 400px;
+/* --- Cube Stage --- */
+.cube-side {
   display: flex;
   justify-content: center;
   align-items: center;
-  perspective: 1000px;
-  cursor: grab;
+}
+
+.cube-stage-3d {
+  width: 100%;
+  height: 500px; /* 固定高度，确保 Three.js 渲染 */
   position: relative;
-}
-.cube-stage:active { cursor: grabbing; }
-
-.cube {
-  width: 200px;
-  height: 200px;
-  position: relative;
-  transform-style: preserve-3d;
+  /* 悬浮动画：让 3D 魔方看起来悬浮在空中 */
+  animation: float 6s ease-in-out infinite;
 }
 
-/* Cube Faces & Tiles 样式保持不变 */
-.cube-face {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  padding: 4px;
-  background: #1a202c;
-  border-radius: 8px;
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
 }
-.cube-tile { border-radius: 4px; position: relative; overflow: hidden; }
-.sticker { width: 100%; height: 100%; background: inherit; position: relative; }
-.sticker::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);
-}
-.face-front .cube-tile { background: #345bf8; }
-.face-back .cube-tile { background: #15ee1e; }
-.face-left .cube-tile { background: #ff9800; }
-.face-right .cube-tile { background: #ee1c1c; }
-.face-top .cube-tile { background: #ffffff; }
-.face-bottom .cube-tile { background: #f5f5f5; }
-
-.face-front { transform: translateZ(100px); }
-.face-back { transform: rotateY(180deg) translateZ(100px); }
-.face-left { transform: rotateY(-90deg) translateZ(100px); }
-.face-right { transform: rotateY(90deg) translateZ(100px); }
-.face-top { transform: rotateX(90deg) translateZ(100px); }
-.face-bottom { transform: rotateX(-90deg) translateZ(100px); }
 
 /* --- 通用 Section --- */
 .section-wrapper { padding: 100px 0; }
@@ -575,7 +481,8 @@ onUnmounted(() => {
   .hero-content { flex-direction: column; text-align: center; padding-top: 40px; }
   .text-side { margin-bottom: 40px; }
   .action-group { justify-content: center; }
-  .cube-stage { height: 350px; }
+  /* 响应式调整高度 */
+  .cube-stage-3d { height: 350px; }
 }
 @media (max-width: 768px) {
   .main-title { font-size: 2.5rem; }

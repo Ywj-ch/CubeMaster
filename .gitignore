@@ -1,0 +1,61 @@
+# ==========================
+# 1. 全局/IDE (必须忽略)
+# ==========================
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+
+# ==========================
+# 2. 前端 (Vue/Node)
+# ==========================
+frontend/node_modules/
+frontend/dist/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.env.local
+frontend/.env.*.local
+
+# ==========================
+# 3. 后端 (Python/FastAPI)
+# ==========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+
+.venv/
+.venv_new/
+venv/
+env/
+backend/cube_results/
+
+# 环境变量
+.env
+
+# ==========================
+# 4. YOLO / AI 训练数据 (最重要！防止仓库爆炸)
+# ==========================
+# 忽略数据集 (图片和标签)
+yolo_train/datasets/
+yolo_train/raw_images/
+
+# 忽略训练过程产生的日志和权重 (runs 文件夹通常很大)
+yolo_train/runs/
+
+# 忽略临时测试脚本生成的图片
+*.jpg
+*.png
+!backend/images/*.png  # 但保留后端用于显示的占位图(如果有的话)
+
+# 忽略大型模型文件 (除了我们明确要用的)
+*.pt
+*.onnx
+#如果你想保留最终部署的模型，可以用 ! 排除忽略
+!backend/models/best.pt

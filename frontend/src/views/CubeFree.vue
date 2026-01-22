@@ -18,10 +18,11 @@
 
     <div class="main-display-area">
       <div class="cube-container-box">
-        <Cube3DView
+       <Cube3DView
           ref="cubeRef"
           :cubeState="cubeState"
-          :disabled="!isGameStarted || isAutoOperating || isMoving"
+          :interactive="isGameStarted && !isAutoOperating && !isMoving"
+          :enableControls="true"
         />
       </div>
     </div>

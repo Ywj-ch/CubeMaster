@@ -20,6 +20,7 @@ const emit = defineEmits(['cell-click']);
 const colorMap = {
   white: "#FFFFFF", yellow: "#FFD500", red: "#C41E3A",
   orange: "#FF5800", blue: "#0051BA", green: "#009E60",
+  black: "#000000"
 };
 
 const handleCellClick = (index) => {
