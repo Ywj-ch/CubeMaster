@@ -40,11 +40,13 @@
 
     <div class="solver-main-content">
       <div class="view-3d-box">
+        <!-- 绑定 moveDuration -->
         <Cube3DView
           ref="cube3dRef"
           :cubeState="cubeState"
           :interactive="!hasSolved"
           :enableControls="true"
+          :moveDuration="demoSpeed"
         />
         <div class="step-counter" v-if="steps.length">
           <span class="curr">{{ currentStep }}</span>
@@ -95,43 +97,58 @@
     </div>
 
     <div class="solver-footer">
-      <!-- 优化后的播放控制栏 -->
       <div class="playback-controls">
-        <el-tooltip content="上一步" placement="top">
-          <el-button
-            circle
-            size="large"
-            :icon="ArrowLeft"
-            @click="prevStep"
-            :disabled="currentStep === 0 || is3DBusy"
-            class="nav-btn"
-          />
-        </el-tooltip>
+        <!-- 左侧：速度控制 (新增) -->
+        <div class="speed-control-wrapper">
+          <span class="speed-label">速度</span>
+          <el-radio-group v-model="demoSpeed" size="small" class="speed-radios">
+            <el-radio-button :label="800">慢</el-radio-button>
+            <el-radio-button :label="300">中</el-radio-button>
+            <el-radio-button :label="150">快</el-radio-button>
+          </el-radio-group>
+        </div>
 
-        <el-button
-          type="primary"
-          size="large"
-          class="play-btn"
-          @click="toggleAutoPlay"
-          :disabled="!hasSolved || currentStep >= steps.length"
-          round
-        >
-          <el-icon class="el-icon--left">
-            <component :is="isAutoPlaying ? VideoPause : VideoPlay" />
-          </el-icon>
-          {{ isAutoPlaying ? '暂停演示' : '自动演示' }}
-        </el-button>
+        <!-- 中间：核心播放按钮 -->
+        <div class="main-controls">
+          <el-tooltip content="上一步" placement="top">
+            <el-button
+              circle
+              size="large"
+              :icon="ArrowLeft"
+              @click="prevStep"
+              :disabled="currentStep === 0 || is3DBusy"
+              class="nav-btn"
+            />
+          </el-tooltip>
 
-        <el-tooltip content="下一步" placement="top">
           <el-button
-            circle
+            type="primary"
             size="large"
-            :icon="ArrowRight"
-            @click="nextStep"
-            :disabled="currentStep >= steps.length || !hasSolved || is3DBusy"
-            class="nav-btn"
-          />
-        </el-tooltip>
+            class="play-btn"
+            @click="toggleAutoPlay"
+            :disabled="!hasSolved || currentStep >= steps.length"
+            round
+          >
+            <el-icon class="el-icon--left">
+              <component :is="isAutoPlaying ? VideoPause : VideoPlay" />
+            </el-icon>
+            {{ isAutoPlaying ? '暂停演示' : '自动演示' }}
+          </el-button>
+
+          <el-tooltip content="下一步" placement="top">
+            <el-button
+              circle
+              size="large"
+              :icon="ArrowRight"
+              @click="nextStep"
+              :disabled="currentStep >= steps.length || !hasSolved || is3DBusy"
+              class="nav-btn"
+            />
+          </el-tooltip>
+        </div>
+
+        <!-- 右侧：占位，保持中间居中 (可选) -->
+        <div class="control-spacer"></div>
       </div>
 
       <div class="steps-progress-bar" v-if="steps.length">
@@ -166,7 +183,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onUnmounted } from "vue";
+import { ref, nextTick, onUnmounted, watch } from "vue"; // 引入 watch
 import {solveCube, saveCubeState} from "../api/cubeService.js";
 import { createCubeFromJson } from "../utils/cubeState";
 import {applyMove, invertMove} from "../utils/cubeMoves";
@@ -193,7 +210,7 @@ const COLOR_ORDER = ['white', 'yellow', 'red', 'orange', 'blue', 'green'];
 // 自动播放相关状态
 const isAutoPlaying = ref(false);
 let autoPlayTimer = null;
-const AUTO_PLAY_INTERVAL = 800; // 自动播放间隔 (ms)，需大于动画时长
+const demoSpeed = ref(300); // 默认速度 300ms
 
 // 打开扫描器的方法
 const openScanner = () => {
@@ -249,7 +266,7 @@ const toggleColor = (faceKey, index) => {
 
 async function fetchSolution() {
   loading.value = true;
-  stopAutoPlay(); // 重新求解前停止播放
+  stopAutoPlay();
   try {
     await saveCubeState(cubeState.value.faces);
     const res = await solveCube();
@@ -289,8 +306,10 @@ function startAutoPlay() {
   if (currentStep.value >= steps.value.length) return;
 
   isAutoPlaying.value = true;
-  // 立即执行一步，然后开始循环
   nextStep(true);
+
+  // 动态计算间隔：动画时长 + 50ms 缓冲
+  const interval = demoSpeed.value + 50;
 
   autoPlayTimer = setInterval(() => {
     if (currentStep.value >= steps.value.length) {
@@ -298,7 +317,7 @@ function startAutoPlay() {
     } else {
       nextStep(true);
     }
-  }, AUTO_PLAY_INTERVAL);
+  }, interval);
 }
 
 function stopAutoPlay() {
@@ -308,6 +327,14 @@ function stopAutoPlay() {
     autoPlayTimer = null;
   }
 }
+
+// 监听速度变化，如果正在播放，需要重置定时器以应用新速度
+watch(demoSpeed, () => {
+  if (isAutoPlaying.value) {
+    stopAutoPlay();
+    startAutoPlay();
+  }
+});
 
 // --- 步骤控制 ---
 
@@ -325,22 +352,22 @@ function nextStep(isAuto = false) {
     cube3dRef.value.playMove(move);
     currentStep.value++;
 
+    // 锁定时长跟随动画速度，加一点缓冲
     setTimeout(() => {
       is3DBusy.value = false;
-    }, 350);
+    }, demoSpeed.value + 20);
 
     nextTick(() => {
       const activeNode = document.querySelector('.step-node.is-active');
       if (activeNode) activeNode.scrollIntoView({ behavior: 'smooth', inline: 'center' });
     });
   } else {
-    // 如果已经到最后一步，停止自动播放
     stopAutoPlay();
   }
 }
 
 function prevStep() {
-  stopAutoPlay(); // 手动介入时停止自动播放
+  stopAutoPlay();
   if (!hasSolved.value || is3DBusy.value) return;
 
   if (currentStep.value > 0) {
@@ -352,14 +379,13 @@ function prevStep() {
     cube3dRef.value.playMove(reverseMove);
     setTimeout(() => {
       is3DBusy.value = false;
-    }, 350);
+    }, demoSpeed.value + 20);
   }
 }
 
-// 允许点击步骤条跳转（可选功能，暂未完全实现逻辑，仅作为占位）
 function jumpToStep(index) {
-  // 复杂的跳转逻辑需要计算中间差值，这里暂时只停止播放
   stopAutoPlay();
+  // 暂未实现复杂跳转逻辑
 }
 
 function resetCube() {
@@ -371,14 +397,13 @@ function resetCube() {
   hasSolved.value = false;
 }
 
-// 组件卸载时清理定时器
 onUnmounted(() => {
   stopAutoPlay();
 });
 </script>
 
 <style scoped>
-/* 1. 整体页面背景优化 */
+/* 保持原有布局样式 */
 .cube-solver-page {
   height: 100vh;
   width: 100vw;
@@ -387,16 +412,15 @@ onUnmounted(() => {
   background: radial-gradient(circle at 50% 50%, #f8fafc 0%, #f1f5f9 100%);
   padding: 0 40px;
   box-sizing: border-box;
-  overflow: hidden; /* 禁止页面滚动 */
+  overflow: hidden;
 }
 
-/* 2. 顶部标题美化 */
 .solver-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 25px 0;
-  flex-shrink: 0; /* 防止顶部被压缩 */
+  flex-shrink: 0;
 }
 .main-title {
   font-size: 24px;
@@ -408,16 +432,14 @@ onUnmounted(() => {
 }
 .sub-title { color: #94a3b8; font-size: 13px; margin-top: 4px; font-weight: 500; }
 
-/* 3. 中间展示区：解决溢出与比例 */
 .solver-main-content {
   flex: 1;
   display: flex;
   gap: 24px;
-  min-height: 0; /* 核心：允许子元素收缩 */
-  padding-bottom: 20px; /* 为下方留出呼吸感 */
+  min-height: 0;
+  padding-bottom: 20px;
 }
 
-/* 3D 区域卡片化 */
 .view-3d-box {
   flex: 3.5;
   background: rgba(255, 255, 255, 0.5);
@@ -431,7 +453,7 @@ onUnmounted(() => {
 .step-counter {
   position: absolute;
   top: 20px;
-  left: 20px; /* 移到左边，更符合 UI 逻辑 */
+  left: 20px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(4px);
   padding: 8px 16px;
@@ -441,9 +463,8 @@ onUnmounted(() => {
 .curr { font-size: 20px; font-weight: 800; color: #3b82f6; }
 .total { color: #94a3b8; font-size: 14px; margin-left: 4px; }
 
-/* 优化后的 2D 容器 */
 .view-2d-box {
-  flex: 1.2; /* 稍微增加占比以适应垂直布局 */
+  flex: 1.2;
   background: white;
   border-radius: 24px;
   padding: 20px;
@@ -452,10 +473,9 @@ onUnmounted(() => {
   align-items: center;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow-y: auto; /* 如果内容过多允许内部滚动 */
+  overflow-y: auto;
 }
 
-/* 垂直容器 */
 .vertical-net {
   display: flex;
   flex-direction: column;
@@ -464,7 +484,6 @@ onUnmounted(() => {
   align-items: center;
 }
 
-/* 2x2 网格处理中间四个面，防止横向溢出 */
 .face-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -482,7 +501,6 @@ onUnmounted(() => {
   transition: all 0.2s;
 }
 
-/* 移除那个“蓝色的框”，保持统一的灰色边框，仅在 hover 时反馈 */
 .face-wrapper:hover {
   border-color: #cbd5e1;
   background: #f1f5f9;
@@ -505,18 +523,16 @@ onUnmounted(() => {
   gap: 4px;
 }
 
-/* 当已经有解法时，2D区域的样式 */
 .is-solved-locked {
   cursor: not-allowed;
   position: relative;
 }
 
-/* 4. 底部操作区：修复挡住问题 */
 .solver-footer {
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 30px 30px 0 0;
-  padding: 24px 40px 35px; /* 底部增加 padding 确保不贴边 */
+  padding: 24px 40px 35px;
   box-shadow: 0 -15px 50px rgba(0,0,0,0.04);
   z-index: 10;
 }
@@ -524,13 +540,41 @@ onUnmounted(() => {
 /* 播放控制器样式优化 */
 .playback-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* 两端对齐 */
   align-items: center;
-  gap: 20px; /* 按钮间距 */
   margin-bottom: 24px;
+  position: relative;
 }
 
-/* 播放按钮突出显示 */
+/* 速度控制区 */
+.speed-control-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 200px; /* 固定宽度占位 */
+}
+.speed-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+.speed-radios :deep(.el-radio-button__inner) {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* 中间核心按钮 */
+.main-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 右侧占位 */
+.control-spacer {
+  width: 200px;
+}
+
 .play-btn {
   width: 140px;
   font-weight: 600;
@@ -542,7 +586,6 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
 }
 
-/* 导航按钮样式 */
 .nav-btn {
   border-color: #e2e8f0;
   color: #64748b;
@@ -553,7 +596,6 @@ onUnmounted(() => {
   background: #eff6ff;
 }
 
-/* 5. 步骤条“轨道感”美化 */
 .steps-progress-bar {
   background: #f8fafc;
   padding: 12px;
@@ -579,7 +621,6 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-/* 高亮当前步骤 */
 .step-node.is-active {
   background: #3b82f6;
   border-color: #3b82f6;
@@ -589,7 +630,6 @@ onUnmounted(() => {
 .step-node.is-active .node-move { color: white; }
 .step-node.is-active .node-idx { color: rgba(255,255,255,0.7); }
 
-/* 已完成步骤变淡 */
 .step-node.is-past {
   opacity: 0.4;
   filter: grayscale(0.8);
@@ -598,7 +638,6 @@ onUnmounted(() => {
 .node-idx { font-size: 10px; color: #cbd5e1; font-weight: 700; margin-bottom: 4px; }
 .node-move { font-size: 17px; font-weight: 800; color: #334155; }
 
-/* 滚动条美化 (适配 Element Plus) */
 :deep(.el-scrollbar__bar) {
   bottom: 0px;
 }

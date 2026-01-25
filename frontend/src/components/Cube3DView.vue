@@ -38,13 +38,15 @@ const props = defineProps({
 
   // --- 是否允许缩放 ---
   // 默认开启，保证 Solver 和 Free 模式能缩放
-  enableZoom: { type: Boolean, default: true }
+  enableZoom: { type: Boolean, default: true },
+
+  // --- 每次移动的动画时长 (毫秒) ---
+  moveDuration: { type: Number, default: 300 }
 });
 
 const emit = defineEmits(['move']);
 
 const DRAG_THRESHOLD = 35;
-const ANIMATION_DURATION = 300;
 const CUBIE_SIZE = 0.95;
 
 const COLOR_MAP = {
@@ -199,7 +201,7 @@ function playMove(move) {
 
   const start = performance.now();
   function step(now) {
-    const t = Math.min((now - start) / ANIMATION_DURATION, 1);
+    const t = Math.min((now - start) / props.moveDuration, 1);
     rotateGroup.rotation[axis] = angle * t;
     if (t < 1) {
       requestAnimationFrame(step);
@@ -295,7 +297,6 @@ function handleCubeRotation(dragDir) {
     const move = getMoveCommand(bestDragAxis, moveSign, startCubie.position, normal);
     if (move) {
       emit('move', move);
-      playMove(move);
     }
   }
 }

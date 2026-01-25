@@ -52,10 +52,14 @@ yolo_train/runs/
 # 忽略临时测试脚本生成的图片
 *.jpg
 *.png
-!backend/images/*.png  # 但保留后端用于显示的占位图(如果有的话)
+!backend/images/*.png  # 但保留后端用于显示的占位图
 
 # 忽略大型模型文件 (除了我们明确要用的)
 *.pt
 *.onnx
-#如果你想保留最终部署的模型，可以用 ! 排除忽略
 !backend/models/best.pt
+
+
+/runs/detect/cube_yolo_v1/args.yaml
+/project_context.md
+/runs/detect/cube_yolo_v1/results.csv
