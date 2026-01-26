@@ -40,7 +40,6 @@
 
     <div class="solver-main-content">
       <div class="view-3d-box">
-        <!-- 绑定 moveDuration -->
         <Cube3DView
           ref="cube3dRef"
           :cubeState="cubeState"
@@ -57,48 +56,68 @@
       <div class="view-2d-box" :class="{ 'is-solved-locked': hasSolved }">
         <div class="box-label">2D 状态校准</div>
 
-        <div class="vertical-net">
-          <div class="face-group">
-            <div class="face-wrapper">
-              <span class="face-id">U (顶面)</span>
-              <Face2DView :face="cubeState.faces.U" @cell-click="idx => toggleColor('U', idx)" />
+        <div class="editor-container">
+          <!-- 左侧：2D 展开图 -->
+          <div class="vertical-net">
+            <div class="face-group">
+              <div class="face-wrapper">
+                <span class="face-id">U (顶面)</span>
+                <Face2DView :face="cubeState.faces.U" @cell-click="idx => toggleColor('U', idx)" />
+              </div>
+            </div>
+
+            <div class="face-grid">
+              <div class="face-wrapper">
+                <span class="face-id">L (左)</span>
+                <Face2DView :face="cubeState.faces.L" @cell-click="idx => toggleColor('L', idx)" />
+              </div>
+              <div class="face-wrapper">
+                <span class="face-id">F (前)</span>
+                <Face2DView :face="cubeState.faces.F" @cell-click="idx => toggleColor('F', idx)" />
+              </div>
+              <div class="face-wrapper">
+                <span class="face-id">R (右)</span>
+                <Face2DView :face="cubeState.faces.R" @cell-click="idx => toggleColor('R', idx)" />
+              </div>
+              <div class="face-wrapper">
+                <span class="face-id">B (后)</span>
+                <Face2DView :face="cubeState.faces.B" @cell-click="idx => toggleColor('B', idx)" />
+              </div>
+            </div>
+
+            <div class="face-group">
+              <div class="face-wrapper">
+                <span class="face-id">D (底面)</span>
+                <Face2DView :face="cubeState.faces.D" @cell-click="idx => toggleColor('D', idx)" />
+              </div>
             </div>
           </div>
 
-          <div class="face-grid">
-            <div class="face-wrapper">
-              <span class="face-id">L (左)</span>
-              <Face2DView :face="cubeState.faces.L" @cell-click="idx => toggleColor('L', idx)" />
-            </div>
-            <div class="face-wrapper">
-              <span class="face-id">F (前)</span>
-              <Face2DView :face="cubeState.faces.F" @cell-click="idx => toggleColor('F', idx)" />
-            </div>
-            <div class="face-wrapper">
-              <span class="face-id">R (右)</span>
-              <Face2DView :face="cubeState.faces.R" @cell-click="idx => toggleColor('R', idx)" />
-            </div>
-            <div class="face-wrapper">
-              <span class="face-id">B (后)</span>
-              <Face2DView :face="cubeState.faces.B" @cell-click="idx => toggleColor('B', idx)" />
-            </div>
-          </div>
-
-          <div class="face-group">
-            <div class="face-wrapper">
-              <span class="face-id">D (底面)</span>
-              <Face2DView :face="cubeState.faces.D" @cell-click="idx => toggleColor('D', idx)" />
+          <!-- 右侧：竖向调色板 (新增) -->
+          <div class="palette-toolbar">
+            <div class="palette-label">画笔</div>
+            <div
+              v-for="color in PALETTE"
+              :key="color.name"
+              class="palette-item"
+              :class="{ active: activeColor === color.name }"
+              :style="{ backgroundColor: color.hex }"
+              @click="activeColor = color.name"
+              :title="color.label"
+            >
+              <!-- 选中标记 -->
+              <div v-if="activeColor === color.name" class="check-mark"></div>
             </div>
           </div>
         </div>
 
-        <p class="hint-text"><el-icon><InfoFilled /></el-icon> 点击方块修正识别错误</p>
+        <p class="hint-text"><el-icon><InfoFilled /></el-icon> 选择画笔颜色后点击方块修改</p>
       </div>
     </div>
 
     <div class="solver-footer">
+      <!-- 底部播放控制栏保持不变 -->
       <div class="playback-controls">
-        <!-- 左侧：速度控制 (新增) -->
         <div class="speed-control-wrapper">
           <span class="speed-label">速度</span>
           <el-radio-group v-model="demoSpeed" size="small" class="speed-radios">
@@ -108,7 +127,6 @@
           </el-radio-group>
         </div>
 
-        <!-- 中间：核心播放按钮 -->
         <div class="main-controls">
           <el-tooltip content="上一步" placement="top">
             <el-button
@@ -147,7 +165,6 @@
           </el-tooltip>
         </div>
 
-        <!-- 右侧：占位，保持中间居中 (可选) -->
         <div class="control-spacer"></div>
       </div>
 
@@ -183,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onUnmounted, watch } from "vue"; // 引入 watch
+import { ref, nextTick, onUnmounted, watch } from "vue";
 import {solveCube, saveCubeState} from "../api/cubeService.js";
 import { createCubeFromJson } from "../utils/cubeState";
 import {applyMove, invertMove} from "../utils/cubeMoves";
@@ -205,19 +222,26 @@ const cube3dRef = ref(null);
 const solutionMoves = ref([]);
 const is3DBusy = ref(false);
 const isScannerVisible = ref(false);
-const COLOR_ORDER = ['white', 'yellow', 'red', 'orange', 'blue', 'green'];
 
-// 自动播放相关状态
+// 调色板配置 (新增)
+const PALETTE = [
+  { name: 'white',  hex: '#FFFFFF', label: '白' },
+  { name: 'yellow', hex: '#FFD500', label: '黄' },
+  { name: 'red',    hex: '#C41E3A', label: '红' },
+  { name: 'orange', hex: '#FF5800', label: '橙' },
+  { name: 'blue',   hex: '#0051BA', label: '蓝' },
+  { name: 'green',  hex: '#009E60', label: '绿' }
+];
+const activeColor = ref('white'); // 当前画笔颜色
+
 const isAutoPlaying = ref(false);
 let autoPlayTimer = null;
-const demoSpeed = ref(300); // 默认速度 300ms
+const demoSpeed = ref(300);
 
-// 打开扫描器的方法
 const openScanner = () => {
   isScannerVisible.value = true;
 };
 
-// 处理扫描结果
 const handleScannedResult = (result) => {
   isScannerVisible.value = false;
   const newCube = createCubeFromJson(result);
@@ -226,37 +250,28 @@ const handleScannedResult = (result) => {
   ElMessage.success('扫描成功，请点击 2D 图纠正可能的识别错误');
 };
 
+/**
+ * 颜色切换逻辑 (修改为画笔模式)
+ */
 const toggleColor = (faceKey, index) => {
   if (hasSolved.value) {
     ElMessage.info("请先完成当前解法或重置魔方后再修改状态");
     return;
   }
+
   const faceData = cubeState.value.faces[faceKey];
   if (!faceData) return;
 
-  let currentColor;
-  let row, col;
+  // 使用当前选中的画笔颜色
+  const newColor = activeColor.value;
 
+  let row, col;
   if (Array.isArray(faceData[0])) {
     row = Math.floor(index / 3);
     col = index % 3;
-    currentColor = faceData[row][col];
+    faceData[row][col] = newColor;
   } else {
-    currentColor = faceData[index];
-  }
-
-  let nextColor;
-  if (!COLOR_ORDER.includes(currentColor)) {
-    nextColor = COLOR_ORDER[0];
-  } else {
-    const nextIdx = (COLOR_ORDER.indexOf(currentColor) + 1) % COLOR_ORDER.length;
-    nextColor = COLOR_ORDER[nextIdx];
-  }
-
-  if (Array.isArray(faceData[0])) {
-    faceData[row][col] = nextColor;
-  } else {
-    faceData[index] = nextColor;
+    faceData[index] = newColor;
   }
 
   const updatedCube = createCubeFromJson(cubeState.value.faces);
@@ -292,8 +307,6 @@ async function fetchSolution() {
   }
 }
 
-// --- 自动播放逻辑 ---
-
 function toggleAutoPlay() {
   if (isAutoPlaying.value) {
     stopAutoPlay();
@@ -304,13 +317,9 @@ function toggleAutoPlay() {
 
 function startAutoPlay() {
   if (currentStep.value >= steps.value.length) return;
-
   isAutoPlaying.value = true;
   nextStep(true);
-
-  // 动态计算间隔：动画时长 + 50ms 缓冲
   const interval = demoSpeed.value + 50;
-
   autoPlayTimer = setInterval(() => {
     if (currentStep.value >= steps.value.length) {
       stopAutoPlay();
@@ -328,7 +337,6 @@ function stopAutoPlay() {
   }
 }
 
-// 监听速度变化，如果正在播放，需要重置定时器以应用新速度
 watch(demoSpeed, () => {
   if (isAutoPlaying.value) {
     stopAutoPlay();
@@ -336,13 +344,8 @@ watch(demoSpeed, () => {
   }
 });
 
-// --- 步骤控制 ---
-
 function nextStep(isAuto = false) {
-  if (!isAuto) {
-    stopAutoPlay();
-  }
-
+  if (!isAuto) stopAutoPlay();
   if (!hasSolved.value || is3DBusy.value) return;
 
   if (currentStep.value < solutionMoves.value.length) {
@@ -351,12 +354,9 @@ function nextStep(isAuto = false) {
     applyMove(cubeState.value, move);
     cube3dRef.value.playMove(move);
     currentStep.value++;
-
-    // 锁定时长跟随动画速度，加一点缓冲
     setTimeout(() => {
       is3DBusy.value = false;
     }, demoSpeed.value + 20);
-
     nextTick(() => {
       const activeNode = document.querySelector('.step-node.is-active');
       if (activeNode) activeNode.scrollIntoView({ behavior: 'smooth', inline: 'center' });
@@ -383,9 +383,9 @@ function prevStep() {
   }
 }
 
+// 点击步骤节点跳转（还没做）
 function jumpToStep(index) {
   stopAutoPlay();
-  // 暂未实现复杂跳转逻辑
 }
 
 function resetCube() {
@@ -395,6 +395,7 @@ function resetCube() {
   solutionMoves.value = [];
   currentStep.value = 0;
   hasSolved.value = false;
+  activeColor.value = 'white';
 }
 
 onUnmounted(() => {
@@ -463,6 +464,7 @@ onUnmounted(() => {
 .curr { font-size: 20px; font-weight: 800; color: #3b82f6; }
 .total { color: #94a3b8; font-size: 14px; margin-left: 4px; }
 
+/* --- 编辑器区域布局修改 --- */
 .view-2d-box {
   flex: 1.2;
   background: white;
@@ -470,28 +472,101 @@ onUnmounted(() => {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* 移除 align-items: center，改为 stretch 或默认 */
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
 }
 
+.box-label {
+  text-align: center; /* 标题保持居中 */
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+/* 新增容器：包含 2D 图和调色板 */
+.editor-container {
+  display: flex;
+  justify-content: center;
+  gap: 32px; /* 间距 */
+  width: 100%;
+}
+
 .vertical-net {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: 100%;
+  gap: 12px;
   align-items: center;
+  /* 稍微缩小一点比例以适应布局 */
+  transform: scale(0.95);
 }
 
+/* 调色板样式 */
+.palette-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  height: fit-content;
+  align-self: center;
+}
+
+.palette-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.palette-item {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px; /* 圆角矩形更现代 */
+  border: 2px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.palette-item:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.palette-item.active {
+  border-color: #3b82f6;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 选中标记 (小圆点) */
+.check-mark {
+  width: 8px;
+  height: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 50%;
+}
+.palette-item.active .check-mark {
+  background: white; /* 选中时白点更明显 */
+}
+
+/* --- 原有 Face 样式微调 --- */
 .face-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 8px; /* 间距调小一点 */
 }
 
 .face-wrapper {
-  padding: 8px;
+  padding: 6px;
   background: #f8fafc;
   border-radius: 12px;
   border: 1px solid #f1f5f9;
@@ -507,27 +582,32 @@ onUnmounted(() => {
 }
 
 .face-id {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #64748b;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   text-transform: uppercase;
 }
 
 .hint-text {
-  margin-top: 20px;
+  margin-top: auto; /* 推到底部 */
+  padding-top: 20px;
   font-size: 12px;
   color: #94a3b8;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
 }
 
 .is-solved-locked {
   cursor: not-allowed;
   position: relative;
+  opacity: 0.8;
+  filter: grayscale(0.2);
 }
 
+/* 底部区域 */
 .solver-footer {
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.5);
@@ -537,21 +617,19 @@ onUnmounted(() => {
   z-index: 10;
 }
 
-/* 播放控制器样式优化 */
 .playback-controls {
   display: flex;
-  justify-content: space-between; /* 两端对齐 */
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
   position: relative;
 }
 
-/* 速度控制区 */
 .speed-control-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 200px; /* 固定宽度占位 */
+  width: 200px;
 }
 .speed-label {
   font-size: 12px;
@@ -563,14 +641,12 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
-/* 中间核心按钮 */
 .main-controls {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-/* 右侧占位 */
 .control-spacer {
   width: 200px;
 }

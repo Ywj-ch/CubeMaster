@@ -111,7 +111,7 @@
       </div>
     </el-dialog>
 
-    <!-- 胜利结算卡片 (新增) -->
+    <!-- 胜利结算卡片 -->
     <transition name="fade">
       <div v-if="isVictory" class="victory-overlay">
         <div class="victory-card">
@@ -145,8 +145,9 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import Cube3DView from '../components/Cube3DView.vue';
 import { createCubeFromJson } from '../utils/cubeState';
-import { applyMove } from '../utils/cubeMoves';
+import { applyMove, invertMove } from '../utils/cubeMoves';
 import { Timer, Refresh, RefreshLeft, VideoPlay, QuestionFilled } from '@element-plus/icons-vue';
+import confetti from 'canvas-confetti'; // 引入撒花库
 
 const cubeState = ref(createCubeFromJson());
 const cubeRef = ref(null);
@@ -214,20 +215,17 @@ function checkSolved() {
   for (const key of faceKeys) {
     let faceData = faces[key];
 
-    // 兼容性处理：如果是 3x3 二维数组，展平为一维
     if (Array.isArray(faceData[0])) {
       faceData = faceData.flat();
     }
 
-    const centerColor = faceData[4]; // 中心块颜色
+    const centerColor = faceData[4];
 
-    // 检查该面是否纯色
     const isFaceSolved = faceData.every(c => c === centerColor);
 
-    if (!isFaceSolved) return; // 只要有一面没还原，就没成功
+    if (!isFaceSolved) return;
   }
 
-  // 六面全部纯色 -> 胜利
   handleVictory();
 }
 
@@ -236,11 +234,34 @@ function handleVictory() {
   isGameStarted.value = false;
   finalTimeStr.value = timeDisplay.value;
 
-  // 计算 TPS (Turns Per Second)
   const seconds = currentTime.value / 1000;
   tps.value = seconds > 0 ? (history.value.length / seconds).toFixed(2) : "0.00";
 
   isVictory.value = true;
+
+  // --- 触发撒花特效 ---
+  triggerConfetti();
+}
+
+// 撒花配置函数
+function triggerConfetti() {
+  const count = 200;
+  const defaults = {
+    origin: { y: 0.7 },
+    zIndex: 3000
+  };
+
+  function fire(particleRatio, opts) {
+    confetti(Object.assign({}, defaults, opts, {
+      particleCount: Math.floor(count * particleRatio)
+    }));
+  }
+
+  fire(0.25, { spread: 26, startVelocity: 55, });
+  fire(0.2, { spread: 60, });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+  fire(0.1, { spread: 120, startVelocity: 45, });
 }
 
 // 处理 3D 组件的转动事件
@@ -252,7 +273,6 @@ function handle3DMove(move) {
  * 执行转动
  */
 async function executeMove(move, force = false) {
-  // 1. 状态拦截
   if (isAutoOperating.value && !force) return;
   if (!isGameStarted.value && !force) return;
   if (isMoving.value) return;
@@ -260,11 +280,9 @@ async function executeMove(move, force = false) {
   if (cubeRef.value) {
     isMoving.value = true;
 
-    // 2. 执行动画与数据更新
     cubeRef.value.playMove(move);
     applyMove(cubeState.value, move);
 
-    // 3. 记录历史
     if (!force) {
       history.value.push(move);
       nextTick(() => {
@@ -273,7 +291,6 @@ async function executeMove(move, force = false) {
       });
     }
 
-    // 4. 动画回调与胜利检测
     setTimeout(() => {
       isMoving.value = false;
       if (!force) checkSolved();
@@ -283,7 +300,7 @@ async function executeMove(move, force = false) {
 
 async function scrambleWithAnimation() {
   if (isAutoOperating.value) return;
-  isVictory.value = false; // 关闭结算弹窗
+  isVictory.value = false;
   isGameStarted.value = false;
   stopTimer();
   currentTime.value = 0;
