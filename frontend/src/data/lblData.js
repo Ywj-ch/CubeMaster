@@ -1,5 +1,5 @@
-// src/data/tutorials.js
-export const tutorialData = [
+// src/data/lblData.js
+export const lblSteps = [
   {
     id: "step-1",
     title: "第一步：底层黄色十字",
@@ -8,7 +8,7 @@ export const tutorialData = [
     cases: [
       {
         id: "case-1-1",
-        title: "情况一：黄色棱块在顶层",
+        title: "黄色棱块在顶层",
         description: "黄色棱块位于顶层（U面），且其侧面颜色已对准对应中心块。",
         setup: "F' F'",
         algorithm: "F2",
@@ -16,7 +16,7 @@ export const tutorialData = [
       },
       {
         id: "case-1-2",
-        title: "情况二：黄色棱块在中层",
+        title: "黄色棱块在中层",
         description: "黄色棱块在中层，此时需要观察底层情况。",
         setup: "R D R",
         algorithm: "D' R D",
@@ -24,7 +24,7 @@ export const tutorialData = [
       },
       {
         id: "case-1-3",
-        title: "情况三：白色棱块在底层但错位",
+        title: "白色棱块在底层但错位",
         description: "白色棱块已在底层，但侧面颜色未与中心块对齐。",
         setup: "R D R D' R'",
         algorithm: "R2 U F2", // 调整错位棱块
@@ -40,7 +40,7 @@ export const tutorialData = [
     cases: [
       {
         id: "case-2-1",
-        title: "情况一：角块在顶层，黄色朝前",
+        title: "角块在顶层，黄色朝前",
         description: "黄色角块位于顶层，且黄色面朝前，并且左侧面或者是右边侧面与该侧面中心颜色相同，",
         setup: "U' F2 U2 F2 R2 D R2 U R2 U B R B' R' D2 F2 D R U R'",
         algorithm: "U R U' R'",
@@ -48,7 +48,7 @@ export const tutorialData = [
       },
       {
         id: "case-2-2",
-        title: "情况二：角块在顶层，黄色朝侧面",
+        title: "角块在顶层，黄色朝侧面",
         description: "黄色角块位于顶层，但黄色面朝左侧或右侧。",
         setup: "R2 F' R2 U2 R2 F2 R2 U2 R' F2 U2 F U' R U",
         algorithm: "U' U' R' U R",
@@ -56,7 +56,7 @@ export const tutorialData = [
       },
       {
         id: "case-2-3",
-        title: "情况三：角块在底层但错位",
+        title: "角块在底层但错位",
         description: "白色角块已在底层，但位置错误或朝向错误。",
         setup: "B D2 F R2 B2 U2 R2 U2 F' U2 R F' D2 F' L B2 U' L U' B'",
         algorithm: "R U R' U'",
@@ -104,7 +104,7 @@ export const tutorialData = [
     cases: [
       {
         id: "case-4-1",
-        title: "情况一：小拐角（两个相邻棱块白色朝上）",
+        title: "小拐角（两个相邻棱块白色朝上）",
         description: "顶层有两个相邻的白色棱块朝上，形成L形。",
         setup: "F R U R' U' F'",
         algorithm: "F R U R' U' F'",
@@ -112,7 +112,7 @@ export const tutorialData = [
       },
       {
         id: "case-4-2",
-        title: "情况二：直线（两个相对棱块白色朝上）",
+        title: "直线（两个相对棱块白色朝上）",
         description: "顶层有两个相对的白色棱块朝上，形成一条直线。让直线水平。",
         setup: "F R U R' U' F' F R U R' U' F'",
         algorithm: "F R U R' U' F'",
@@ -179,7 +179,6 @@ export const tutorialData = [
     title: "第七步：顶层棱块归位（完成还原）",
     shortDesc: "调整棱块，大功告成！",
     description: "最后一步！调整顶层四个棱块的位置，完成整个魔方的还原。将已经完成的一面放在后面（B面）。",
-    orientation: { u: 'yellow', f: 'blue' },
     cases: [
       {
         id: "case-7-1",

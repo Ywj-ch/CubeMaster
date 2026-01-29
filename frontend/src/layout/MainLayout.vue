@@ -1,7 +1,7 @@
 <template>
   <div class="layout-container">
     <header :class="['header', { 'header-hidden': !showHeader, 'header-scrolled': isScrolled }]">
-      <div class="header-left">
+      <div class="header-left" @click="goHome">
         <div class="logo-container">
           <img src="/icons/logo_icon.svg" alt="CubeMaster Logo" width="26" height="26" />
         </div>
@@ -29,10 +29,16 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 const showHeader = ref(true);
 const isScrolled = ref(false);
 let lastScrollPosition = 0;
+const router = useRouter();
+
+const goHome = () => {
+  router.push('/');
+};
 
 const handleScroll = () => {
   const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
@@ -100,6 +106,10 @@ onUnmounted(() => {
   align-items: center; /* 垂直居中 */
   gap: 12px;           /* 在 Logo 和网站名之间留出 12px 的高级感间距 */
   cursor: pointer;    /* 增加交互感 */
+}
+
+.header-left:hover {
+  opacity: 0.8;
 }
 
 .logo-container {

@@ -90,7 +90,7 @@
           <el-col :xs="24" :sm="12" :md="8">
             <el-card class="course-card" shadow="hover">
               <div class="course-banner level-1">
-                <span class="level-tag">入门</span>
+                <span class="level-tag">基础</span>
                 <el-icon class="course-icon"><Reading /></el-icon>
               </div>
               <div class="course-content">
@@ -98,7 +98,7 @@
                 <p>了解中心块、棱块区别，掌握 U R F 等基础转动语言。</p>
                 <div class="course-meta">
                   <span><el-icon><Timer /></el-icon> 10分钟</span>
-                  <el-button text bg size="small" @click="handleEnterLearning">开始学习</el-button>
+                  <el-button text bg size="small" @click="handleEnterLearningBasic">开始学习</el-button>
                 </div>
               </div>
             </el-card>
@@ -107,15 +107,15 @@
           <el-col :xs="24" :sm="12" :md="8">
             <el-card class="course-card" shadow="hover">
               <div class="course-banner level-2">
-                <span class="level-tag">进阶</span>
+                <span class="level-tag">入门</span>
                 <el-icon class="course-icon"><DataLine /></el-icon>
               </div>
               <div class="course-content">
                 <h4>层先法 (LBL) 详解</h4>
                 <p>最经典的七步还原法，无需大量公式，逻辑清晰易上手。</p>
                 <div class="course-meta">
-                  <span><el-icon><Collection /></el-icon> 3 章节</span>
-                  <el-button text bg size="small" @click="handleEnterLearning">查看课程</el-button>
+                  <span><el-icon><Collection /></el-icon> 7 章节</span>
+                  <el-button text bg size="small" @click="handleEnterLearningLbl">查看课程</el-button>
                 </div>
               </div>
             </el-card>
@@ -124,7 +124,7 @@
           <el-col :xs="24" :sm="12" :md="8">
             <el-card class="course-card" shadow="hover">
               <div class="course-banner level-3">
-                <span class="level-tag">竞速</span>
+                <span class="level-tag">进阶</span>
                 <el-icon class="course-icon"><Trophy /></el-icon>
               </div>
               <div class="course-content">
@@ -132,7 +132,7 @@
                 <p>世界纪录保持者都在用的速拧方法，F2L/OLL/PLL 全解析。</p>
                 <div class="course-meta">
                   <span><el-icon><Unlock /></el-icon> 待解锁</span>
-                  <el-button text bg size="small" disabled>敬请期待</el-button>
+                  <el-button text bg size="small" @click="handleEnterLearningCfop">开发中</el-button>
                 </div>
               </div>
             </el-card>
@@ -140,7 +140,7 @@
         </el-row>
 
         <div class="mt-5">
-          <el-button type="primary" plain round @click="handleEnterLearning">
+          <el-button type="primary" plain round @click="handleEnterLearningBasic">
             进入学习中心 <el-icon><ArrowRight /></el-icon>
           </el-button>
         </div>
@@ -203,7 +203,9 @@ const homeCubeState = ref(createCubeFromJson());
 // 路由跳转
 const handleEnterSolver = () => router.push('/solver');
 const handleEnterPlayground = () => router.push('/cube');
-const handleEnterLearning = () => router.push('/learning');
+const handleEnterLearningBasic = () => router.push('/learning/basic');
+const handleEnterLearningLbl = () => router.push('/learning/lbl');
+const handleEnterLearningCfop = () => router.push('/learning/cfop');
 
 // 数据定义
 const features = [
