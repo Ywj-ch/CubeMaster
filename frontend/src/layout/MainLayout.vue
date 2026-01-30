@@ -1,9 +1,24 @@
 <template>
   <div class="layout-container">
-    <header :class="['header', { 'header-hidden': !showHeader, 'header-scrolled': isScrolled }]">
+    <!-- Header: 增加 isHomePage 判断，非首页直接应用 scrolled 样式 -->
+    <header
+      :class="[
+        'header',
+        {
+          'header-hidden': !showHeader,
+          'header-scrolled': isScrolled || !isHomePage,
+          'header-on-home': isHomePage,
+        },
+      ]"
+    >
       <div class="header-left" @click="goHome">
         <div class="logo-container">
-          <img src="/icons/logo_icon.svg" alt="CubeMaster Logo" width="26" height="26" />
+          <img
+            src="/icons/logo_icon.svg"
+            alt="CubeMaster Logo"
+            width="26"
+            height="26"
+          />
         </div>
         <span class="site-name">CubeMaster</span>
       </div>
@@ -17,64 +32,74 @@
       </nav>
     </header>
 
-    <main class="main-content">
+    <!-- Main: 非首页时自动空出 header 的高度，防止内容重叠 -->
+    <main :class="['main-content', { 'main-content-padded': !isHomePage }]">
       <router-view />
     </main>
 
+    <!-- Footer: 极简紧凑版 -->
     <footer class="footer">
-      <p>Copyright © 2026 chippanda</p>
+      <p class="copyright">Copyright © 2026 chippanda</p>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const showHeader = ref(true);
 const isScrolled = ref(false);
 let lastScrollPosition = 0;
 const router = useRouter();
+const route = useRoute();
 
-const goHome = () => {
-  router.push('/');
-};
+// 核心逻辑：判断当前是否为首页
+const isHomePage = computed(() => route.path === "/");
+
+const goHome = () => router.push("/");
 
 const handleScroll = () => {
-  const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+  const currentScrollPosition =
+    window.pageYOffset || document.documentElement.scrollTop;
 
-  // 判断是否已经离开了顶部
-  isScrolled.value = currentScrollPosition > 20;
+  // 滚动反馈
+  isScrolled.value = currentScrollPosition > 10;
 
-  // 滚动逻辑：向下滑动且超过 header 高度时隐藏，向上滑动时显示
+  // 显隐逻辑
   if (currentScrollPosition < 0) return;
+  if (Math.abs(currentScrollPosition - lastScrollPosition) < 40) return;
 
-  if (Math.abs(currentScrollPosition - lastScrollPosition) < 60) return; // 设定阈值避免抖动
-
-  showHeader.value = currentScrollPosition < lastScrollPosition || currentScrollPosition < 80;
+  showHeader.value =
+    currentScrollPosition < lastScrollPosition || currentScrollPosition < 100;
   lastScrollPosition = currentScrollPosition;
 };
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener("scroll", handleScroll);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
 <style scoped>
-/* 1. 布局基础 */
 .layout-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased; /* Apple 风格平滑字体 */
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  background-color: #ffffff;
 }
 
-/* 2. Header: 毛玻璃与智能显隐 */
+/* --- Header 基础 --- */
 .header {
   height: 64px;
   width: 100%;
@@ -83,83 +108,79 @@ onUnmounted(() => {
   align-items: center;
   padding: 0 40px;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.8); /* 降低透明度 */
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08); /* 极细分割线 */
   position: fixed;
   top: 0;
   z-index: 1000;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s; /* 丝滑动画 */
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s,
+    border-color 0.3s;
+}
+
+/* 初始状态：只有在首页且未滚动时才透明 */
+.header.header-on-home:not(.header-scrolled) {
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+/* 激活状态：非首页或已滚动时，应用磨砂玻璃效果 */
+.header-scrolled,
+.header:not(.header-on-home) {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
 }
 
 .header-hidden {
-  transform: translateY(-100%); /* 向下滑动时完全隐藏 */
+  transform: translateY(-100%);
 }
 
-.header-scrolled {
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03); /* 滚动后才出现的细腻阴影 */
-}
-
-/* 3. Logo: 拟物化微质感 (Skeuomorphic) */
+/* --- Logo & Nav --- */
 .header-left {
   display: flex;
-  align-items: center; /* 垂直居中 */
-  gap: 12px;           /* 在 Logo 和网站名之间留出 12px 的高级感间距 */
-  cursor: pointer;    /* 增加交互感 */
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
 }
-
-.header-left:hover {
-  opacity: 0.8;
-}
-
 .logo-container {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  width: 34px;
+  height: 34px;
+  background: #ffffff;
   border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* 核心：三重阴影实现物理悬浮感 */
-  box-shadow:
-    2px 2px 5px rgba(0, 0, 0, 0.05),      /* 外部投影 */
-    -1px -1px 2px rgba(255, 255, 255, 1), /* 反光高光 */
-    inset 0 1px 1px rgba(255, 255, 255, 0.8); /* 内部边缘光 */
-  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
-
 .site-name {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.02em; /* 紧凑排版 */
-  color: #1d1d1f;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
-/* 4. 导航栏交互 */
 .nav-wrapper {
   display: flex;
   gap: 28px;
 }
-
 .nav-item {
   text-decoration: none;
-  font-size: 15px;
-  color: #515154;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 600;
   position: relative;
-  padding: 4px 0;
+  padding: 6px 0;
+  transition: color 0.2s;
 }
-
 .nav-item:hover {
-  color: #0071e3;
+  color: #2563eb;
 }
-
-/* 激活状态：使用极简的微点或短横线 */
 .router-link-exact-active {
-  color: #1d1d1f;
+  color: #0f172a;
 }
-
 .router-link-exact-active::after {
   content: "";
   position: absolute;
@@ -168,27 +189,49 @@ onUnmounted(() => {
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background-color: #0071e3;
-  border-radius: 50%; /* 圆点指示器，比横线更高级 */
+  background-color: #2563eb;
+  border-radius: 50%;
 }
 
-/* 5. 主内容与页脚 */
+/* --- Content Area --- */
 .main-content {
   flex: 1;
-  margin-top: 0;
-  padding-top: 64px;
-  background: #ffffff;
+  background: transparent;
 }
 
+/* 关键优化：非首页页面增加顶部内边距，防止内容被 Header 遮挡 */
+.main-content-padded {
+  padding-top: 64px;
+}
+
+/* --- Footer: 紧凑收口 --- */
 .footer {
-  height: 80px;
+  padding: 32px 0; /* 压缩间距 */
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f5f5f7;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  color: #86868b;
-  font-size: 14px;
-  letter-spacing: 0.01em;
+  background: transparent;
+}
+.copyright {
+  color: #94a3b8;
+  font-size: 14px; /* 进一步减小字号，更显精致 */
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 20px;
+  }
+  .nav-wrapper {
+    gap: 16px;
+  }
+  .nav-item {
+    font-size: 13px;
+  }
+  .site-name {
+    display: none;
+  } /* 手机端隐藏名称只留 logo */
 }
 </style>
