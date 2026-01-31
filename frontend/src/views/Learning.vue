@@ -1,7 +1,6 @@
 <template>
   <div class="learning-container">
-    <el-container style="height: 100vh;">
-
+    <el-container style="height: 100vh">
       <!-- 1. 左侧导航栏 -->
       <el-aside width="280px" class="tutorial-sidebar">
         <div class="sidebar-header">
@@ -41,7 +40,6 @@
               :key="step.id || index"
               :index="index.toString()"
             >
-
               <span>{{ step.title }}</span>
             </el-menu-item>
           </el-menu>
@@ -50,7 +48,6 @@
 
       <!-- 2. 右侧主内容区 -->
       <el-main class="tutorial-content">
-
         <!-- 只有当前课程有步骤数据时才显示内容 -->
         <div v-if="currentStep">
           <!-- 章节标题区 -->
@@ -62,18 +59,23 @@
           <el-divider />
 
           <!-- 遍历当前章节的所有“情况” -->
-          <div v-for="(item, index) in currentStep.cases" :key="item.id" class="case-card">
+          <div
+            v-for="(item, index) in currentStep.cases"
+            :key="item.id"
+            class="case-card"
+          >
             <el-card shadow="hover" class="styled-card">
               <template #header>
                 <div class="card-header">
                   <!-- 这里加上了 index+1 是为了区分情况1、情况2，这通常是保留的 -->
-                  <el-tag effect="light" round style="margin-right: 10px;">情况 {{ index + 1 }}</el-tag>
+                  <el-tag effect="light" round style="margin-right: 10px"
+                    >情况 {{ index + 1 }}</el-tag
+                  >
                   <span class="case-title">{{ item.title }}</span>
                 </div>
               </template>
 
               <el-row :gutter="30" align="middle">
-
                 <!-- 左侧：文字讲解 -->
                 <el-col :span="14">
                   <div class="instruction-text">
@@ -116,7 +118,6 @@
                     />
                   </div>
                 </el-col>
-
               </el-row>
             </el-card>
           </div>
@@ -126,18 +127,17 @@
         <div v-else class="empty-state">
           <el-empty description="该课程内容正在开发中，敬请期待..." />
         </div>
-
       </el-main>
     </el-container>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { VideoPlay } from '@element-plus/icons-vue';
-import { courseList } from '../data/courses.js';
-import TutorialCube from '../components/TutorialCube.vue';
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { VideoPlay } from "@element-plus/icons-vue";
+import { courseList } from "../data/courses.js";
+import TutorialCube from "../components/TutorialCube.vue";
 
 // 引入路由钩子
 const route = useRoute();
@@ -155,7 +155,9 @@ const cubeRefs = ref({});
 // --- 计算属性 ---
 
 const currentCourse = computed(() => {
-  return courseList.find(c => c.id === currentCourseId.value) || courseList[0];
+  return (
+    courseList.find((c) => c.id === currentCourseId.value) || courseList[0]
+  );
 });
 
 const currentSteps = computed(() => {
@@ -180,9 +182,9 @@ watch(
       currentStepIndex.value = 0;
       cubeRefs.value = {};
       // 滚动回顶部
-      document.querySelector('.tutorial-content')?.scrollTo(0, 0);
+      document.querySelector(".tutorial-content")?.scrollTo(0, 0);
     }
-  }
+  },
 );
 
 // --- 方法 ---
@@ -196,13 +198,13 @@ const setCubeRef = (el, id) => {
 // 修改：下拉框切换课程时，触发路由跳转
 // 路由跳转会触发上面的 watch，从而更新 currentCourseId 和界面
 const handleCourseChange = (newId) => {
-  router.push({ name: 'Learning', params: { courseId: newId } });
+  router.push({ name: "Learning", params: { courseId: newId } });
 };
 
 const handleSelectStep = (index) => {
   currentStepIndex.value = parseInt(index);
   cubeRefs.value = {};
-  document.querySelector('.tutorial-content')?.scrollTo(0, 0);
+  document.querySelector(".tutorial-content")?.scrollTo(0, 0);
 };
 
 const handlePlay = (caseId) => {
@@ -226,7 +228,7 @@ const handlePlay = (caseId) => {
   border-right: 1px solid #e6e6e6;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.02);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02);
   z-index: 10;
 }
 
@@ -285,7 +287,6 @@ const handlePlay = (caseId) => {
 :deep(.el-select__suffix) {
   color: rgba(255, 255, 255, 0.7);
 }
-
 
 /* --- 侧边栏菜单 --- */
 .sidebar-menu {
@@ -385,7 +386,7 @@ const handlePlay = (caseId) => {
 }
 
 .algo-text {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   font-size: 1.3rem;
   font-weight: bold;
   color: #303133;
@@ -414,7 +415,7 @@ const handlePlay = (caseId) => {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #dcdfe6;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.02);
 }
 
 .empty-state {

@@ -9,16 +9,30 @@
       <div class="timer-num">{{ timeDisplay }}</div>
     </div>
 
-    <!-- 帮助按钮 (新增) -->
+    <!-- 帮助按钮 -->
     <div class="help-btn-wrapper">
-      <el-button circle @click="showHelp = true" :icon="QuestionFilled" size="large" />
+      <el-button
+        circle
+        @click="showHelp = true"
+        :icon="QuestionFilled"
+        size="large"
+      />
     </div>
 
     <div class="header-section">
       <h2 class="mode-title">自由探索</h2>
       <div class="status-indicator">
-        <span class="dot" :class="{ 'is-active': isGameStarted && !isAutoOperating }"></span>
-        {{ isAutoOperating ? '正在打乱...' : (isGameStarted ? '挑战进行中' : '准备就绪') }}
+        <span
+          class="dot"
+          :class="{ 'is-active': isGameStarted && !isAutoOperating }"
+        ></span>
+        {{
+          isAutoOperating
+            ? "正在打乱..."
+            : isGameStarted
+              ? "挑战进行中"
+              : "准备就绪"
+        }}
       </div>
     </div>
 
@@ -80,7 +94,9 @@
               </span>
             </transition-group>
             <div v-if="history.length === 0" class="seq-empty">
-              {{ isGameStarted ? '请开始你的操作...' : '点击“开始挑战”进行计时' }}
+              {{
+                isGameStarted ? "请开始你的操作..." : "点击“开始挑战”进行计时"
+              }}
             </div>
           </div>
         </el-scrollbar>
@@ -88,7 +104,13 @@
     </div>
 
     <!-- 操作指南弹窗 -->
-    <el-dialog v-model="showHelp" title="操作指南" width="400px" center align-center>
+    <el-dialog
+      v-model="showHelp"
+      title="操作指南"
+      width="400px"
+      center
+      align-center
+    >
       <div class="help-content">
         <div class="help-section">
           <h4>🖱️ 鼠标操作</h4>
@@ -106,7 +128,9 @@
             <div class="key-item"><span class="key">F</span> 前层 (Front)</div>
             <div class="key-item"><span class="key">B</span> 后层 (Back)</div>
           </div>
-          <p class="tip-text">注：按住 <code>Shift</code> + 字母可进行逆时针旋转</p>
+          <p class="tip-text">
+            注：按住 <code>Shift</code> + 字母可进行逆时针旋转
+          </p>
         </div>
       </div>
     </el-dialog>
@@ -132,7 +156,12 @@
             </div>
           </div>
           <div class="victory-actions">
-            <el-button type="primary" size="large" @click="scrambleWithAnimation">再来一局</el-button>
+            <el-button
+              type="primary"
+              size="large"
+              @click="scrambleWithAnimation"
+              >再来一局</el-button
+            >
             <el-button size="large" @click="isVictory = false">关闭</el-button>
           </div>
         </div>
@@ -142,19 +171,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
-import Cube3DView from '../components/Cube3DView.vue';
-import { createCubeFromJson } from '../utils/cubeState';
-import { applyMove, invertMove } from '../utils/cubeMoves';
-import { Timer, Refresh, RefreshLeft, VideoPlay, QuestionFilled } from '@element-plus/icons-vue';
-import confetti from 'canvas-confetti'; // 引入撒花库
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+import Cube3DView from "../components/Cube3DView.vue";
+import { createCubeFromJson } from "../utils/cubeState";
+import { applyMove, invertMove } from "../utils/cubeMoves";
+import {
+  Timer,
+  Refresh,
+  RefreshLeft,
+  VideoPlay,
+  QuestionFilled,
+} from "@element-plus/icons-vue";
+import confetti from "canvas-confetti"; // 引入撒花库
 
 const cubeState = ref(createCubeFromJson());
 const cubeRef = ref(null);
 const history = ref([]);
 const isAutoOperating = ref(false); // 打乱模式锁定
-const isMoving = ref(false);        // 单步动画锁定
-const isGameStarted = ref(false);   // 游戏开始状态
+const isMoving = ref(false); // 单步动画锁定
+const isGameStarted = ref(false); // 游戏开始状态
 const scrollRef = ref(null);
 
 const currentTime = ref(0);
@@ -173,9 +208,15 @@ const timeDisplay = computed(() => {
 });
 
 function formatTime(ms) {
-  const m = Math.floor(ms / 60000).toString().padStart(2, '0');
-  const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
-  const msec = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
+  const m = Math.floor(ms / 60000)
+    .toString()
+    .padStart(2, "0");
+  const s = Math.floor((ms % 60000) / 1000)
+    .toString()
+    .padStart(2, "0");
+  const msec = Math.floor((ms % 1000) / 10)
+    .toString()
+    .padStart(2, "0");
   return `${m}:${s}.${msec}`;
 }
 
@@ -210,7 +251,7 @@ function checkSolved() {
   if (!isGameStarted.value || history.value.length === 0) return;
 
   const faces = cubeState.value.faces;
-  const faceKeys = ['U', 'D', 'L', 'R', 'F', 'B'];
+  const faceKeys = ["U", "D", "L", "R", "F", "B"];
 
   for (const key of faceKeys) {
     let faceData = faces[key];
@@ -221,7 +262,7 @@ function checkSolved() {
 
     const centerColor = faceData[4];
 
-    const isFaceSolved = faceData.every(c => c === centerColor);
+    const isFaceSolved = faceData.every((c) => c === centerColor);
 
     if (!isFaceSolved) return;
   }
@@ -235,7 +276,8 @@ function handleVictory() {
   finalTimeStr.value = timeDisplay.value;
 
   const seconds = currentTime.value / 1000;
-  tps.value = seconds > 0 ? (history.value.length / seconds).toFixed(2) : "0.00";
+  tps.value =
+    seconds > 0 ? (history.value.length / seconds).toFixed(2) : "0.00";
 
   isVictory.value = true;
 
@@ -248,20 +290,22 @@ function triggerConfetti() {
   const count = 200;
   const defaults = {
     origin: { y: 0.7 },
-    zIndex: 3000
+    zIndex: 3000,
   };
 
   function fire(particleRatio, opts) {
-    confetti(Object.assign({}, defaults, opts, {
-      particleCount: Math.floor(count * particleRatio)
-    }));
+    confetti(
+      Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(count * particleRatio),
+      }),
+    );
   }
 
-  fire(0.25, { spread: 26, startVelocity: 55, });
-  fire(0.2, { spread: 60, });
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
   fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
   fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-  fire(0.1, { spread: 120, startVelocity: 45, });
+  fire(0.1, { spread: 120, startVelocity: 45 });
 }
 
 // 处理 3D 组件的转动事件
@@ -286,7 +330,7 @@ async function executeMove(move, force = false) {
     if (!force) {
       history.value.push(move);
       nextTick(() => {
-        const inner = scrollRef.value?.$el.querySelector('.el-scrollbar__wrap');
+        const inner = scrollRef.value?.$el.querySelector(".el-scrollbar__wrap");
         if (inner) inner.scrollLeft = inner.scrollWidth;
       });
     }
@@ -307,13 +351,26 @@ async function scrambleWithAnimation() {
   history.value = [];
   isAutoOperating.value = true;
 
-  const moves = ["R", "L", "U", "D", "F", "B", "R'", "L'", "U'", "D'", "F'", "B'"];
+  const moves = [
+    "R",
+    "L",
+    "U",
+    "D",
+    "F",
+    "B",
+    "R'",
+    "L'",
+    "U'",
+    "D'",
+    "F'",
+    "B'",
+  ];
   for (let i = 0; i < 2; i++) {
     const randomMove = moves[Math.floor(Math.random() * moves.length)];
     if (cubeRef.value) {
       cubeRef.value.playMove(randomMove);
       applyMove(cubeState.value, randomMove);
-      await new Promise(r => setTimeout(r, 320));
+      await new Promise((r) => setTimeout(r, 320));
     }
   }
   isAutoOperating.value = false;
@@ -338,20 +395,20 @@ function handleKeydown(e) {
 
   const key = e.key.toUpperCase();
   const shift = e.shiftKey;
-  const validKeys = ['U', 'D', 'L', 'R', 'F', 'B'];
+  const validKeys = ["U", "D", "L", "R", "F", "B"];
   if (validKeys.includes(key)) {
     executeMove(key + (shift ? "'" : ""));
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown);
-  document.body.style.overflow = 'hidden';
+  window.addEventListener("keydown", handleKeydown);
+  document.body.style.overflow = "hidden";
 });
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown);
-  document.body.style.overflow = '';
+  window.removeEventListener("keydown", handleKeydown);
+  document.body.style.overflow = "";
   stopTimer();
 });
 </script>
@@ -388,8 +445,17 @@ onUnmounted(() => {
   color: #1969d9;
   margin-bottom: 5px;
 }
-.timer-label { font-size: 11px; letter-spacing: 1.5px; font-weight: 600; }
-.timer-num { font-size: 36px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e293b; }
+.timer-label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+.timer-num {
+  font-size: 36px;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  color: #1e293b;
+}
 
 /* 帮助按钮样式 */
 .help-btn-wrapper {
@@ -399,11 +465,32 @@ onUnmounted(() => {
   z-index: 100;
 }
 
-.header-section { margin-top: 20px; }
-.mode-title { font-size: 32px; color: #1e293b; font-weight: 800; margin-bottom: 10px; }
-.status-indicator { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b; }
-.dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; }
-.dot.is-active { background: #10b981; box-shadow: 0 0 8px #10b981; }
+.header-section {
+  margin-top: 20px;
+}
+.mode-title {
+  font-size: 32px;
+  color: #1e293b;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #cbd5e1;
+  border-radius: 50%;
+}
+.dot.is-active {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
 
 .main-display-area {
   flex: 1;
@@ -435,8 +522,15 @@ onUnmounted(() => {
   gap: 25px;
 }
 
-.action-buttons { display: flex; gap: 24px; }
-.ctrl-btn { padding: 25px 40px; font-size: 16px; border-radius: 15px; }
+.action-buttons {
+  display: flex;
+  gap: 24px;
+}
+.ctrl-btn {
+  padding: 25px 40px;
+  font-size: 16px;
+  border-radius: 15px;
+}
 
 .start-btn {
   background: #10b981;
@@ -454,30 +548,57 @@ onUnmounted(() => {
   align-items: center;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
-.seq-label { font-weight: 800; color: #94a3b8; margin-right: 25px; font-size: 12px; }
-.seq-items { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.seq-label {
+  font-weight: 800;
+  color: #94a3b8;
+  margin-right: 25px;
+  font-size: 12px;
+}
+.seq-items {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
 .seq-tag {
   background: #f1f5f9;
   color: #3b82f6;
   padding: 10px 18px;
   border-radius: 12px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-weight: 700;
 }
-.seq-empty { color: #cbd5e1; font-size: 14px; }
+.seq-empty {
+  color: #cbd5e1;
+  font-size: 14px;
+}
 
 /* 帮助弹窗样式 */
-.help-content { padding: 0 10px; }
-.help-section { margin-bottom: 20px; }
-.help-section h4 { margin: 0 0 10px 0; color: #1e293b; }
-.help-section p { margin: 5px 0; color: #64748b; font-size: 14px; }
+.help-content {
+  padding: 0 10px;
+}
+.help-section {
+  margin-bottom: 20px;
+}
+.help-section h4 {
+  margin: 0 0 10px 0;
+  color: #1e293b;
+}
+.help-section p {
+  margin: 5px 0;
+  color: #64748b;
+  font-size: 14px;
+}
 .key-map-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 10px;
 }
-.key-item { font-size: 14px; color: #475569; }
+.key-item {
+  font-size: 14px;
+  color: #475569;
+}
 .key {
   display: inline-block;
   padding: 2px 8px;
@@ -488,7 +609,10 @@ onUnmounted(() => {
   font-weight: 700;
   margin-right: 5px;
 }
-.tip-text { font-size: 12px !important; color: #94a3b8 !important; }
+.tip-text {
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+}
 
 /* 胜利结算遮罩 */
 .victory-overlay {
@@ -506,26 +630,64 @@ onUnmounted(() => {
   padding: 40px 60px;
   border-radius: 30px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
   animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.victory-icon { font-size: 60px; margin-bottom: 10px; }
-.victory-card h3 { font-size: 28px; margin: 0 0 30px 0; color: #1e293b; }
+.victory-icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+.victory-card h3 {
+  font-size: 28px;
+  margin: 0 0 30px 0;
+  color: #1e293b;
+}
 .stats-grid {
   display: flex;
   gap: 40px;
   margin-bottom: 40px;
 }
-.stat-item { display: flex; flex-direction: column; gap: 5px; }
-.stat-item .label { font-size: 12px; color: #94a3b8; font-weight: 600; }
-.stat-item .value { font-size: 24px; font-weight: 800; color: #3b82f6; font-family: 'JetBrains Mono', monospace; }
-.stat-item .value.time { color: #10b981; }
-.victory-actions { display: flex; gap: 15px; justify-content: center; }
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.stat-item .label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+.stat-item .value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #3b82f6;
+  font-family: "JetBrains Mono", monospace;
+}
+.stat-item .value.time {
+  color: #10b981;
+}
+.victory-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
 
 @keyframes popIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

@@ -16,6 +16,6 @@ export function saveCubeState(facesData) {
 // 识别魔方状态
 export function recognizeCube(payload) {
   return axios.post(`${BASE_URL}/api/recognize`, payload, {
-    timeout: 300000
+    timeout: 300000,
   });
 }

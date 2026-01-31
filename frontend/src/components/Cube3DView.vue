@@ -26,18 +26,23 @@ const props = defineProps({
   autoRotateSpeed: { type: Number, default: 4.0 },
   cameraPosition: { type: Array, default: () => [6, 6, 6] },
   enableZoom: { type: Boolean, default: true },
-  moveDuration: { type: Number, default: 300 }
+  moveDuration: { type: Number, default: 300 },
 });
 
-const emit = defineEmits(['move']);
+const emit = defineEmits(["move"]);
 
 const DRAG_THRESHOLD = 35;
 const CUBIE_SIZE = 0.95;
 
 const COLOR_MAP = {
-  white: "#FFFFFF", yellow: "#FFD500", red: "#C41E3A",
-  orange: "#FF5800", blue: "#0051BA", green: "#009E60",
-  internal: "#222222", black: "#000000"
+  white: "#FFFFFF",
+  yellow: "#FFD500",
+  red: "#C41E3A",
+  orange: "#FF5800",
+  blue: "#0051BA",
+  green: "#009E60",
+  internal: "#222222",
+  black: "#000000",
 };
 
 // =========================================================
@@ -76,8 +81,8 @@ const normalizedState = computed(() => {
         F: props.cubeState[2],
         D: props.cubeState[3],
         L: props.cubeState[4],
-        B: props.cubeState[5]
-      }
+        B: props.cubeState[5],
+      },
     };
   }
   // 情况 B: 传入的是复杂对象 (来自 Solver / Free 模式)
@@ -155,26 +160,44 @@ function getFaceColor(face, x, y, z, faces) {
   let row, col;
   // 这里的映射逻辑必须与 cubeLogic.js 的扁平化逻辑一致
   switch (face) {
-    case "U": row = z + 1; col = x + 1; break;
-    case "D": row = 0 - z + 1; col = x + 1; break; // 注意 D 面的坐标映射
-    case "F": row = 1 - y; col = x + 1; break;
-    case "B": row = 1 - y; col = 1 - x; break;
-    case "R": row = 1 - y; col = 1 - z; break;
-    case "L": row = 1 - y; col = z + 1; break;
+    case "U":
+      row = z + 1;
+      col = x + 1;
+      break;
+    case "D":
+      row = 0 - z + 1;
+      col = x + 1;
+      break; // 注意 D 面的坐标映射
+    case "F":
+      row = 1 - y;
+      col = x + 1;
+      break;
+    case "B":
+      row = 1 - y;
+      col = 1 - x;
+      break;
+    case "R":
+      row = 1 - y;
+      col = 1 - z;
+      break;
+    case "L":
+      row = 1 - y;
+      col = z + 1;
+      break;
   }
   // 容错处理：如果 faces 数据没准备好，返回黑色
-  if (!faces || !faces[face]) return 'black';
+  if (!faces || !faces[face]) return "black";
   return faces[face][row * 3 + col];
 }
 
 function getCubieFaceColors(cubie, faces) {
   const res = Array(6).fill(null);
   const [x, y, z] = cubie.pos;
-  if (x === 1)  res[0] = getFaceColor("R", x, y, z, faces);
+  if (x === 1) res[0] = getFaceColor("R", x, y, z, faces);
   if (x === -1) res[1] = getFaceColor("L", x, y, z, faces);
-  if (y === 1)  res[2] = getFaceColor("U", x, y, z, faces);
+  if (y === 1) res[2] = getFaceColor("U", x, y, z, faces);
   if (y === -1) res[3] = getFaceColor("D", x, y, z, faces);
-  if (z === 1)  res[4] = getFaceColor("F", x, y, z, faces);
+  if (z === 1) res[4] = getFaceColor("F", x, y, z, faces);
   if (z === -1) res[5] = getFaceColor("B", x, y, z, faces);
   return res;
 }
@@ -186,13 +209,20 @@ function renderCubies() {
   while (cubeGroup.children.length) cubeGroup.remove(cubeGroup.children[0]);
 
   const state = normalizedState.value;
-  const allCubies = [...state.cubies.corners, ...state.cubies.edges, ...state.cubies.centers];
+  const allCubies = [
+    ...state.cubies.corners,
+    ...state.cubies.edges,
+    ...state.cubies.centers,
+  ];
 
-  allCubies.forEach(c => {
+  allCubies.forEach((c) => {
     const faceColors = getCubieFaceColors(c, state.faces);
     const geometry = new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
-    const materials = faceColors.map(color =>
-      new THREE.MeshLambertMaterial({ color: color ? COLOR_MAP[color] : COLOR_MAP.internal })
+    const materials = faceColors.map(
+      (color) =>
+        new THREE.MeshLambertMaterial({
+          color: color ? COLOR_MAP[color] : COLOR_MAP.internal,
+        }),
     );
     const mesh = new THREE.Mesh(geometry, materials);
     mesh.position.set(...c.pos);
@@ -215,15 +245,24 @@ function playMove(move) {
 
     let axis, layerValue, angle;
     const moveMap = {
-      "R":  { axis: 'x', lv: 1,  a: -Math.PI/2 }, "R'": { axis: 'x', lv: 1,  a: Math.PI/2 },
-      "L":  { axis: 'x', lv: -1, a: Math.PI/2 },  "L'": { axis: 'x', lv: -1, a: -Math.PI/2 },
-      "U":  { axis: 'y', lv: 1,  a: -Math.PI/2 }, "U'": { axis: 'y', lv: 1,  a: Math.PI/2 },
-      "D":  { axis: 'y', lv: -1, a: Math.PI/2 },  "D'": { axis: 'y', lv: -1, a: -Math.PI/2 },
-      "F":  { axis: 'z', lv: 1,  a: -Math.PI/2 }, "F'": { axis: 'z', lv: 1,  a: Math.PI/2 },
-      "B":  { axis: 'z', lv: -1, a: Math.PI/2 },  "B'": { axis: 'z', lv: -1, a: -Math.PI/2 },
-      "R2": { axis: 'x', lv: 1,  a: -Math.PI },    "L2": { axis: 'x', lv: -1, a: Math.PI },
-      "U2": { axis: 'y', lv: 1,  a: -Math.PI },    "D2": { axis: 'y', lv: -1, a: Math.PI },
-      "F2": { axis: 'z', lv: 1,  a: -Math.PI },    "B2": { axis: 'z', lv: -1, a: Math.PI }
+      R: { axis: "x", lv: 1, a: -Math.PI / 2 },
+      "R'": { axis: "x", lv: 1, a: Math.PI / 2 },
+      L: { axis: "x", lv: -1, a: Math.PI / 2 },
+      "L'": { axis: "x", lv: -1, a: -Math.PI / 2 },
+      U: { axis: "y", lv: 1, a: -Math.PI / 2 },
+      "U'": { axis: "y", lv: 1, a: Math.PI / 2 },
+      D: { axis: "y", lv: -1, a: Math.PI / 2 },
+      "D'": { axis: "y", lv: -1, a: -Math.PI / 2 },
+      F: { axis: "z", lv: 1, a: -Math.PI / 2 },
+      "F'": { axis: "z", lv: 1, a: Math.PI / 2 },
+      B: { axis: "z", lv: -1, a: Math.PI / 2 },
+      "B'": { axis: "z", lv: -1, a: -Math.PI / 2 },
+      R2: { axis: "x", lv: 1, a: -Math.PI },
+      L2: { axis: "x", lv: -1, a: Math.PI },
+      U2: { axis: "y", lv: 1, a: -Math.PI },
+      D2: { axis: "y", lv: -1, a: Math.PI },
+      F2: { axis: "z", lv: 1, a: -Math.PI },
+      B2: { axis: "z", lv: -1, a: Math.PI },
     };
 
     const config = moveMap[move];
@@ -234,10 +273,15 @@ function playMove(move) {
     }
     ({ axis, lv: layerValue, a: angle } = config);
 
-    const targets = cubeGroup.children.filter(m => Math.round(m.position[axis]) === layerValue);
+    const targets = cubeGroup.children.filter(
+      (m) => Math.round(m.position[axis]) === layerValue,
+    );
     const rotateGroup = new THREE.Group();
     scene.add(rotateGroup);
-    targets.forEach(m => { cubeGroup.remove(m); rotateGroup.add(m); });
+    targets.forEach((m) => {
+      cubeGroup.remove(m);
+      rotateGroup.add(m);
+    });
 
     const start = performance.now();
     function step(now) {
@@ -252,7 +296,9 @@ function playMove(move) {
         while (rotateGroup.children.length) {
           const m = rotateGroup.children[0];
           m.applyMatrix4(rotateGroup.matrix);
-          ["x", "y", "z"].forEach(coord => m.position[coord] = Math.round(m.position[coord]));
+          ["x", "y", "z"].forEach(
+            (coord) => (m.position[coord] = Math.round(m.position[coord])),
+          );
           rotateGroup.remove(m);
           cubeGroup.add(m);
         }
@@ -281,8 +327,12 @@ function onMouseDown(event) {
   if (intersects.length > 0) {
     const intersect = intersects[0];
     startCubie = intersect.object;
-    startNormal = intersect.face.normal.clone().applyQuaternion(startCubie.quaternion);
-    ["x", "y", "z"].forEach(a => startNormal[a] = Math.round(startNormal[a]));
+    startNormal = intersect.face.normal
+      .clone()
+      .applyQuaternion(startCubie.quaternion);
+    ["x", "y", "z"].forEach(
+      (a) => (startNormal[a] = Math.round(startNormal[a])),
+    );
 
     startMousePos.set(event.clientX, event.clientY);
     isMouseDown = true;
@@ -313,16 +363,23 @@ function handleCubeRotation(dragDir) {
   let possibleAxes = [];
 
   // 根据法向确定可能的滑动轴
-  if (Math.abs(normal.x) > 0.5) possibleAxes = [new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
-  else if (Math.abs(normal.y) > 0.5) possibleAxes = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 1)];
+  if (Math.abs(normal.x) > 0.5)
+    possibleAxes = [new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
+  else if (Math.abs(normal.y) > 0.5)
+    possibleAxes = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 1)];
   else possibleAxes = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0)];
 
-  let bestDragAxis = null, maxDot = -1, moveSign = 1;
+  let bestDragAxis = null,
+    maxDot = -1,
+    moveSign = 1;
 
-  possibleAxes.forEach(axis => {
+  possibleAxes.forEach((axis) => {
     const p1 = startCubie.position.clone().project(camera);
     const p2 = startCubie.position.clone().add(axis).project(camera);
-    const screenVector = new THREE.Vector2(p2.x - p1.x, p2.y - p1.y).normalize();
+    const screenVector = new THREE.Vector2(
+      p2.x - p1.x,
+      p2.y - p1.y,
+    ).normalize();
     const dot = dragDir.dot(screenVector);
     if (Math.abs(dot) > maxDot) {
       maxDot = Math.abs(dot);
@@ -332,9 +389,14 @@ function handleCubeRotation(dragDir) {
   });
 
   if (bestDragAxis && maxDot > 0.5) {
-    const move = getMoveCommand(bestDragAxis, moveSign, startCubie.position, normal);
+    const move = getMoveCommand(
+      bestDragAxis,
+      moveSign,
+      startCubie.position,
+      normal,
+    );
     if (move) {
-      emit('move', move);
+      emit("move", move);
     }
   }
 }
@@ -409,22 +471,46 @@ onUnmounted(() => {
 });
 
 // 监听归一化后的状态变化
-watch(normalizedState, () => {
-  if (!isAnimating) renderCubies();
-}, { deep: true });
+watch(
+  normalizedState,
+  () => {
+    if (!isAnimating) renderCubies();
+  },
+  { deep: true },
+);
 
 // 监听配置变化
-watch(() => props.enableControls, (val) => { if (controls) controls.enabled = val; });
-watch(() => props.autoRotate, (val) => { if (controls) controls.autoRotate = val; });
-watch(() => props.autoRotateSpeed, (val) => { if (controls) controls.autoRotateSpeed = val; });
-watch(() => props.enableZoom, (val) => { if (controls) controls.enableZoom = val; });
+watch(
+  () => props.enableControls,
+  (val) => {
+    if (controls) controls.enabled = val;
+  },
+);
+watch(
+  () => props.autoRotate,
+  (val) => {
+    if (controls) controls.autoRotate = val;
+  },
+);
+watch(
+  () => props.autoRotateSpeed,
+  (val) => {
+    if (controls) controls.autoRotateSpeed = val;
+  },
+);
+watch(
+  () => props.enableZoom,
+  (val) => {
+    if (controls) controls.enableZoom = val;
+  },
+);
 
 // 暴露方法
 defineExpose({
   playMove,
   triggerMove: playMove, // 别名，兼容 TutorialCube
   resetView: () => controls?.reset(),
-  renderCubies
+  renderCubies,
 });
 </script>
 

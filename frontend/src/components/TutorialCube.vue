@@ -5,7 +5,7 @@
       :cubeState="displayColors"
       :interactive="true"
       :moveDuration="500"
-      style="width: 100%; height: 100%;"
+      style="width: 100%; height: 100%"
     />
 
     <!-- 悬浮重置按钮 -->
@@ -22,13 +22,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import Cube3DView from '../components/Cube3DView.vue';
-import { SOLVED_STATE, cloneState, applyMove, stateToColors } from '../utils/cubeLogic.js';
+import { ref, onMounted, watch } from "vue";
+import Cube3DView from "../components/Cube3DView.vue";
+import {
+  SOLVED_STATE,
+  cloneState,
+  applyMove,
+  stateToColors,
+} from "../utils/cubeLogic.js";
 
 const props = defineProps({
-  setup: { type: String, default: '' },           // 初始设置动作，如 "F2"
-  algorithm: { type: String, default: '' },       // 演示动作，如 "R U R'"
+  setup: { type: String, default: "" }, // 初始设置动作，如 "F2"
+  algorithm: { type: String, default: "" }, // 演示动作，如 "R U R'"
 });
 
 // 内部状态
@@ -44,9 +49,9 @@ const initCube = () => {
 
   // 2. 如果有 setup 步骤，瞬间执行完（不播放动画）
   if (props.setup) {
-    const moves = props.setup.split(' ');
-    moves.forEach(move => {
-      if(move) state = applyMove(state, move);
+    const moves = props.setup.split(" ");
+    moves.forEach((move) => {
+      if (move) state = applyMove(state, move);
     });
   }
 
@@ -60,7 +65,7 @@ const playAlgorithm = async () => {
   if (isAnimating.value || !props.algorithm) return;
   isAnimating.value = true;
 
-  const moves = props.algorithm.split(' ');
+  const moves = props.algorithm.split(" ");
 
   // 逐个执行动画
   for (const move of moves) {
@@ -83,13 +88,16 @@ const playAlgorithm = async () => {
 // 暴露给父组件的方法
 defineExpose({
   play: playAlgorithm,
-  reset: initCube
+  reset: initCube,
 });
 
 // 监听 setup 变化（比如切换章节时），重置魔方
-watch(() => props.setup, () => {
-  initCube();
-});
+watch(
+  () => props.setup,
+  () => {
+    initCube();
+  },
+);
 
 onMounted(() => {
   initCube();
@@ -97,7 +105,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.tutorial-cube-wrapper {
+.tutorial-cube-wra pper {
   position: relative;
   width: 100%;
   height: 100%;

@@ -3,7 +3,9 @@
     <div class="solver-header">
       <div class="title-group">
         <h2 class="main-title">Kociemba 智能求解演示</h2>
-        <p class="sub-title">算法层级：二阶段缩减算法 | 最优解步数：{{ steps.length }}</p>
+        <p class="sub-title">
+          算法层级：二阶段缩减算法 | 最优解步数：{{ steps.length }}
+        </p>
       </div>
       <div class="header-actions">
         <el-button
@@ -62,33 +64,51 @@
             <div class="face-group">
               <div class="face-wrapper">
                 <span class="face-id">U (顶面)</span>
-                <Face2DView :face="cubeState.faces.U" @cell-click="idx => toggleColor('U', idx)" />
+                <Face2DView
+                  :face="cubeState.faces.U"
+                  @cell-click="(idx) => toggleColor('U', idx)"
+                />
               </div>
             </div>
 
             <div class="face-grid">
               <div class="face-wrapper">
                 <span class="face-id">L (左)</span>
-                <Face2DView :face="cubeState.faces.L" @cell-click="idx => toggleColor('L', idx)" />
+                <Face2DView
+                  :face="cubeState.faces.L"
+                  @cell-click="(idx) => toggleColor('L', idx)"
+                />
               </div>
               <div class="face-wrapper">
                 <span class="face-id">F (前)</span>
-                <Face2DView :face="cubeState.faces.F" @cell-click="idx => toggleColor('F', idx)" />
+                <Face2DView
+                  :face="cubeState.faces.F"
+                  @cell-click="(idx) => toggleColor('F', idx)"
+                />
               </div>
               <div class="face-wrapper">
                 <span class="face-id">R (右)</span>
-                <Face2DView :face="cubeState.faces.R" @cell-click="idx => toggleColor('R', idx)" />
+                <Face2DView
+                  :face="cubeState.faces.R"
+                  @cell-click="(idx) => toggleColor('R', idx)"
+                />
               </div>
               <div class="face-wrapper">
                 <span class="face-id">B (后)</span>
-                <Face2DView :face="cubeState.faces.B" @cell-click="idx => toggleColor('B', idx)" />
+                <Face2DView
+                  :face="cubeState.faces.B"
+                  @cell-click="(idx) => toggleColor('B', idx)"
+                />
               </div>
             </div>
 
             <div class="face-group">
               <div class="face-wrapper">
                 <span class="face-id">D (底面)</span>
-                <Face2DView :face="cubeState.faces.D" @cell-click="idx => toggleColor('D', idx)" />
+                <Face2DView
+                  :face="cubeState.faces.D"
+                  @cell-click="(idx) => toggleColor('D', idx)"
+                />
               </div>
             </div>
           </div>
@@ -111,7 +131,9 @@
           </div>
         </div>
 
-        <p class="hint-text"><el-icon><InfoFilled /></el-icon> 选择画笔颜色后点击方块修改</p>
+        <p class="hint-text">
+          <el-icon><InfoFilled /></el-icon> 选择画笔颜色后点击方块修改
+        </p>
       </div>
     </div>
 
@@ -150,7 +172,7 @@
             <el-icon class="el-icon--left">
               <component :is="isAutoPlaying ? VideoPause : VideoPlay" />
             </el-icon>
-            {{ isAutoPlaying ? '暂停演示' : '自动演示' }}
+            {{ isAutoPlaying ? "暂停演示" : "自动演示" }}
           </el-button>
 
           <el-tooltip content="下一步" placement="top">
@@ -177,7 +199,7 @@
               class="step-node"
               :class="{
                 'is-active': index === currentStep - 1,
-                'is-past': index < currentStep - 1
+                'is-past': index < currentStep - 1,
               }"
               @click="jumpToStep(index)"
             >
@@ -201,16 +223,23 @@
 
 <script setup>
 import { ref, nextTick, onUnmounted, watch } from "vue";
-import {solveCube, saveCubeState} from "../api/cubeService.js";
+import { solveCube, saveCubeState } from "../api/cubeService.js";
 import { createCubeFromJson } from "../utils/cubeState";
-import {applyMove, invertMove} from "../utils/cubeMoves";
+import { applyMove, invertMove } from "../utils/cubeMoves";
 import Face2DView from "../components/Face2DView.vue";
 import Cube3DView from "../components/Cube3DView.vue";
-import CubeScanner from '../components/CubeScanner.vue';
+import CubeScanner from "../components/CubeScanner.vue";
 import {
-  Camera, Search, RefreshLeft, ArrowLeft, ArrowRight, InfoFilled, VideoPlay, VideoPause
+  Camera,
+  Search,
+  RefreshLeft,
+  ArrowLeft,
+  ArrowRight,
+  InfoFilled,
+  VideoPlay,
+  VideoPause,
 } from "@element-plus/icons-vue";
-import { ElMessage } from 'element-plus';
+import { ElMessage } from "element-plus";
 
 // 状态
 const loading = ref(false);
@@ -225,14 +254,14 @@ const isScannerVisible = ref(false);
 
 // 调色板配置 (新增)
 const PALETTE = [
-  { name: 'white',  hex: '#FFFFFF', label: '白' },
-  { name: 'yellow', hex: '#FFD500', label: '黄' },
-  { name: 'red',    hex: '#C41E3A', label: '红' },
-  { name: 'orange', hex: '#FF5800', label: '橙' },
-  { name: 'blue',   hex: '#0051BA', label: '蓝' },
-  { name: 'green',  hex: '#009E60', label: '绿' }
+  { name: "white", hex: "#FFFFFF", label: "白" },
+  { name: "yellow", hex: "#FFD500", label: "黄" },
+  { name: "red", hex: "#C41E3A", label: "红" },
+  { name: "orange", hex: "#FF5800", label: "橙" },
+  { name: "blue", hex: "#0051BA", label: "蓝" },
+  { name: "green", hex: "#009E60", label: "绿" },
 ];
-const activeColor = ref('white'); // 当前画笔颜色
+const activeColor = ref("white"); // 当前画笔颜色
 
 const isAutoPlaying = ref(false);
 let autoPlayTimer = null;
@@ -247,7 +276,7 @@ const handleScannedResult = (result) => {
   const newCube = createCubeFromJson(result);
   cubeState.value.cubies = newCube.cubies;
   cubeState.value.faces = newCube.faces;
-  ElMessage.success('扫描成功，请点击 2D 图纠正可能的识别错误');
+  ElMessage.success("扫描成功，请点击 2D 图纠正可能的识别错误");
 };
 
 /**
@@ -297,8 +326,7 @@ async function fetchSolution() {
     solutionMoves.value = data.moves;
     currentStep.value = 0;
     hasSolved.value = true;
-    ElMessage.success('求解成功！');
-
+    ElMessage.success("求解成功！");
   } catch (e) {
     console.error(e);
     ElMessage.error("请求失败，请检查网络");
@@ -358,8 +386,9 @@ function nextStep(isAuto = false) {
       is3DBusy.value = false;
     }, demoSpeed.value + 20);
     nextTick(() => {
-      const activeNode = document.querySelector('.step-node.is-active');
-      if (activeNode) activeNode.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      const activeNode = document.querySelector(".step-node.is-active");
+      if (activeNode)
+        activeNode.scrollIntoView({ behavior: "smooth", inline: "center" });
     });
   } else {
     stopAutoPlay();
@@ -395,7 +424,7 @@ function resetCube() {
   solutionMoves.value = [];
   currentStep.value = 0;
   hasSolved.value = false;
-  activeColor.value = 'white';
+  activeColor.value = "white";
 }
 
 onUnmounted(() => {
@@ -431,7 +460,12 @@ onUnmounted(() => {
   -webkit-text-fill-color: transparent;
   font-weight: 800;
 }
-.sub-title { color: #94a3b8; font-size: 13px; margin-top: 4px; font-weight: 500; }
+.sub-title {
+  color: #94a3b8;
+  font-size: 13px;
+  margin-top: 4px;
+  font-weight: 500;
+}
 
 .solver-main-content {
   flex: 1;
@@ -447,8 +481,10 @@ onUnmounted(() => {
   border-radius: 28px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.02);
-  border: 1px solid rgba(255,255,255,0.8);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.03),
+    0 1px 2px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .step-counter {
@@ -461,8 +497,16 @@ onUnmounted(() => {
   border-radius: 12px;
   border: 1px solid #f1f5f9;
 }
-.curr { font-size: 20px; font-weight: 800; color: #3b82f6; }
-.total { color: #94a3b8; font-size: 14px; margin-left: 4px; }
+.curr {
+  font-size: 20px;
+  font-weight: 800;
+  color: #3b82f6;
+}
+.total {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-left: 4px;
+}
 
 /* --- 编辑器区域布局修改 --- */
 .view-2d-box {
@@ -527,13 +571,13 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   border-radius: 10px; /* 圆角矩形更现代 */
-  border: 2px solid rgba(0,0,0,0.05);
+  border: 2px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .palette-item:hover {
@@ -551,7 +595,7 @@ onUnmounted(() => {
 .check-mark {
   width: 8px;
   height: 8px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 50%;
 }
 .palette-item.active .check-mark {
@@ -613,7 +657,7 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.5);
   border-radius: 30px 30px 0 0;
   padding: 24px 40px 35px;
-  box-shadow: 0 -15px 50px rgba(0,0,0,0.04);
+  box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.04);
   z-index: 10;
 }
 
@@ -676,7 +720,7 @@ onUnmounted(() => {
   background: #f8fafc;
   padding: 12px;
   border-radius: 20px;
-  border: 1px inset rgba(0,0,0,0.01);
+  border: 1px inset rgba(0, 0, 0, 0.01);
 }
 
 .steps-flex {
@@ -703,16 +747,29 @@ onUnmounted(() => {
   box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
   transform: translateY(-5px);
 }
-.step-node.is-active .node-move { color: white; }
-.step-node.is-active .node-idx { color: rgba(255,255,255,0.7); }
+.step-node.is-active .node-move {
+  color: white;
+}
+.step-node.is-active .node-idx {
+  color: rgba(255, 255, 255, 0.7);
+}
 
 .step-node.is-past {
   opacity: 0.4;
   filter: grayscale(0.8);
 }
 
-.node-idx { font-size: 10px; color: #cbd5e1; font-weight: 700; margin-bottom: 4px; }
-.node-move { font-size: 17px; font-weight: 800; color: #334155; }
+.node-idx {
+  font-size: 10px;
+  color: #cbd5e1;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.node-move {
+  font-size: 17px;
+  font-weight: 800;
+  color: #334155;
+}
 
 :deep(.el-scrollbar__bar) {
   bottom: 0px;

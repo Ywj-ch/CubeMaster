@@ -12,20 +12,24 @@
 
 <script setup>
 const props = defineProps({
-  face: { type: Array, required: true }
+  face: { type: Array, required: true },
 });
 
-const emit = defineEmits(['cell-click']);
+const emit = defineEmits(["cell-click"]);
 
 const colorMap = {
-  white: "#FFFFFF", yellow: "#FFD500", red: "#C41E3A",
-  orange: "#FF5800", blue: "#0051BA", green: "#009E60",
-  black: "#000000"
+  white: "#FFFFFF",
+  yellow: "#FFD500",
+  red: "#C41E3A",
+  orange: "#FF5800",
+  blue: "#0051BA",
+  green: "#009E60",
+  black: "#000000",
 };
 
 const handleCellClick = (index) => {
   // 直接发送 0-8 的索引，让父组件去处理坐标转换
-  emit('cell-click', index);
+  emit("cell-click", index);
 };
 </script>
 
@@ -39,9 +43,14 @@ const handleCellClick = (index) => {
   border: 2px solid #333;
 }
 .cell {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
   transition: all 0.1s;
 }
-.cell:hover { filter: brightness(1.2); transform: scale(1.05); z-index: 2; }
+.cell:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+  z-index: 2;
+}
 </style>
