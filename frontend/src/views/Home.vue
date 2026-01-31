@@ -240,7 +240,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Cube3DView from "../components/Cube3DView.vue";
 import { createCubeFromJson } from "../utils/cubeState";
@@ -256,6 +256,9 @@ import {
   Collection,
   Unlock,
   DArrowRight,
+  Monitor,
+  Cpu,
+  VideoPlay,
 } from "@element-plus/icons-vue";
 
 const router = useRouter();
@@ -351,6 +354,30 @@ const faqs = [
     content: "是的，这是一个基于 MIT 协议的开源项目。我们欢迎开发者参与贡献。",
   },
 ];
+
+// === 核心逻辑：滚动触发动画 ===
+onMounted(() => {
+  const observerOptions = {
+    threshold: 0.15, // 元素露出 15% 时触发
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // 当元素进入视野，添加 is-visible 类触发 CSS 动画
+        entry.target.classList.add("is-visible");
+        // 触发后停止观察，保证动画只跑一次
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // 扫描所有需要入场动画的元素
+  const animElements = document.querySelectorAll(
+    ".animate-entry, .animate-entry-right",
+  );
+  animElements.forEach((el) => observer.observe(el));
+});
 </script>
 
 <style scoped>
@@ -441,7 +468,7 @@ const faqs = [
   background: radial-gradient(
     circle at center,
     rgba(59, 130, 246, 0.12) 0%,
-    rgba(255, 255, 255, 0) 70%
+    /* 稍微调低透明度 */ rgba(255, 255, 255, 0) 70%
   );
   filter: blur(90px);
   z-index: -1;
@@ -1174,12 +1201,12 @@ button.learn-more:hover .button-text {
 
 /* === 入场动画系统 === */
 
-/* 1. 定义动画关键帧：从下往上浮动，并变清晰 */
+/* 1. 定义动画关键帧 */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px); /* 初始位置在下方 30px */
-    filter: blur(5px); /* 初始带一点模糊，更有质感 */
+    transform: translateY(30px);
+    filter: blur(5px);
   }
   to {
     opacity: 1;
@@ -1188,30 +1215,6 @@ button.learn-more:hover .button-text {
   }
 }
 
-/* 2. 基础动画类 */
-.animate-entry {
-  opacity: 0; /* 初始状态必须隐藏，否则会闪一下 */
-  animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; /* forwards 保持动画结束状态 */
-}
-
-/* 3. 延迟阶梯 (Stagger) */
-.delay-1 {
-  animation-delay: 0.1s;
-} /* Badge */
-.delay-2 {
-  animation-delay: 0.3s;
-} /* 标题 */
-.delay-3 {
-  animation-delay: 0.5s;
-} /* 副标题 */
-.delay-4 {
-  animation-delay: 0.7s;
-} /* 按钮 */
-.delay-5 {
-  animation-delay: 0.9s;
-} /* 底部 Logo */
-
-/* 右侧魔方的特殊入场：从右侧滑入 */
 @keyframes fadeInRight {
   from {
     opacity: 0;
@@ -1222,9 +1225,37 @@ button.learn-more:hover .button-text {
     transform: translateX(0);
   }
 }
+
+/* 2. 修改动画类：默认不执行动画，只设置初始隐藏状态 */
+.animate-entry,
 .animate-entry-right {
   opacity: 0;
-  animation: fadeInRight 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  animation-delay: 0.4s;
+  will-change: transform, opacity;
+}
+
+/* 3. 激活类：大幅度拉长时间，并使用更平滑的曲线 */
+.animate-entry.is-visible {
+  animation: fadeInUp 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.animate-entry-right.is-visible {
+  animation: fadeInRight 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* 4. 延迟梯度 */
+.delay-1 {
+  animation-delay: 0.5s;
+}
+.delay-2 {
+  animation-delay: 1s;
+}
+.delay-3 {
+  animation-delay: 1.5s;
+}
+.delay-4 {
+  animation-delay: 2s;
+}
+.delay-5 {
+  animation-delay: 2.5s;
 }
 </style>

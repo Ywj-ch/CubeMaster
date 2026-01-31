@@ -14,7 +14,7 @@ const routes = [
       {
         path: "cube",
         name: "CubeFree",
-        component: () => import("../views" + "/CubeFree.vue"),
+        component: () => import("../views/CubeFree.vue"),
       },
       {
         path: "solver",
