@@ -105,7 +105,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.tutorial-cube-wra pper {
+.tutorial-cube-wrapper {
   position: relative;
   width: 100%;
   height: 100%;

@@ -8,137 +8,135 @@
         </p>
       </div>
       <div class="header-actions">
-        <el-button
-          type="success"
-          size="large"
-          @click="openScanner"
-          :icon="Camera"
-          round
-        >
-          扫描识别
-        </el-button>
-        <el-button
-          type="primary"
-          size="large"
+        <!-- 1. 扫描识别 (Ins风格 -> 蓝青渐变胶囊) -->
+        <button class="btn-scan-glass" @click="openScanner">
+          <span class="svgContainer">
+            <el-icon><Camera /></el-icon>
+          </span>
+          <span class="BG"></span>
+          <!-- 新增文字，让它变长 -->
+          <span class="btn-text">扫描识别</span>
+        </button>
+
+        <!-- 2. 智能求解 (Send风格 -> 搜索飞行) -->
+        <button
+          class="btn-solve-fly"
           @click="fetchSolution"
-          :loading="loading"
-          :icon="Search"
-          round
+          :disabled="loading"
         >
-          {{ loading ? "正在分析状态..." : "智能求解" }}
-        </el-button>
-        <el-button
-          type="danger"
-          size="large"
-          plain
-          @click="resetCube"
-          :icon="RefreshLeft"
-          round
-        >
-          重置魔方
-        </el-button>
+          <div class="svg-wrapper-1">
+            <div class="svg-wrapper">
+              <el-icon v-if="loading" class="is-loading"><Loading /></el-icon>
+              <el-icon v-else><Search /></el-icon>
+            </div>
+          </div>
+          <span>{{ loading ? "计算中..." : "智能求解" }}</span>
+        </button>
+
+        <!-- 3. 重置魔方 (极简红框) -->
+        <button class="btn-reset-minimal" @click="resetCube">
+          <el-icon><RefreshLeft /></el-icon>
+          重置
+        </button>
       </div>
     </div>
 
-    <div class="solver-main-content">
-      <div class="view-3d-box">
-        <Cube3DView
-          ref="cube3dRef"
-          :cubeState="cubeState"
-          :interactive="!hasSolved"
-          :enableControls="true"
-          :moveDuration="demoSpeed"
-        />
-        <div class="step-counter" v-if="steps.length">
-          <span class="curr">{{ currentStep }}</span>
-          <span class="total">/ {{ steps.length }}</span>
+    <!-- 中间内容区：flex: 1 自动撑开，溢出滚动 -->
+    <div class="solver-content-wrapper">
+      <div class="solver-main-content">
+        <div class="view-3d-box">
+          <Cube3DView
+            ref="cube3dRef"
+            :cubeState="cubeState"
+            :interactive="!hasSolved"
+            :enableControls="true"
+            :moveDuration="demoSpeed"
+          />
+          <div class="step-counter" v-if="steps.length">
+            <span class="curr">{{ currentStep }}</span>
+            <span class="total">/ {{ steps.length }}</span>
+          </div>
         </div>
-      </div>
 
-      <div class="view-2d-box" :class="{ 'is-solved-locked': hasSolved }">
-        <div class="box-label">2D 状态校准</div>
+        <div class="view-2d-box" :class="{ 'is-solved-locked': hasSolved }">
+          <div class="box-label">2D 状态校准</div>
 
-        <div class="editor-container">
-          <!-- 左侧：2D 展开图 -->
-          <div class="vertical-net">
-            <div class="face-group">
-              <div class="face-wrapper">
-                <span class="face-id">U (顶面)</span>
-                <Face2DView
-                  :face="cubeState.faces.U"
-                  @cell-click="(idx) => toggleColor('U', idx)"
-                />
+          <div class="editor-container">
+            <div class="vertical-net">
+              <div class="face-group">
+                <div class="face-wrapper">
+                  <span class="face-id">U (顶面)</span>
+                  <Face2DView
+                    :face="cubeState.faces.U"
+                    @cell-click="(idx) => toggleColor('U', idx)"
+                  />
+                </div>
+              </div>
+              <div class="face-grid">
+                <div class="face-wrapper">
+                  <span class="face-id">L (左)</span>
+                  <Face2DView
+                    :face="cubeState.faces.L"
+                    @cell-click="(idx) => toggleColor('L', idx)"
+                  />
+                </div>
+                <div class="face-wrapper">
+                  <span class="face-id">F (前)</span>
+                  <Face2DView
+                    :face="cubeState.faces.F"
+                    @cell-click="(idx) => toggleColor('F', idx)"
+                  />
+                </div>
+                <div class="face-wrapper">
+                  <span class="face-id">R (右)</span>
+                  <Face2DView
+                    :face="cubeState.faces.R"
+                    @cell-click="(idx) => toggleColor('R', idx)"
+                  />
+                </div>
+                <div class="face-wrapper">
+                  <span class="face-id">B (后)</span>
+                  <Face2DView
+                    :face="cubeState.faces.B"
+                    @cell-click="(idx) => toggleColor('B', idx)"
+                  />
+                </div>
+              </div>
+              <div class="face-group">
+                <div class="face-wrapper">
+                  <span class="face-id">D (底面)</span>
+                  <Face2DView
+                    :face="cubeState.faces.D"
+                    @cell-click="(idx) => toggleColor('D', idx)"
+                  />
+                </div>
               </div>
             </div>
 
-            <div class="face-grid">
-              <div class="face-wrapper">
-                <span class="face-id">L (左)</span>
-                <Face2DView
-                  :face="cubeState.faces.L"
-                  @cell-click="(idx) => toggleColor('L', idx)"
-                />
-              </div>
-              <div class="face-wrapper">
-                <span class="face-id">F (前)</span>
-                <Face2DView
-                  :face="cubeState.faces.F"
-                  @cell-click="(idx) => toggleColor('F', idx)"
-                />
-              </div>
-              <div class="face-wrapper">
-                <span class="face-id">R (右)</span>
-                <Face2DView
-                  :face="cubeState.faces.R"
-                  @cell-click="(idx) => toggleColor('R', idx)"
-                />
-              </div>
-              <div class="face-wrapper">
-                <span class="face-id">B (后)</span>
-                <Face2DView
-                  :face="cubeState.faces.B"
-                  @cell-click="(idx) => toggleColor('B', idx)"
-                />
-              </div>
-            </div>
-
-            <div class="face-group">
-              <div class="face-wrapper">
-                <span class="face-id">D (底面)</span>
-                <Face2DView
-                  :face="cubeState.faces.D"
-                  @cell-click="(idx) => toggleColor('D', idx)"
-                />
+            <div class="palette-toolbar">
+              <div class="palette-label">画笔</div>
+              <div
+                v-for="color in PALETTE"
+                :key="color.name"
+                class="palette-item"
+                :class="{ active: activeColor === color.name }"
+                :style="{ backgroundColor: color.hex }"
+                @click="activeColor = color.name"
+                :title="color.label"
+              >
+                <div v-if="activeColor === color.name" class="check-mark"></div>
               </div>
             </div>
           </div>
 
-          <!-- 右侧：竖向调色板 (新增) -->
-          <div class="palette-toolbar">
-            <div class="palette-label">画笔</div>
-            <div
-              v-for="color in PALETTE"
-              :key="color.name"
-              class="palette-item"
-              :class="{ active: activeColor === color.name }"
-              :style="{ backgroundColor: color.hex }"
-              @click="activeColor = color.name"
-              :title="color.label"
-            >
-              <!-- 选中标记 -->
-              <div v-if="activeColor === color.name" class="check-mark"></div>
-            </div>
-          </div>
+          <p class="hint-text">
+            <el-icon><InfoFilled /></el-icon> 选择画笔颜色后点击方块修改
+          </p>
         </div>
-
-        <p class="hint-text">
-          <el-icon><InfoFilled /></el-icon> 选择画笔颜色后点击方块修改
-        </p>
       </div>
     </div>
 
     <div class="solver-footer">
-      <!-- 底部播放控制栏保持不变 -->
       <div class="playback-controls">
         <div class="speed-control-wrapper">
           <span class="speed-label">速度</span>
@@ -238,10 +236,10 @@ import {
   InfoFilled,
   VideoPlay,
   VideoPause,
+  Loading,
 } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 
-// 状态
 const loading = ref(false);
 const hasSolved = ref(false);
 const steps = ref([]);
@@ -252,7 +250,6 @@ const solutionMoves = ref([]);
 const is3DBusy = ref(false);
 const isScannerVisible = ref(false);
 
-// 调色板配置 (新增)
 const PALETTE = [
   { name: "white", hex: "#FFFFFF", label: "白" },
   { name: "yellow", hex: "#FFD500", label: "黄" },
@@ -261,7 +258,7 @@ const PALETTE = [
   { name: "blue", hex: "#0051BA", label: "蓝" },
   { name: "green", hex: "#009E60", label: "绿" },
 ];
-const activeColor = ref("white"); // 当前画笔颜色
+const activeColor = ref("white");
 
 const isAutoPlaying = ref(false);
 let autoPlayTimer = null;
@@ -270,7 +267,6 @@ const demoSpeed = ref(300);
 const openScanner = () => {
   isScannerVisible.value = true;
 };
-
 const handleScannedResult = (result) => {
   isScannerVisible.value = false;
   const newCube = createCubeFromJson(result);
@@ -279,21 +275,14 @@ const handleScannedResult = (result) => {
   ElMessage.success("扫描成功，请点击 2D 图纠正可能的识别错误");
 };
 
-/**
- * 颜色切换逻辑 (修改为画笔模式)
- */
 const toggleColor = (faceKey, index) => {
   if (hasSolved.value) {
     ElMessage.info("请先完成当前解法或重置魔方后再修改状态");
     return;
   }
-
   const faceData = cubeState.value.faces[faceKey];
   if (!faceData) return;
-
-  // 使用当前选中的画笔颜色
   const newColor = activeColor.value;
-
   let row, col;
   if (Array.isArray(faceData[0])) {
     row = Math.floor(index / 3);
@@ -302,7 +291,6 @@ const toggleColor = (faceKey, index) => {
   } else {
     faceData[index] = newColor;
   }
-
   const updatedCube = createCubeFromJson(cubeState.value.faces);
   cubeState.value.cubies = updatedCube.cubies;
   hasSolved.value = false;
@@ -375,7 +363,6 @@ watch(demoSpeed, () => {
 function nextStep(isAuto = false) {
   if (!isAuto) stopAutoPlay();
   if (!hasSolved.value || is3DBusy.value) return;
-
   if (currentStep.value < solutionMoves.value.length) {
     const move = solutionMoves.value[currentStep.value];
     is3DBusy.value = true;
@@ -398,7 +385,6 @@ function nextStep(isAuto = false) {
 function prevStep() {
   stopAutoPlay();
   if (!hasSolved.value || is3DBusy.value) return;
-
   if (currentStep.value > 0) {
     is3DBusy.value = true;
     currentStep.value--;
@@ -412,7 +398,6 @@ function prevStep() {
   }
 }
 
-// 点击步骤节点跳转（还没做）
 function jumpToStep(index) {
   stopAutoPlay();
 }
@@ -433,23 +418,28 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 保持原有布局样式 */
+/* --- 布局修复 -- */
 .cube-solver-page {
-  height: 100vh;
-  width: 100vw;
+  /*
+    使用 flex-grow: 1 自动占满父容器 (MainLayout) 的剩余空间。
+    不再使用 100vh，这样就不会因为 Header 高度计算错误而溢出。
+  */
+  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: radial-gradient(circle at 50% 50%, #f8fafc 0%, #f1f5f9 100%);
   padding: 0 40px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden; /* 防止页面整体滚动，只让内部区域滚动 */
 }
 
+/* 顶部 Header */
 .solver-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 25px 0;
+  padding: 20px 0;
   flex-shrink: 0;
 }
 .main-title {
@@ -466,12 +456,182 @@ onUnmounted(() => {
   margin-top: 4px;
   font-weight: 500;
 }
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* --- 1. 扫描识别按钮 (Ins风格 -> 蓝青渐变胶囊) --- */
+.btn-scan-glass {
+  width: 130px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  position: relative;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+  gap: 8px; /* 增加 gap */
+}
+.svgContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.8px;
+  border-radius: 50px;
+  transition: all 0.3s;
+  border: 1px solid rgba(156, 156, 156, 0.2);
+  z-index: 2;
+  position: absolute;
+  inset: 0; /* 覆盖在背景上 */
+}
+.BG {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  /* 1. 改为线性流光渐变 (蓝 -> 青 -> 蓝) */
+  background: linear-gradient(90deg, #2563eb, #06b6d4, #2563eb);
+  /* 2. 放大背景尺寸，以便移动 */
+  background-size: 200% 100%;
+  z-index: 1;
+  border-radius: 50px;
+  pointer-events: none;
+  transition: all 0.3s;
+  /* 3. 默认静止，悬浮时才动，或者一直动也可以 */
+  animation: scan-flow 3s linear infinite;
+  opacity: 0.8;
+}
+/* 新增动画关键帧 */
+@keyframes scan-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+.btn-text {
+  z-index: 3;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  margin-left: 28px; /* 给图标留位置 */
+  transition: all 0.3s;
+}
+.svgContainer .el-icon {
+  font-size: 18px;
+  color: white;
+  position: absolute;
+  left: 16px;
+} /* 固定图标位置 */
+
+.btn-scan-glass:hover .BG {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+  opacity: 1;
+}
+.btn-scan-glass:hover .svgContainer {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- 2. 智能求解按钮 (Send风格 -> 飞行) --- */
+.btn-solve-fly {
+  font-family: inherit;
+  font-size: 16px;
+  background: #2563eb;
+  color: white;
+  padding: 0.7em 1.5em;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 50px;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: pointer;
+  height: 44px;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+.btn-solve-fly span {
+  display: block;
+  margin-left: 0.5em;
+  transition: all 0.3s ease-in-out;
+  font-weight: 700;
+}
+.btn-solve-fly .el-icon {
+  font-size: 18px;
+  display: block;
+  transform-origin: center center;
+  transition: transform 0.3s ease-in-out;
+}
+.btn-solve-fly:hover .svg-wrapper {
+  animation: fly-1 0.6s ease-in-out infinite alternate;
+}
+.btn-solve-fly:hover .el-icon {
+  transform: translateX(2.5em) scale(1.2);
+  color: #fff;
+}
+.btn-solve-fly:hover span {
+  transform: translateX(5em);
+  opacity: 0;
+}
+.btn-solve-fly:active {
+  transform: scale(0.95);
+}
+@keyframes fly-1 {
+  from {
+    transform: translateY(0.1em);
+  }
+  to {
+    transform: translateY(-0.1em);
+  }
+}
+
+/* --- 3. 重置按钮 (极简红框) --- */
+.btn-reset-minimal {
+  padding: 0 24px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid #fecaca;
+  border-radius: 50px;
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+.btn-reset-minimal:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+}
+
+/* --- 中间内容区 (关键修改：限制高度，允许内部滚动) --- */
+.solver-content-wrapper {
+  flex: 1; /* 占据剩余高度 */
+  min-height: 0; /* 允许 flex 子项收缩 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 防止溢出 */
+}
 
 .solver-main-content {
   flex: 1;
   display: flex;
   gap: 24px;
-  min-height: 0;
+  min-height: 0; /* 关键：允许子元素滚动 */
   padding-bottom: 20px;
 }
 
@@ -508,7 +668,7 @@ onUnmounted(() => {
   margin-left: 4px;
 }
 
-/* --- 编辑器区域布局修改 --- */
+/* --- 编辑器区域布局 --- */
 .view-2d-box {
   flex: 1.2;
   background: white;
@@ -516,37 +676,29 @@ onUnmounted(() => {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  /* 移除 align-items: center，改为 stretch 或默认 */
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
+  overflow-y: auto; /* 允许右侧长内容滚动 */
 }
-
 .box-label {
-  text-align: center; /* 标题保持居中 */
+  text-align: center;
   font-weight: 700;
   color: #64748b;
   margin-bottom: 15px;
 }
-
-/* 新增容器：包含 2D 图和调色板 */
 .editor-container {
   display: flex;
   justify-content: center;
-  gap: 32px; /* 间距 */
+  gap: 32px;
   width: 100%;
 }
-
 .vertical-net {
   display: flex;
   flex-direction: column;
   gap: 12px;
   align-items: center;
-  /* 稍微缩小一点比例以适应布局 */
   transform: scale(0.95);
 }
-
-/* 调色板样式 */
 .palette-toolbar {
   display: flex;
   flex-direction: column;
@@ -558,7 +710,6 @@ onUnmounted(() => {
   height: fit-content;
   align-self: center;
 }
-
 .palette-label {
   font-size: 12px;
   color: #94a3b8;
@@ -566,32 +717,27 @@ onUnmounted(() => {
   text-align: center;
   margin-bottom: 4px;
 }
-
 .palette-item {
   width: 36px;
   height: 36px;
-  border-radius: 10px; /* 圆角矩形更现代 */
+  border-radius: 10px;
   border: 2px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
-
 .palette-item:hover {
   transform: scale(1.1);
   z-index: 1;
 }
-
 .palette-item.active {
   border-color: #3b82f6;
   transform: scale(1.15);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
-
-/* 选中标记 (小圆点) */
 .check-mark {
   width: 8px;
   height: 8px;
@@ -599,16 +745,13 @@ onUnmounted(() => {
   border-radius: 50%;
 }
 .palette-item.active .check-mark {
-  background: white; /* 选中时白点更明显 */
+  background: white;
 }
-
-/* --- 原有 Face 样式微调 --- */
 .face-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px; /* 间距调小一点 */
+  gap: 8px;
 }
-
 .face-wrapper {
   padding: 6px;
   background: #f8fafc;
@@ -619,12 +762,10 @@ onUnmounted(() => {
   align-items: center;
   transition: all 0.2s;
 }
-
 .face-wrapper:hover {
   border-color: #cbd5e1;
   background: #f1f5f9;
 }
-
 .face-id {
   font-size: 10px;
   font-weight: 700;
@@ -632,9 +773,8 @@ onUnmounted(() => {
   margin-bottom: 4px;
   text-transform: uppercase;
 }
-
 .hint-text {
-  margin-top: auto; /* 推到底部 */
+  margin-top: auto;
   padding-top: 20px;
   font-size: 12px;
   color: #94a3b8;
@@ -643,7 +783,6 @@ onUnmounted(() => {
   justify-content: center;
   gap: 4px;
 }
-
 .is-solved-locked {
   cursor: not-allowed;
   position: relative;
@@ -660,7 +799,6 @@ onUnmounted(() => {
   box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.04);
   z-index: 10;
 }
-
 .playback-controls {
   display: flex;
   justify-content: space-between;
@@ -668,7 +806,6 @@ onUnmounted(() => {
   margin-bottom: 24px;
   position: relative;
 }
-
 .speed-control-wrapper {
   display: flex;
   align-items: center;
@@ -684,17 +821,14 @@ onUnmounted(() => {
   padding: 6px 12px;
   font-size: 12px;
 }
-
 .main-controls {
   display: flex;
   align-items: center;
   gap: 20px;
 }
-
 .control-spacer {
   width: 200px;
 }
-
 .play-btn {
   width: 140px;
   font-weight: 600;
@@ -705,7 +839,6 @@ onUnmounted(() => {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
 }
-
 .nav-btn {
   border-color: #e2e8f0;
   color: #64748b;
@@ -715,21 +848,18 @@ onUnmounted(() => {
   color: #3b82f6;
   background: #eff6ff;
 }
-
 .steps-progress-bar {
   background: #f8fafc;
   padding: 12px;
   border-radius: 20px;
   border: 1px inset rgba(0, 0, 0, 0.01);
 }
-
 .steps-flex {
   display: flex;
   gap: 12px;
   padding: 10px 5px;
   align-items: center;
 }
-
 .step-node {
   min-width: 70px;
   background: white;
@@ -740,7 +870,6 @@ onUnmounted(() => {
   border: 1px solid #f1f5f9;
   cursor: pointer;
 }
-
 .step-node.is-active {
   background: #3b82f6;
   border-color: #3b82f6;
@@ -753,12 +882,10 @@ onUnmounted(() => {
 .step-node.is-active .node-idx {
   color: rgba(255, 255, 255, 0.7);
 }
-
 .step-node.is-past {
   opacity: 0.4;
   filter: grayscale(0.8);
 }
-
 .node-idx {
   font-size: 10px;
   color: #cbd5e1;
@@ -770,7 +897,6 @@ onUnmounted(() => {
   font-weight: 800;
   color: #334155;
 }
-
 :deep(.el-scrollbar__bar) {
   bottom: 0px;
 }

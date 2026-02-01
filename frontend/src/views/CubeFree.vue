@@ -975,7 +975,7 @@ onUnmounted(() => {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 }
 
-/* --- 针对“随机打乱”的特化 --- */
+/* --- 针对“随机打乱按钮”的特化 --- */
 .scramble-btn:hover:not(:disabled) {
   color: #2563eb; /* 悬浮变蓝，呼应主题 */
   border-color: #cbd5e1;
@@ -987,7 +987,7 @@ onUnmounted(() => {
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* --- 针对“重置”的特化 --- */
+/* --- 针对“重置”按钮的特化 --- */
 .reset-btn:hover {
   color: #ef4444 !important; /* 悬浮变红，警示危险 */
   background-color: #fef2f2 !important;
