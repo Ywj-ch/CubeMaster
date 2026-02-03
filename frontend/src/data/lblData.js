@@ -3,7 +3,6 @@ export const lblSteps = [
   {
     id: "step-1",
     title: "第一步：底层黄色十字",
-    shortDesc: "打好地基",
     description:
       "选择黄色作为底层（D面），构建黄色十字，并确保每个黄色棱块的侧面颜色与中心块对齐。这是后续所有步骤的基础。",
     cases: [
@@ -36,7 +35,6 @@ export const lblSteps = [
   {
     id: "step-2",
     title: "第二步：完成第一层（底层角块）",
-    shortDesc: "填平第一层",
     description:
       "将四个带有黄色的角块放入底层的四个角位。完成后，底层完全为黄色，且每个角块的侧面颜色与中心块颜色一致。",
     cases: [
@@ -70,7 +68,6 @@ export const lblSteps = [
   {
     id: "step-3",
     title: "第三步：还原第二层（中层棱块）",
-    shortDesc: "加固第二层",
     description:
       "还原中间层的四个棱块（这些棱块不带白色）。从顶层寻找不含白色的棱块，将其插入中层的正确位置。",
     cases: [
@@ -103,7 +100,6 @@ export const lblSteps = [
   {
     id: "step-4",
     title: "第四步：顶层白色十字",
-    shortDesc: "顶层十字",
     description:
       "在顶层（白色面）形成一个白色十字，不考虑角块的颜色。通过一个公式处理两种情况（拐角、直线）。",
     cases: [
@@ -187,7 +183,6 @@ export const lblSteps = [
   {
     id: "step-7",
     title: "第七步：顶层棱块归位（完成还原）",
-    shortDesc: "调整棱块，大功告成！",
     description:
       "最后一步！调整顶层四个棱块的位置，完成整个魔方的还原。将已经完成的一面放在后面（B面）。",
     cases: [
