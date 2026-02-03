@@ -49,17 +49,11 @@ yolo_train/raw_images/
 # 忽略训练过程产生的日志和权重 (runs 文件夹通常很大)
 yolo_train/runs/
 
-# 忽略临时测试脚本生成的图片
-*.jpg
-*.png
-!backend/images/*.png  # 但保留后端用于显示的占位图
 
 # 忽略大型模型文件 (除了我们明确要用的)
 *.pt
 *.onnx
 !backend/models/best.pt
 
-
-/runs/detect/cube_yolo_v1/args.yaml
 /project_context.md
-/runs/detect/cube_yolo_v1/results.csv
+/runs/detect/
