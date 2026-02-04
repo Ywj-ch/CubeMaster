@@ -19,7 +19,7 @@ export const courseList = [
   {
     id: "advanced",
     title: "进阶：2-Look OLL/PLL",
-    description: "从入门到熟练的必经之路，仅需16个公式。",
+    description: "从入门到熟练的必经之路，仅需16个公式即可快速缩短还原时间。",
     steps: ollPllSteps,
   },
   {

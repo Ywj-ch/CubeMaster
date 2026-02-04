@@ -85,8 +85,8 @@
                         <el-tag
                           v-for="tag in item.tags"
                           :key="tag"
-                          size="small"
-                          effect="dark"
+                          size="default"
+                          effect="light"
                           type="info"
                           >{{ tag }}</el-tag
                         >
@@ -108,7 +108,7 @@
                   </div>
                   <div class="algo-card-footer">
                     <span class="view-demo-link">
-                      <el-icon><VideoPlay /></el-icon> 查看3D演示
+                      <el-icon size="20"><VideoPlay /></el-icon> 查看3D演示
                     </span>
                   </div>
                 </div>
@@ -256,7 +256,7 @@
             <div class="demo-controls-overlay">
               <el-button
                 type="primary"
-                size="large"
+                size="default"
                 circle
                 :icon="VideoPlay"
                 class="demo-play-btn"
@@ -647,31 +647,32 @@ const handleDemoPlay = () => {
 /* 强制两列布局容器 */
 .cases-wrapper.grid-layout {
   display: grid;
-  /* 强制锁定为 2 列，不再使用 auto-fill 避免挤出第三列 */
-  grid-template-columns: 1fr 1fr;
-  /* 让同一行的卡片自动等高，解决内容多撑开不一致的问题 */
-  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: stretch;
   gap: 32px;
   width: 100%;
+}
+
+.case-block {
+  /* 确保外层容器也是满高度 */
+  height: 100%;
 }
 
 /* 进阶算法卡片主体：去重叠、明亮化 */
 .algo-3d-card {
   width: 100%;
-  /* 确保占据 grid 分配的所有高度 */
-  height: 100%;
-  /* 彻底移除导致重叠的负边距 */
-  margin: 0 !important;
-  background: #ffffff; /* 改为明亮主题 */
+  height: 100%; /* 占满 grid 分配的高度 */
+  min-height: 420px; /* 增加最小高度，让它更接近正方形 */
+  background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 28px;
+  border-radius: 20px; /* 圆角加大 */
+  padding: 32px; /* 内边距加大 */
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
 }
 
 .algo-3d-card:hover {
@@ -684,82 +685,100 @@ const handleDemoPlay = () => {
 /* 卡片内部元素调色与排版 */
 .algo-card-header {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .algo-thumb-box {
   background: #f8fafc;
-  padding: 10px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 14px;
   border: 1px solid #edf2f7;
-}
-.algo-title-text {
-  font-size: 1.25rem;
-  color: #1e293b;
-  margin: 5px 0 0 0;
-  font-weight: 800;
-}
-.algo-no {
-  font-family: "JetBrains Mono", monospace;
-  color: #94a3b8;
-  font-weight: 700;
-  font-size: 12px;
-  margin-right: 10px;
+  /* 稍微放大缩略图区域 */
+  min-width: 100px;
+  display: flex;
+  justify-content: center;
 }
 
+.algo-meta-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* 标题和标签之间的间距 */
+}
+
+.algo-id-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 标签之间的间距拉开 */
+}
+
+.algo-no {
+  font-family: "JetBrains Mono", monospace;
+  color: #97b4de;
+  font-weight: 700;
+  font-size: 16px; /* 序号字体加大 */
+}
+
+.algo-title-text {
+  font-size: 1.5rem; /* 标题字体加大 */
+  color: #141c2f; /* 颜色加深 */
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* 4. 公式区域 (字体加大) */
 .algo-formula-zone {
-  background: #eff6ff; /* 浅蓝色块 */
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  background: #f1f5f9;
+  padding: 18px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #dbeafe;
-}
-.formula-code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 1rem;
-  color: #2563eb;
-  font-weight: 700;
-}
-.steps-tag {
-  font-size: 10px;
-  color: #64748b;
-  font-weight: 800;
+  border: 1px solid #e2e8f0;
 }
 
-/* 识别技巧：确保撑开空间实现底部对齐 */
-.algo-recognition-box {
-  flex: 1; /* 关键：自动伸缩，确保 footer 在最下方 */
-  margin-bottom: 15px;
+.formula-code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.2rem;
+  color: #2563eb;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
+
+.steps-tag {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 800;
+  background: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* 5. 识别技巧 (自动撑开，底部对齐) */
+.algo-recognition-box {
+  flex: 1; /* 自动占据剩余空间 */
+  margin-bottom: 20px;
+}
+
 .rec-label {
-  font-size: 11px;
+  font-size: 16px;
   color: #94a3b8;
   font-weight: 800;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
 }
-.rec-list {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
+
 .rec-list li {
-  font-size: 13px;
-  color: #64748b;
-  margin-bottom: 8px;
+  font-size: 16px;
+  color: #475569;
+  margin-bottom: 10px;
+  line-height: 1.6;
   position: relative;
-  padding-left: 18px;
-  line-height: 1.4;
-}
-.rec-list li::before {
-  content: "→";
-  position: absolute;
-  left: 0;
-  color: #3b82f6;
+  padding-left: 20px;
 }
 
 .algo-card-footer {
@@ -769,7 +788,7 @@ const handleDemoPlay = () => {
 }
 .view-demo-link {
   color: #94a3b8;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -790,13 +809,13 @@ const handleDemoPlay = () => {
 }
 .demo-controls-overlay {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 16px;
+  left: 20px;
   z-index: 100;
 }
 .demo-play-btn {
-  width: 56px !important;
-  height: 56px !important;
+  width: 48px !important;
+  height: 48px !important;
   font-size: 24px;
   box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4) !important;
 }

@@ -11,7 +11,7 @@
     <!-- 悬浮重置按钮 -->
     <div class="controls">
       <el-button
-        size="small"
+        size="default"
         circle
         icon="Refresh"
         @click="initCube"

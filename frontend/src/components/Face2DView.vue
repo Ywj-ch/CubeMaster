@@ -50,19 +50,44 @@ const handleCellClick = (index) => {
 <style scoped>
 .face {
   display: grid;
-  /* 使用 CSS 变量控制网格大小 */
   grid-template-columns: repeat(3, var(--size));
   grid-template-rows: repeat(3, var(--size));
-  gap: 2px;
-  background-color: #333;
-  border: 2px solid #333;
-  width: fit-content;
+  gap: 3px; /* 增加一点间隙，让每个块更独立 */
+  border: none; /* 去掉硬边框 */
+  padding: 3px;
+  background: #1e293b; /* 优雅的深蓝黑底座 */
+  border-radius: 6px; /* 整个魔方带一点圆角 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .cell {
   width: var(--size);
   height: var(--size);
-  transition: all 0.1s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 4px; /* 每个小块都有圆角，像真实的贴纸/塑料块 */
+
+  /* 核心：内阴影制造立体感 (Inset Shadow) */
+  /* 上方亮光，下方暗影，模拟微凸效果 */
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 2px rgba(0, 0, 0, 0.05);
+}
+
+/*
+   特殊处理白色块：因为白色背景上白色高光看不见，
+   我们需要给白色块加一点点灰度渐变，让它看起来像陶瓷
+*/
+.cell[style*="rgb(255, 255, 255)"],
+.cell[style*="#FFFFFF"] {
+  background: linear-gradient(145deg, #ffffff, #f1f5f9) !important;
+  border: 1px solid rgba(0,0,0,0.05); /* 极细描边防止融入背景 */
+}
+
+/* 黑色块（未还原部分）也优化一下，不要死黑 */
+.cell[style*="rgb(0, 0, 0)"],
+.cell[style*="#000000"] {
+  background-color: #334155 !important; /* 改为深岩灰，更有质感 */
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.5); /* 内陷感 */
 }
 
 /* 只有带有 can-hover 类的组件才会有点击手势和悬停效果 */
