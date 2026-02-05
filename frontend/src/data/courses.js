@@ -24,8 +24,7 @@ export const courseList = [
   },
   {
     id: "cfop",
-    title: "突破：CFOP 速拧 (开发中)",
+    title: "突破：CFOP 速拧",
     description: "迈向高手的必经之路",
-    steps: [], // 暂时为空，未来填入 CFOP 数据
   },
 ];

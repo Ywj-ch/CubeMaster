@@ -10,7 +10,7 @@
 
           <!-- 课程切换下拉框 -->
           <el-select
-            v-model="currentCourseId"
+            :model-value="currentCourseId"
             placeholder="选择教程"
             class="course-select"
             @change="handleCourseChange"
@@ -298,7 +298,9 @@ const demoCubeRef = ref(null);
 const currentCourse = computed(
   () => courseList.find((c) => c.id === currentCourseId.value) || courseList[0],
 );
+
 const currentSteps = computed(() => currentCourse.value.steps || []);
+
 const currentStep = computed(() =>
   !currentSteps.value || currentSteps.value.length === 0
     ? null
@@ -317,6 +319,7 @@ const getTagLabel = (type, index) => {
   if (type === "notation-grid") return `符号表`;
   return `情况 ${index + 1}`;
 };
+
 const getTagColor = (type) => {
   if (type === "graphic") return "primary";
   if (type === "notation-grid") return "warning";
@@ -333,22 +336,31 @@ watch(
     }
   },
 );
+
 const setCubeRef = (el, id) => {
   if (el) cubeRefs.value[id] = el;
 };
+
 const handleCourseChange = (newId) => {
+  if (newId === "cfop") {
+    router.push("/cfop");
+    return;
+  }
   currentStepIndex.value = 0;
-  router.push({ name: "Learning", params: { courseId: newId } });
+  router.push({ params: { courseId: newId } });
 };
+
 const handleSelectStep = (index) => {
   currentStepIndex.value = parseInt(index);
   cubeRefs.value = {};
   document.querySelector(".tutorial-content")?.scrollTo(0, 0);
 };
+
 const handlePlay = (caseId) => {
   const cubeInstance = cubeRefs.value[caseId];
   if (cubeInstance) cubeInstance.play();
 };
+
 const resetView = () => {
   currentStepIndex.value = 0;
   cubeRefs.value = {};
@@ -360,6 +372,7 @@ const openDemo = (item) => {
   currentDemoItem.value = item;
   demoVisible.value = true;
 };
+
 const handleDemoPlay = () => {
   if (demoCubeRef.value) demoCubeRef.value.play();
 };

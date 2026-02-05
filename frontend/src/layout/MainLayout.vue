@@ -34,7 +34,7 @@
 
     <!-- Main: 非首页时自动空出 header 的高度，防止内容重叠 -->
     <main :class="['main-content', { 'main-content-padded': !isHomePage }]">
-      <router-view />
+      <router-view :key="$route.fullPath" />
     </main>
 
     <!-- Footer: 极简紧凑版 -->

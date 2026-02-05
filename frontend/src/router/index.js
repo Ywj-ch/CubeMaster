@@ -22,6 +22,11 @@ const routes = [
         component: () => import("../views/Solver.vue"),
       },
       {
+        path: "cfop",
+        name: "CfopIntro",
+        component: () => import("../views/CfopIntro.vue"),
+      },
+      {
         path: "learning",
         redirect: "/learning/basics",
       },
@@ -29,13 +34,12 @@ const routes = [
         path: "learning/:courseId",
         name: "Learning",
         component: () => import("../views/Learning.vue"),
-        // 路由守卫：校验参数是否合法，不合法重定向到默认课程
         beforeEnter: (to, from, next) => {
-          const validIds = ["basics", "lbl", "cfop"];
+          console.log("检查路由参数:", to.params.courseId);
+          const validIds = ["basics", "lbl", "advanced"];
           if (validIds.includes(to.params.courseId)) {
             next();
           } else {
-            // 如果乱输 URL (如 /learning/abc)，重定向到基础篇
             next("/learning/basics");
           }
         },

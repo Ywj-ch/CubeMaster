@@ -270,7 +270,7 @@ const handleEnterSolver = () => router.push("/solver");
 const handleEnterPlayground = () => router.push("/cube");
 const handleEnterLearningBasic = () => router.push("/learning/basic");
 const handleEnterLearningLbl = () => router.push("/learning/lbl");
-const handleEnterLearningCfop = () => router.push("/learning/cfop");
+const handleEnterLearningCfop = () => router.push("cfop");
 
 // === 1. 特性板块数据 (Features) ===
 const features = [
@@ -321,8 +321,8 @@ const courses_data = [
     level: "进阶",
     desc: "世界纪录保持者都在用的速拧方法，F2L/OLL/PLL 全解析。",
     icon: "Trophy",
-    meta: "待解锁",
-    btnText: "开发中",
+    meta: "119 公式",
+    btnText: "进入课程",
     color: "#f43f5e",
     action: handleEnterLearningCfop,
   },
@@ -998,7 +998,7 @@ onMounted(() => {
   font-size: 1rem;
 }
 
-/* --- 底部关于区域 --- */
+/* ------------- 底部关于区域 -------------- */
 .about-cta-wrapper {
   margin-top: 40px; /* 距离 FAQ 更近一点 */
   width: 100%;
