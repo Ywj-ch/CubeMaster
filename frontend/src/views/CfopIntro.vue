@@ -74,17 +74,25 @@
         <p class="section-sub">不确定从哪里开始？根据你的经验水平选择：</p>
 
         <div class="decision-grid">
-          <div class="decision-card emerald" @click="goToCourse('advanced')">
+          <!-- 左卡：跳转到 2-Look 课程 -->
+          <div
+            class="decision-card emerald"
+            @click="goToCourse2Look('advanced')"
+          >
             <div class="icon-box">🌱</div>
             <h3>我是 CFOP 新手</h3>
             <p>从 16 个基础算法开始 (2-Look)</p>
           </div>
+
+          <!-- 中卡：电梯模式，滚动到下方 Roadmap -->
           <div class="decision-card blue" @click="scrollToId('full-roadmap')">
             <div class="icon-box">📈</div>
-            <h3>我了解两步 OLL/PLL</h3>
-            <p>准备学习完整 78 个算法</p>
+            <h3>挑战完整 CFOP</h3>
+            <p>分模块攻克 F2L + OLL + PLL</p>
           </div>
-          <div class="decision-card purple" @click="scrollToId('alg-table')">
+
+          <!-- 右卡：同样滚动到下方，或未来做全局搜索 -->
+          <div class="decision-card purple" @click="scrollToId('full-roadmap')">
             <div class="icon-box">⚡</div>
             <h3>我需要快速参考</h3>
             <p>查阅算法表与指法技巧</p>
@@ -150,10 +158,17 @@
 
       <!-- ================= 6. 4步路线图 ================= -->
       <section id="full-roadmap" class="section-block">
-        <h2 class="section-heading">4 步 CFOP 详解</h2>
+        <h2 class="section-heading">4 步 CFOP 详解与入口</h2>
+        <p class="section-sub">点击卡片进入对应的算法库：</p>
 
         <div class="steps-container">
-          <div class="step-card" v-for="(step, idx) in cfopSteps" :key="idx">
+          <div
+            class="step-card"
+            v-for="(step, idx) in cfopSteps"
+            :key="idx"
+            :class="{ 'is-clickable': step.route }"
+            @click="handleStepClick(step)"
+          >
             <div class="step-header">
               <div class="step-number">{{ idx + 1 }}</div>
               <div class="step-title">{{ step.title }}</div>
@@ -163,7 +178,15 @@
               <p>{{ step.desc }}</p>
               <div class="step-meta">
                 <span class="meta-tag">目标: {{ step.goal }}</span>
-                <span class="meta-tag">算法数: {{ step.algCount }}</span>
+                <span class="meta-tag highlight"
+                  >算法数: {{ step.algCount }}</span
+                >
+              </div>
+
+              <!-- 仅当有路由时显示“进入”箭头 -->
+              <div v-if="step.route" class="enter-hint">
+                <span>进入库</span>
+                <el-icon><ArrowRight /></el-icon>
               </div>
             </div>
           </div>
@@ -250,13 +273,12 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { Check, Monitor } from "@element-plus/icons-vue";
+import { Check, Monitor, ArrowRight } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const activeNames = ref("1");
 
 // --- 数据区 ---
-
 const learningPoints = [
   "高效的十字规划 (Cross) 和盲拧执行",
   "直观理解 F2L 配对逻辑，减少旋转",
@@ -298,32 +320,40 @@ const timelineData = [
 
 const cfopSteps = [
   {
+    id: "cross",
     title: "十字 (Cross)",
     icon: "🔲",
     desc: "通过将棱块与中心块对齐，在底层完成一个十字。重点在于规划，尽量在 8 步内完成。",
     goal: "底层十字",
-    algCount: "无 (逻辑)",
+    algCount: "无",
+    route: null,
   },
   {
+    id: "f2l",
     title: "F2L (前两层)",
     icon: "🤝",
     desc: "同时还原底层角块和中间层棱块。这是 CFOP 中最慢但也最能提速的阶段。",
     goal: "前两层完成",
-    algCount: "41 (可直观)",
+    algCount: "41",
+    route: "/cfop/lib/f2l",
   },
   {
+    id: "oll",
     title: "OLL (顶层定向)",
     icon: "🎯",
     desc: "将顶层所有颜色统一朝上。分为 2-Look (10个公式) 和 Full (57个公式)。",
-    goal: "顶面全黄",
+    goal: "顶面复原",
     algCount: "57",
+    route: "/cfop/lib/oll",
   },
   {
+    id: "pll",
     title: "PLL (顶层排列)",
     icon: "🏁",
     desc: "交换顶层块的位置以复原魔方。分为 2-Look (6个公式) 和 Full (21个公式)。",
     goal: "魔方还原",
     algCount: "21",
+    route: "/cfop/lib/pll",
   },
 ];
 
@@ -359,8 +389,31 @@ const goPractice = () => {
   router.push("/cube");
 };
 
-const goToCourse = (courseType) => {
-  router.push(`/learning/${courseType}`);
+const goToCourse2Look = () => {
+  router.push("/learning/advanced");
+};
+
+const handleStepClick = (step) => {
+  // 直接检查对象中是否有有效路由
+  if (step.route) {
+    console.log("正在跳转到:", step.route);
+    router.push(step.route);
+  } else {
+    // 针对没有路由的步骤（如 Cross）
+    console.log("该步骤暂无算法库");
+  }
+};
+
+const scrollToId = (id) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth", // 平滑滚动效果
+      block: "start", // 滚动到元素顶部
+    });
+  } else {
+    console.warn(`未找到 ID 为 ${id} 的元素`);
+  }
 };
 </script>
 
@@ -803,10 +856,19 @@ const goToCourse = (courseType) => {
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid #e2e8f0;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的曲线 */
+  position: relative;
 }
-.step-card:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+
+/* 只有带路由的卡片才有悬浮效果 */
+.step-card.is-clickable {
+  cursor: pointer;
+}
+
+.step-card.is-clickable:hover {
+  transform: translateY(-4px) scale(1.01); /* 微微上浮放大 */
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6; /* 边框变蓝 */
 }
 
 .step-header {
@@ -816,6 +878,12 @@ const goToCourse = (courseType) => {
   align-items: center;
   gap: 16px;
   border-bottom: 1px solid #f1f5f9;
+  transition: background 0.3s;
+}
+
+/* 悬浮时 Header 变色 */
+.step-card.is-clickable:hover .step-header {
+  background: #eff6ff;
 }
 
 .step-number {
@@ -828,12 +896,14 @@ const goToCourse = (courseType) => {
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 14px;
 }
 
 .step-title {
   font-size: 1.25rem;
   font-weight: 800;
   flex: 1;
+  color: #1e293b;
 }
 .step-icon {
   font-size: 1.5rem;
@@ -841,11 +911,13 @@ const goToCourse = (courseType) => {
 
 .step-body {
   padding: 24px;
+  position: relative;
 }
 .step-body p {
   color: #475569;
   line-height: 1.6;
   margin-bottom: 16px;
+  max-width: 90%;
 }
 
 .step-meta {
@@ -859,6 +931,32 @@ const goToCourse = (courseType) => {
   padding: 4px 10px;
   border-radius: 6px;
   font-weight: 600;
+}
+.meta-tag.highlight {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #dcfce7;
+}
+
+/* 箭头入口提示 */
+.enter-hint {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #3b82f6;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.step-card.is-clickable:hover .enter-hint {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* --- 7. 对比表 --- */

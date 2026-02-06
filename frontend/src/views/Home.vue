@@ -262,7 +262,6 @@ import {
 } from "@element-plus/icons-vue";
 
 const router = useRouter();
-const loading = ref(false);
 const activeNames = ref("1");
 const homeCubeState = ref(createCubeFromJson());
 
@@ -404,12 +403,38 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 0; /* 放在最底层 */
+  z-index: 0;
+  pointer-events: none;
+
+  --color: #e1e1e1;
+  background-color: #f3f3f3;
   background-image:
-    linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-    linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-  background-size: 40px 40px;
-  /* 径向遮罩：让网格在中心清晰，边缘淡出，避免死板 */
+    linear-gradient(
+      0deg,
+      transparent 24%,
+      var(--color) 25%,
+      var(--color) 26%,
+      transparent 27%,
+      transparent 74%,
+      var(--color) 75%,
+      var(--color) 76%,
+      transparent 77%,
+      transparent
+    ),
+    linear-gradient(
+      90deg,
+      transparent 24%,
+      var(--color) 25%,
+      var(--color) 26%,
+      transparent 27%,
+      transparent 74%,
+      var(--color) 75%,
+      var(--color) 76%,
+      transparent 77%,
+      transparent
+    );
+  background-size: 55px 55px;
+
   -webkit-mask-image: radial-gradient(
     ellipse 80% 50% at 50% 0%,
     #000 70%,
@@ -420,7 +445,6 @@ onMounted(() => {
     #000 70%,
     transparent 100%
   );
-  pointer-events: none;
 }
 
 .container {

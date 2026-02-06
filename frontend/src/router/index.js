@@ -27,6 +27,11 @@ const routes = [
         component: () => import("../views/CfopIntro.vue"),
       },
       {
+        path: "cfop/lib/:step",
+        name: "CfopLibrary",
+        component: () => import("../views/CfopAlgorithmLibrary.vue"),
+      },
+      {
         path: "learning",
         redirect: "/learning/basics",
       },
