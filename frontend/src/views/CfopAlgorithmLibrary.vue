@@ -32,7 +32,7 @@
 
       <!-- 2. 分类导航 (数据源动态切换) -->
       <div class="filter-wrapper">
-        <div class="glass-radio-group">
+        <div class="glass-radio-group scrollable-hide-bar" ref="radioGroupRef">
           <template v-for="cat in currentConfig.categories" :key="cat.value">
             <input
               type="radio"
@@ -150,17 +150,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, nextTick, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ArrowLeft, VideoPlay, CopyDocument } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import TutorialCube from "../components/TutorialCube.vue";
 import { pllAlgorithms, pllCategories } from "../data/cfop/pll.js";
-// import { ollAlgorithms, ollCategories } from '../data/cfop/oll.js'; // 以后你写好后取消注释
+import { ollAlgorithms, ollCategories } from "../data/cfop/oll.js";
 
 const route = useRoute();
 
-// --- 1. 数据映射表 (核心逻辑) ---
+// --- 1. 数据映射表 ---
 const dataMap = {
   pll: {
     title: "PLL",
@@ -169,8 +169,8 @@ const dataMap = {
   },
   oll: {
     title: "OLL",
-    list: [],
-    categories: [{ label: "所有", value: "all" }],
+    list: ollAlgorithms,
+    categories: ollCategories,
   },
   f2l: {
     title: "F2L",
@@ -179,7 +179,6 @@ const dataMap = {
   },
 };
 
-// 当前路由对应的配置
 const currentConfig = computed(() => {
   const step = route.params.step;
   return dataMap[step] || dataMap.pll;
@@ -192,28 +191,87 @@ const dialogVisible = ref(false);
 const selectedAlgo = ref(null);
 const tutorialCubeRef = ref(null);
 
-// 关键：当路由参数切换时（如从 PLL 换到 OLL），重置筛选状态
+// DOM 引用
+const radioGroupRef = ref(null);
+// 滑块样式 (改为响应式对象)
+const gliderStyle = ref({ width: "0px", transform: "translateX(0)" });
+
+// --- 3. 核心：基于 DOM 的滑块位置计算 + 自动滚动 ---
+const updateGlider = () => {
+  const container = radioGroupRef.value;
+  if (!container) return;
+
+  // 1. 找到所有 Label 和当前选中项索引
+  const labels = container.querySelectorAll("label");
+  const currentIndex = currentConfig.value.categories.findIndex(
+    (c) => c.value === currentCategory.value,
+  );
+
+  // 2. 如果找到了选中的项
+  if (currentIndex !== -1 && labels[currentIndex]) {
+    const targetLabel = labels[currentIndex];
+
+    // 获取参数
+    const left = targetLabel.offsetLeft;
+    const width = targetLabel.offsetWidth;
+
+    // A. 移动黑块 (Glider)
+    gliderStyle.value = {
+      width: `${width}px`,
+      transform: `translateX(${left}px)`,
+    };
+
+    // B. 滚动容器 (Scroll Container)
+    // 算法：标签左边距 - (容器一半宽 - 标签一半宽) = 让标签居中
+    const scrollTarget = left - container.offsetWidth / 2 + width / 2;
+
+    container.scrollTo({
+      left: scrollTarget,
+      behavior: "smooth",
+    });
+  } else {
+    // 3. 没选中时隐藏黑块
+    gliderStyle.value = { width: "0px", transform: "translateX(0)" };
+  }
+};
+
+// --- 4. 监听器 ---
+
+// 监听分类切换 -> 更新滑块
+watch(currentCategory, () => {
+  nextTick(updateGlider);
+});
+
+// 监听路由切换 -> 重置状态并更新滑块
 watch(
   () => route.params.step,
   () => {
     currentCategory.value = "all";
     searchQuery.value = "";
+    // 等待 DOM 更新（因为 categories 列表变了）后再计算
+    nextTick(() => {
+      // 稍微延迟一点点，确保新的 Label 渲染完成
+      setTimeout(updateGlider, 50);
+    });
   },
+  { immediate: true }, // 立即执行一次
 );
 
-// 计算滑块位置 (需动态计算当前分类列表的长度)
-const gliderStyle = computed(() => {
-  const categories = currentConfig.value.categories;
-  const index = categories.findIndex((c) => c.value === currentCategory.value);
-  const width = 100 / categories.length;
-  return {
-    width: `${width}%`,
-    transform: `translateX(${index * 100}%)`,
-  };
+// 初始化和窗口缩放监听
+onMounted(() => {
+  // 延时确保字体加载完成，宽度计算准确
+  setTimeout(updateGlider, 100);
+  window.addEventListener("resize", updateGlider);
 });
 
-// 筛选逻辑 (针对 currentConfig.value.list 进行计算)
+// --- 5. 搜索框筛选逻辑 ---
 const filteredList = computed(() => {
+  console.log(
+    "正在筛选:",
+    currentConfig.value.title,
+    "关键词:",
+    searchQuery.value,
+  );
   return currentConfig.value.list.filter((item) => {
     const catMatch =
       currentCategory.value === "all" ||
@@ -225,7 +283,7 @@ const filteredList = computed(() => {
   });
 });
 
-// 方法
+// --- 6. 交互方法 ---
 const openDemo = (item) => {
   selectedAlgo.value = item;
   dialogVisible.value = true;
@@ -358,12 +416,14 @@ const copyAlgo = (text) => {
   width: 50%;
 }
 
-/* --- Glass Radio Group --- */
+/* --- Glass Radio Group (Updated for Scrolling) --- */
 .filter-wrapper {
   margin-bottom: 50px;
   display: flex;
   justify-content: center;
+  width: 100%; /* 确保外层容器占满宽度，这样里面的 radio-group 居中后，如果太宽就能向两边延伸 */
 }
+
 .glass-radio-group {
   --bg: rgba(255, 255, 255, 0.6);
   display: flex;
@@ -373,15 +433,32 @@ const copyAlgo = (text) => {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  width: fit-content;
-  padding: 4px;
+
+  /* 核心修改：支持横向滚动 */
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%; /* 限制最大宽度不超过屏幕 */
+  white-space: nowrap; /* 强制所有 label 在一行 */
+
+  /* 隐藏滚动条 (兼容性写法) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+
+  padding: 4px; /* 保持内边距 */
+  width: fit-content; /* 内容少时收缩，内容多时被 max-width 限制 */
 }
+
+/* Chrome/Safari 隐藏滚动条 */
+.glass-radio-group::-webkit-scrollbar {
+  display: none;
+}
+
 .glass-radio-group input {
   display: none;
 }
+
 .glass-radio-group label {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -395,9 +472,11 @@ const copyAlgo = (text) => {
   z-index: 2;
   transition: color 0.3s;
 }
+
 .glass-radio-group input:checked + label {
   color: #fff;
 }
+
 .glass-glider {
   position: absolute;
   top: 4px;
@@ -405,7 +484,7 @@ const copyAlgo = (text) => {
   background: #1e293b;
   border-radius: 10px;
   z-index: 1;
-  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* --- 3-Column Grid & Premium Cards --- */

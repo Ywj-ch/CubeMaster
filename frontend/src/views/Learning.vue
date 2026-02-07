@@ -236,38 +236,65 @@
         </div>
       </el-main>
 
-      <!-- [新增] 3D 算法演示弹窗 -->
+      <!-- 3D 算法演示弹窗 -->
       <el-dialog
         v-model="demoVisible"
-        title="3D 算法演示"
-        width="620px"
-        destroy-on-close
+        width="700px"
+        class="immersive-dialog"
+        :show-close="true"
         align-center
+        destroy-on-close
       >
-        <div class="demo-dialog-content">
-          <div class="demo-cube-box">
-            <!-- 只有弹窗打开时才渲染，节省性能 -->
+        <!-- 自定义头部 -->
+        <template #header>
+          <div class="dialog-header-custom">
+            <!-- 这是一个小小的 ID 胶囊 -->
+            <span class="dialog-id-badge">{{ currentDemoItem.id }}</span>
+            <h2>{{ currentDemoItem.title }}</h2>
+          </div>
+        </template>
+
+        <div class="dialog-body">
+          <!-- 3D 舞台区域  -->
+          <div class="cube-viewport">
+            <div class="viewport-bg"></div>
             <TutorialCube
               v-if="demoVisible"
               ref="demoCubeRef"
               :setup="currentDemoItem.setup"
               :algorithm="currentDemoItem.algorithm"
             />
-            <div class="demo-controls-overlay">
-              <el-button
-                type="primary"
-                size="default"
-                circle
-                :icon="VideoPlay"
-                class="demo-play-btn"
-                @click="handleDemoPlay"
-              />
-            </div>
           </div>
-          <div class="demo-info">
-            <h3>{{ currentDemoItem.title }}</h3>
-            <code class="big-formula">{{ currentDemoItem.algorithm }}</code>
-            <p class="demo-tip">{{ currentDemoItem.tips }}</p>
+
+          <!-- 右侧/下方 信息区 -->
+          <div class="info-panel">
+            <!-- 公式展示 -->
+            <div class="info-section">
+              <h4 class="info-label">核心公式</h4>
+              <div class="big-formula-box">
+                <code class="huge-mono">{{ currentDemoItem.algorithm }}</code>
+                <button
+                  class="copy-btn"
+                  @click="copyAlgo(currentDemoItem.algorithm)"
+                >
+                  <el-icon><CopyDocument /></el-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- 提示/技巧展示 -->
+            <div class="info-section" v-if="currentDemoItem.tips">
+              <h4 class="info-label">观察技巧 / TIPS</h4>
+              <p class="recog-desc">{{ currentDemoItem.tips }}</p>
+            </div>
+
+            <!-- 底部操作按钮 (居中胶囊样式) -->
+            <div class="dialog-actions">
+              <button class="primary-action-btn" @click="handleDemoPlay">
+                <el-icon><VideoPlay /></el-icon>
+                <span>开始演示</span>
+              </button>
+            </div>
           </div>
         </div>
       </el-dialog>
@@ -278,7 +305,13 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { VideoPlay, Picture, Select } from "@element-plus/icons-vue";
+import {
+  VideoPlay,
+  Picture,
+  Select,
+  CopyDocument,
+} from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 import { courseList } from "../data/courses.js";
 import TutorialCube from "../components/TutorialCube.vue";
 import Face2DView from "../components/Face2DView.vue";
@@ -359,6 +392,12 @@ const handleSelectStep = (index) => {
 const handlePlay = (caseId) => {
   const cubeInstance = cubeRefs.value[caseId];
   if (cubeInstance) cubeInstance.play();
+};
+
+const copyAlgo = (text) => {
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  ElMessage.success("公式已复制");
 };
 
 const resetView = () => {
@@ -655,7 +694,7 @@ const handleDemoPlay = () => {
   justify-content: center;
 }
 
-/* ==================== 2. 修正后的新增样式 (仅针对网格与进阶卡片) ==================== */
+/* ==================== 2. 修正后的新增样式 ==================== */
 
 /* 强制两列布局容器 */
 .cases-wrapper.grid-layout {
@@ -811,41 +850,161 @@ const handleDemoPlay = () => {
   color: #3b82f6;
 }
 
-/* 弹窗及控制器 */
-.demo-cube-box {
-  height: 380px;
-  background-color: #f0f2f5;
-  border-radius: 16px;
-  border: 1px solid #dcdfe6;
+/*------------ 弹窗及控制器样式 ---------------*/
+/* 1. 弹窗容器去边框、加模糊 */
+:deep(.immersive-dialog) {
+  border-radius: 28px;
   overflow: hidden;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.95); /* 稍微不透明一点，保证阅读 */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.el-dialog__header) {
+  margin-right: 0;
+  padding: 20px 24px 10px;
+}
+
+/* 2. 头部样式 */
+.dialog-header-custom {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.dialog-id-badge {
+  background: #1e293b;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.dialog-header-custom h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+/* 3. 内容布局 */
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 10px 20px;
+}
+
+/* 3D 视口 */
+.cube-viewport {
+  height: 360px; /* 稍微调小一点，适配 Learning 页面的紧凑感 */
+  background: #f8fafc;
+  border-radius: 20px;
   position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
-.demo-controls-overlay {
+.viewport-bg {
   position: absolute;
-  bottom: 16px;
-  left: 20px;
-  z-index: 100;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(59, 130, 246, 0.05) 0%,
+    transparent 70%
+  );
 }
-.demo-play-btn {
-  width: 48px !important;
-  height: 48px !important;
-  font-size: 24px;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4) !important;
+
+/* 信息面板 */
+.info-panel {
+  padding: 0 10px;
 }
-.demo-info {
-  text-align: center;
-  margin-top: 20px;
+.info-section {
+  margin-bottom: 20px;
 }
-.big-formula {
-  font-size: 20px;
-  font-weight: bold;
+.info-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* 大号公式栏 */
+.big-formula-box {
+  background: #f1f5f9;
+  padding: 16px 20px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e2e8f0;
+}
+.huge-mono {
   font-family: "JetBrains Mono", monospace;
-  color: #2563eb;
-  background: #eff6ff;
-  padding: 12px 24px;
+  font-size: 1.25rem;
+  color: #1e293b;
+  font-weight: 800;
+  word-break: break-all; /* 防止公式太长溢出 */
+}
+.copy-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  display: inline-block;
-  margin: 15px 0;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  flex-shrink: 0;
+}
+.copy-btn:hover {
+  color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.recog-desc {
+  font-size: 1rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* 4. 底部按钮 (胶囊居中) */
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.primary-action-btn {
+  min-width: 180px;
+  height: 48px;
+  padding: 0 30px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 100px;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+.primary-action-btn:hover {
+  background: #2563eb;
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+}
+.primary-action-btn:active {
+  transform: translateY(-1px);
 }
 
 /* 响应式兼容 */
