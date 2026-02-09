@@ -61,7 +61,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to, from, savedPosition) {
+    // 如果有历史位置（点后退键），恢复位置
+    if (savedPosition) {
+      return savedPosition;
+    }
+
+    // 否则默认跳转回顶部
     return { top: 0 };
   },
 });

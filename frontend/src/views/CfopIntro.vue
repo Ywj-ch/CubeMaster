@@ -1,8 +1,8 @@
 <template>
   <div class="cfop-intro-page">
     <div class="page-container">
-      <!-- ================= 1. Hero Section (顶部大卡片) ================= -->
-      <section class="hero-section">
+      <!-- ================= 1. Hero Section ================= -->
+      <section class="hero-section" v-animate>
         <!-- 背景光晕装饰 -->
         <div class="glow-bg glow-top-right"></div>
         <div class="glow-bg glow-bottom-left"></div>
@@ -41,8 +41,8 @@
         </div>
       </section>
 
-      <!-- ================= 2. 学习目标 (What you'll learn) ================= -->
-      <section class="section-block">
+      <!-- ================= 2. 学习目标 ================= -->
+      <section class="section-block" v-animate>
         <h2 class="section-heading">你将学到</h2>
         <div class="learning-list-card">
           <ul class="check-list">
@@ -52,7 +52,7 @@
             </li>
           </ul>
 
-          <!-- 模拟器推广卡片 (静态展示) -->
+          <!-- 模拟器推广卡片 -->
           <div class="simulator-promo">
             <div class="promo-icon">
               <el-icon><Monitor /></el-icon>
@@ -68,13 +68,14 @@
         </div>
       </section>
 
-      <!-- ================= 3. 决策树 (Which path?) ================= -->
-      <section class="section-block">
-        <h2 class="section-heading">我应该选择哪条路径？</h2>
-        <p class="section-sub">不确定从哪里开始？根据你的经验水平选择：</p>
+      <!-- ================= 3. 决策树 ================= -->
+      <section class="section-block" v-animate>
+        <h2 class="section-heading text-center">我应该选择哪条路径？</h2>
+        <p class="section-sub text-center">
+          不确定从哪里开始？根据你的经验水平选择：
+        </p>
 
         <div class="decision-grid">
-          <!-- 左卡：跳转到 2-Look 课程 -->
           <div
             class="decision-card emerald"
             @click="goToCourse2Look('advanced')"
@@ -84,14 +85,14 @@
             <p>从 16 个基础算法开始 (2-Look)</p>
           </div>
 
-          <!-- 中卡：电梯模式，滚动到下方 Roadmap -->
+          <!-- 中卡：电梯模式 -->
           <div class="decision-card blue" @click="scrollToId('full-roadmap')">
             <div class="icon-box">📈</div>
             <h3>挑战完整 CFOP</h3>
             <p>分模块攻克 F2L + OLL + PLL</p>
           </div>
 
-          <!-- 右卡：同样滚动到下方，或未来做全局搜索 -->
+          <!-- 右卡：查表模式 -->
           <div class="decision-card purple" @click="scrollToId('full-roadmap')">
             <div class="icon-box">⚡</div>
             <h3>我需要快速参考</h3>
@@ -100,41 +101,61 @@
         </div>
       </section>
 
-      <!-- ================= 4. CFOP 数据概览 (Stats) ================= -->
-      <section class="section-block">
+      <!-- ================= 4. CFOP 数据概览 ================= -->
+      <section class="section-block" v-animate>
         <h2 class="section-heading">CFOP 数据概览</h2>
         <div class="stats-grid">
           <div class="stat-box blue-theme">
-            <div class="stat-icon">🎯</div>
-            <div class="stat-num">4</div>
-            <div class="stat-label">主要步骤</div>
+            <div class="blob"></div>
+            <div class="bg"></div>
+            <div class="stat-content">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-num">4</div>
+              <div class="stat-label">主要步骤</div>
+            </div>
           </div>
+
           <div class="stat-box purple-theme">
-            <div class="stat-icon">🔄</div>
-            <div class="stat-num">57</div>
-            <div class="stat-label">OLL 情况</div>
+            <div class="blob"></div>
+            <div class="bg"></div>
+            <div class="stat-content">
+              <div class="stat-icon">🔄</div>
+              <div class="stat-num">57</div>
+              <div class="stat-label">OLL 情况</div>
+            </div>
           </div>
+
           <div class="stat-box orange-theme">
-            <div class="stat-icon">🧩</div>
-            <div class="stat-num">21</div>
-            <div class="stat-label">PLL 情况</div>
+            <div class="blob"></div>
+            <div class="bg"></div>
+            <div class="stat-content">
+              <div class="stat-icon">🧩</div>
+              <div class="stat-num">21</div>
+              <div class="stat-label">PLL 情况</div>
+            </div>
           </div>
+
           <div class="stat-box emerald-theme">
-            <div class="stat-icon">🤝</div>
-            <div class="stat-num">41</div>
-            <div class="stat-label">F2L 情况</div>
+            <div class="blob"></div>
+            <div class="bg"></div>
+            <div class="stat-content">
+              <div class="stat-icon">🤝</div>
+              <div class="stat-num">41</div>
+              <div class="stat-label">F2L 情况</div>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= 5. 进步时间线 (Timeline) ================= -->
-      <section class="section-block">
+      <!-- ================= 5. 进步时间线 ================= -->
+      <section class="section-block" v-animate>
         <h2 class="section-heading">CFOP 进步时间线</h2>
         <p class="section-sub">掌握每个阶段后你可以期待的速度：</p>
 
         <div class="timeline-container">
           <div
             class="timeline-item"
+            :class="time.colorClass"
             v-for="(time, idx) in timelineData"
             :key="idx"
           >
@@ -157,44 +178,55 @@
       </section>
 
       <!-- ================= 6. 4步路线图 ================= -->
-      <section id="full-roadmap" class="section-block">
-        <h2 class="section-heading">4 步 CFOP 详解与入口</h2>
-        <p class="section-sub">点击卡片进入对应的算法库：</p>
+      <section id="full-roadmap" class="section-block" v-animate>
+        <h2 class="section-heading text-center">4 步 CFOP 详解与入口</h2>
+        <p class="section-sub text-center">点击卡片进入对应的算法库：</p>
 
-        <div class="steps-container">
+        <div class="roadmap-wrapper">
+          <!-- 垂直连接线 -->
+          <div class="roadmap-line"></div>
+
           <div
-            class="step-card"
+            class="roadmap-node"
             v-for="(step, idx) in cfopSteps"
             :key="idx"
             :class="{ 'is-clickable': step.route }"
             @click="handleStepClick(step)"
           >
-            <div class="step-header">
-              <div class="step-number">{{ idx + 1 }}</div>
-              <div class="step-title">{{ step.title }}</div>
-              <div class="step-icon">{{ step.icon }}</div>
+            <!-- 左侧节点 -->
+            <div class="node-marker">
+              <div class="marker-circle">{{ idx + 1 }}</div>
             </div>
-            <div class="step-body">
-              <p>{{ step.desc }}</p>
-              <div class="step-meta">
-                <span class="meta-tag">目标: {{ step.goal }}</span>
-                <span class="meta-tag highlight"
-                  >算法数: {{ step.algCount }}</span
-                >
-              </div>
 
-              <!-- 仅当有路由时显示“进入”箭头 -->
-              <div v-if="step.route" class="enter-hint">
-                <span>进入库</span>
-                <el-icon><ArrowRight /></el-icon>
+            <!-- 右侧卡片 -->
+            <div class="node-card">
+              <div class="card-header">
+                <div class="header-left">
+                  <span class="step-icon">{{ step.icon }}</span>
+                  <h3 class="step-title">{{ step.title }}</h3>
+                </div>
+                <!-- 入口箭头 -->
+                <div class="header-right" v-if="step.route">
+                  <span class="enter-text">进入库</span>
+                  <el-icon><ArrowRight /></el-icon>
+                </div>
+              </div>
+              <div class="card-body">
+                <p>{{ step.desc }}</p>
+                <div class="step-meta">
+                  <span class="meta-tag">目标: {{ step.goal }}</span>
+                  <span class="meta-tag highlight"
+                    >算法: {{ step.algCount }}</span
+                  >
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= 7. 方法对比表 (Comparison) ================= -->
-      <section class="section-block">
+      <!-- ================= 7. 方法对比表 ================= -->
+      <section class="section-block" v-animate>
         <h2 class="section-heading">为什么选择 CFOP？</h2>
         <div class="table-wrapper">
           <table class="comparison-table">
@@ -271,12 +303,31 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Check, Monitor, ArrowRight } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const activeNames = ref("1");
+
+// --- 自定义指令：滚动入场动画 ---
+const vAnimate = {
+  mounted: (el) => {
+    el.classList.add("before-enter");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            el.classList.add("enter");
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.1 },
+    ); // 露出10%触发
+    observer.observe(el);
+  },
+};
 
 // --- 数据区 ---
 const learningPoints = [
@@ -368,7 +419,7 @@ const faqs = [
     id: "2",
     title: "学习 CFOP 需要多久？",
     content:
-      "理解原理只需 15 分钟，但熟练掌握完整 78 个公式通常需要 1-3 个月的练习。",
+      "理解原理只需 15 分钟，但熟练掌握完整 119 个公式通常需要 1-3 个月的练习。",
   },
   {
     id: "3",
@@ -384,54 +435,64 @@ const faqs = [
   },
 ];
 
-// --- 方法区 ---
-const goPractice = () => {
-  router.push("/cube");
-};
-
-const goToCourse2Look = () => {
-  router.push("/learning/advanced");
-};
+// --- 逻辑方法 ---
+const goPractice = () => router.push("/cube");
+const goToCourse2Look = () => router.push("/learning/advanced");
 
 const handleStepClick = (step) => {
-  // 直接检查对象中是否有有效路由
   if (step.route) {
-    console.log("正在跳转到:", step.route);
     router.push(step.route);
   } else {
-    // 针对没有路由的步骤（如 Cross）
-    console.log("该步骤暂无算法库");
+    // 静态卡片不操作
   }
 };
 
 const scrollToId = (id) => {
   const element = document.getElementById(id);
   if (element) {
-    element.scrollIntoView({
-      behavior: "smooth", // 平滑滚动效果
-      block: "start", // 滚动到元素顶部
-    });
-  } else {
-    console.warn(`未找到 ID 为 ${id} 的元素`);
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 };
+
+// 页面加载时处理滚动状态（从 Library 返回）
+onMounted(() => {
+  const state = window.history.state;
+  if (state && state.scrollTarget === "full-roadmap") {
+    setTimeout(() => {
+      scrollToId("full-roadmap");
+      window.history.replaceState({ ...state, scrollTarget: null }, "");
+    }, 100);
+  }
+});
 </script>
 
 <style scoped>
-/* --- 基础设置 --- */
+/* --- 页面基础 --- */
 .cfop-intro-page {
   width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
   font-family: "Inter", sans-serif;
   color: #0f172a;
-  padding-bottom: 80px;
+  padding-bottom: 100px;
+  overflow-x: hidden; /* 避免动效横向溢出 */
 }
 
 .page-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
+}
+
+/* --- 动效类 --- */
+.before-enter {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.enter {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* --- 1. Hero Section --- */
@@ -562,25 +623,20 @@ const scrollToId = (id) => {
   background: #8b5cf6;
 }
 
-/* --- 通用 Section 样式 --- */
+/* --- 通用 Section --- */
 .section-block {
-  margin-bottom: 80px;
+  margin-bottom: 100px;
 }
-
 .section-heading {
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 16px;
   color: #0f172a;
+  margin-bottom: 40px;
 }
-.section-heading.text-center {
-  text-align: center;
-}
-
 .section-sub {
   font-size: 1.1rem;
   color: #64748b;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
 }
 
 /* --- 2. 学习目标 --- */
@@ -593,7 +649,6 @@ const scrollToId = (id) => {
   flex-direction: column;
   gap: 30px;
 }
-
 .check-list {
   list-style: none;
   padding: 0;
@@ -602,7 +657,6 @@ const scrollToId = (id) => {
   flex-direction: column;
   gap: 16px;
 }
-
 .check-list li {
   display: flex;
   align-items: center;
@@ -610,7 +664,6 @@ const scrollToId = (id) => {
   font-size: 1.1rem;
   color: #334155;
 }
-
 .check-icon {
   color: #10b981;
   font-weight: bold;
@@ -625,7 +678,6 @@ const scrollToId = (id) => {
   align-items: center;
   gap: 20px;
 }
-
 .promo-icon {
   width: 48px;
   height: 48px;
@@ -637,7 +689,6 @@ const scrollToId = (id) => {
   color: #3b82f6;
   font-size: 24px;
 }
-
 .promo-text {
   flex: 1;
   font-size: 14px;
@@ -656,7 +707,6 @@ const scrollToId = (id) => {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
 }
-
 .decision-card {
   background: #fff;
   border: 2px solid transparent;
@@ -665,35 +715,32 @@ const scrollToId = (id) => {
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  text-align: center;
 }
-
 .decision-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
-
 .decision-card .icon-box {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 28px;
+  margin: 0 auto 20px;
 }
-
 .decision-card h3 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 8px;
 }
 .decision-card p {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #64748b;
 }
 
-/* 颜色主题 */
 .decision-card.emerald {
   background: linear-gradient(to bottom right, #ecfdf5, #fff);
   border-color: #d1fae5;
@@ -732,42 +779,163 @@ const scrollToId = (id) => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  margin-top: 20px;
 }
-@media (max-width: 768px) {
+
+.stat-box {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: 20px;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+}
+
+/* 1. 顶部彩色装饰线 */
+.stat-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px; /* 线条粗细 */
+  background: var(--theme-color);
+  z-index: 10; /* 确保在最上层 */
+}
+
+/* 2. 内部磨砂背景层 */
+.stat-box .bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(30px);
+  transition: all 0.5s ease;
+}
+
+/* 3. 动态色斑 (默认隐藏) */
+.stat-box .blob {
+  position: absolute;
+  z-index: 1;
+  top: 10%;
+  left: 10%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background-color: var(--theme-color);
+  opacity: 0;
+  filter: blur(20px);
+  transition: all 0.6s ease;
+  animation: blob-bounce 6s infinite ease;
+}
+
+/* --- 悬浮激活逻辑 --- */
+.stat-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: var(--theme-color); /* 边框变色 */
+}
+
+.stat-box:hover .bg {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.stat-box:hover .blob {
+  opacity: 0.6;
+  transform: scale(1.3);
+}
+
+/* 4. 实际内容层 */
+.stat-content {
+  position: relative;
+  z-index: 5; /* 确保在所有层级之上 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.stat-icon {
+  font-size: 26px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.stat-num {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #1e293b;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* 颜色主题配置 */
+.stat-box.blue-theme {
+  --theme-color: #3b82f6;
+}
+.stat-box.purple-theme {
+  --theme-color: #8b5cf6;
+}
+.stat-box.orange-theme {
+  --theme-color: #f59e0b;
+}
+.stat-box.emerald-theme {
+  --theme-color: #10b981;
+}
+
+/* 动画关键帧保持逻辑 */
+@keyframes blob-bounce {
+  0% {
+    transform: translate(-80%, -80%);
+  }
+  25% {
+    transform: translate(20%, -80%);
+  }
+  50% {
+    transform: translate(20%, 20%);
+  }
+  75% {
+    transform: translate(-80%, 20%);
+  }
+  100% {
+    transform: translate(-80%, -80%);
+  }
+}
+
+/* 响应式 */
+@media (max-width: 992px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
-.stat-box {
-  background: #fff;
-  border-radius: 20px;
-  padding: 24px;
-  text-align: center;
-  border: 1px solid #e2e8f0;
-  transition: transform 0.3s;
-}
-.stat-box:hover {
-  transform: scale(1.05);
+@media (max-width: 500px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.stat-icon {
-  font-size: 24px;
-  margin-bottom: 12px;
-}
-.stat-num {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-.stat-label {
-  font-size: 0.9rem;
-  color: #64748b;
-}
-
-/* --- 5. 时间线 --- */
+/* --- 5. 进步时间线 --- */
 .timeline-container {
   display: flex;
   flex-direction: column;
@@ -779,13 +947,42 @@ const scrollToId = (id) => {
   align-items: center;
   gap: 20px;
   background: #fff;
-  padding: 20px;
+  padding: 24px 30px; /* 稍微增加内边距 */
   border-radius: 16px;
   border: 1px solid #e2e8f0;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  position: relative; /* 必须 */
+  overflow: hidden; /* 必须 */
 }
+
 .timeline-item:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+  transform: translateX(8px); /* 悬浮时轻微右移，配合左侧线条更有质感 */
+}
+
+/* 左侧装饰线条通用样式 */
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px; /* 线条宽度 */
+  background: var(--timeline-color);
+}
+
+/* 根据 Template 传入的类名分配颜色 */
+.timeline-item.green {
+  --timeline-color: #10b981;
+}
+.timeline-item.blue {
+  --timeline-color: #3b82f6;
+}
+.timeline-item.purple {
+  --timeline-color: #8b5cf6;
+}
+.timeline-item.orange {
+  --timeline-color: #f59e0b;
 }
 
 .time-badge {
@@ -793,170 +990,184 @@ const scrollToId = (id) => {
   font-weight: 800;
   width: 100px;
   text-align: center;
-}
-.time-badge.green {
-  color: #10b981;
-}
-.time-badge.blue {
-  color: #3b82f6;
-}
-.time-badge.purple {
-  color: #8b5cf6;
-}
-.time-badge.orange {
-  color: #f59e0b;
+  /* 颜色跟随父级变量，保持一致性 */
+  color: var(--timeline-color);
 }
 
 .time-content {
   flex: 1;
 }
+
 .time-content h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #1e293b;
 }
+
 .time-content p {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #64748b;
 }
 
 .progress-bar-wrap {
-  width: 150px;
+  width: 180px;
   height: 8px;
   background: #f1f5f9;
-  border-radius: 4px;
+  border-radius: 10px;
   overflow: hidden;
 }
+
 .progress-bar {
   height: 100%;
-  border-radius: 4px;
-}
-.progress-bar.green {
-  background: linear-gradient(to right, #10b981, #34d399);
-}
-.progress-bar.blue {
-  background: linear-gradient(to right, #3b82f6, #60a5fa);
-}
-.progress-bar.purple {
-  background: linear-gradient(to right, #8b5cf6, #a78bfa);
-}
-.progress-bar.orange {
-  background: linear-gradient(to right, #f59e0b, #fbbf24);
+  border-radius: 10px;
 }
 
-/* --- 6. 步骤卡片 --- */
-.steps-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+/* 进度条也改用变量，简化代码 */
+.progress-bar {
+  background: var(--timeline-color);
+  opacity: 0.8;
 }
 
-.step-card {
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的曲线 */
+/* --- 6. 垂直时间轴 (Roadmap) --- */
+.roadmap-wrapper {
   position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-left: 40px; /* 留出左侧空间 */
 }
 
-/* 只有带路由的卡片才有悬浮效果 */
-.step-card.is-clickable {
-  cursor: pointer;
+/* 贯穿线 */
+.roadmap-line {
+  position: absolute;
+  left: 19px; /* 圆点中心 */
+  top: 20px;
+  bottom: 20px;
+  width: 2px;
+  background: #e2e8f0;
+  z-index: 0;
 }
 
-.step-card.is-clickable:hover {
-  transform: translateY(-4px) scale(1.01); /* 微微上浮放大 */
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6; /* 边框变蓝 */
+.roadmap-node {
+  position: relative;
+  margin-bottom: 40px;
+  cursor: default;
+}
+.roadmap-node:last-child {
+  margin-bottom: 0;
 }
 
-.step-header {
-  background: #f8fafc;
-  padding: 20px 24px;
+.node-marker {
+  position: absolute;
+  left: -40px;
+  top: 24px; /* 对齐卡片顶部 */
+  width: 40px;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background 0.3s;
+  justify-content: center;
+  z-index: 1;
 }
-
-/* 悬浮时 Header 变色 */
-.step-card.is-clickable:hover .step-header {
-  background: #eff6ff;
-}
-
-.step-number {
-  width: 32px;
-  height: 32px;
-  background: #0f172a;
-  color: #fff;
+.marker-circle {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 2px solid #e2e8f0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 800;
+  color: #94a3b8;
+  transition: all 0.3s;
 }
 
-.step-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  flex: 1;
-  color: #1e293b;
+/* 激活状态 (悬浮或点击) */
+.roadmap-node.is-clickable {
+  cursor: pointer;
+}
+.roadmap-node:hover .marker-circle,
+.roadmap-node.is-clickable:hover .marker-circle {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.node-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* 悬浮动效 */
+.roadmap-node.is-clickable:hover .node-card {
+  border-color: #3b82f6;
+  transform: translateX(10px); /* 向右微动，增强连接感 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+/* 静态卡片视觉弱化 */
+.roadmap-node:not(.is-clickable) .node-card {
+  background: #f8fafc;
+  opacity: 0.9;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .step-icon {
   font-size: 1.5rem;
 }
-
-.step-body {
-  padding: 24px;
-  position: relative;
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: #1e293b;
 }
-.step-body p {
-  color: #475569;
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.roadmap-node.is-clickable:hover .header-right {
+  opacity: 1;
+}
+
+.card-body p {
+  color: #64748b;
   line-height: 1.6;
   margin-bottom: 16px;
-  max-width: 90%;
 }
-
-.step-meta {
+.tags-row {
   display: flex;
   gap: 12px;
 }
 .meta-tag {
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 12px;
+  background: #f8fafc;
   padding: 4px 10px;
   border-radius: 6px;
+  font-size: 13px;
+  color: #64748b;
   font-weight: 600;
 }
 .meta-tag.highlight {
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #dcfce7;
-}
-
-/* 箭头入口提示 */
-.enter-hint {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #3b82f6;
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.3s ease;
-}
-
-.step-card.is-clickable:hover .enter-hint {
-  opacity: 1;
-  transform: translateX(0);
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 /* --- 7. 对比表 --- */
@@ -965,29 +1176,25 @@ const scrollToId = (id) => {
   border-radius: 16px;
   border: 1px solid #e2e8f0;
 }
-
 .comparison-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
   min-width: 600px;
 }
-
 .comparison-table th {
   background: #f8fafc;
-  padding: 16px;
+  padding: 20px;
   text-align: left;
   font-weight: 700;
   color: #475569;
   border-bottom: 1px solid #e2e8f0;
 }
-
 .comparison-table td {
-  padding: 16px;
+  padding: 20px;
   border-bottom: 1px solid #f1f5f9;
   color: #334155;
 }
-
 .highlight-row {
   background: #f0f9ff;
 }
@@ -1000,7 +1207,6 @@ const scrollToId = (id) => {
   margin-left: 8px;
   vertical-align: middle;
 }
-
 .tag {
   padding: 4px 8px;
   border-radius: 4px;
@@ -1101,20 +1307,24 @@ const scrollToId = (id) => {
   font-size: 1rem;
 }
 
-/* 响应式微调 */
+/* 响应式 */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2.5rem;
   }
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
+  .decision-grid,
+  .stats-grid,
+  .milestone-grid {
+    grid-template-columns: 1fr;
   }
-  .timeline-item {
-    flex-direction: column;
-    align-items: flex-start;
+  .roadmap-wrapper {
+    padding-left: 0;
   }
-  .progress-bar-wrap {
-    width: 100%;
+  .roadmap-line {
+    display: none;
+  }
+  .node-marker {
+    display: none;
   }
 }
 </style>

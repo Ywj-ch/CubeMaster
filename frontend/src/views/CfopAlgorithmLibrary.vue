@@ -5,7 +5,15 @@
       <!-- 1. Header: 标题根据 :step 动态变化 -->
       <header class="lib-header">
         <div class="header-left">
-          <button @click="$router.push('/cfop')" class="minimal-back-btn">
+          <button
+            @click="
+              $router.push({
+                path: '/cfop',
+                state: { scrollTarget: 'full-roadmap' },
+              })
+            "
+            class="minimal-back-btn"
+          >
             <el-icon><ArrowLeft /></el-icon>
             <span>BACK TO CFOP INFO</span>
           </button>
@@ -157,6 +165,7 @@ import { ElMessage } from "element-plus";
 import TutorialCube from "../components/TutorialCube.vue";
 import { pllAlgorithms, pllCategories } from "../data/cfop/pll.js";
 import { ollAlgorithms, ollCategories } from "../data/cfop/oll.js";
+import { f2lAlgorithms, f2lCategories } from "../data/cfop/f2l.js";
 
 const route = useRoute();
 
@@ -174,8 +183,8 @@ const dataMap = {
   },
   f2l: {
     title: "F2L",
-    list: [],
-    categories: [{ label: "所有", value: "all" }],
+    list: f2lAlgorithms,
+    categories: f2lCategories,
   },
 };
 
