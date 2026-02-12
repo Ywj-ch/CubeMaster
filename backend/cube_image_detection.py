@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import os
 import json
 from ultralytics import YOLO

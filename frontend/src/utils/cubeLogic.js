@@ -75,7 +75,7 @@ function rotateOnce(s, face) {
   s[faceIdx][7] = oldFace[5];
   s[faceIdx][8] = oldFace[2];
 
-  // 2. 旋转侧边块 (核心修正点)
+  // 2. 旋转侧边块
   let temp;
   switch (face) {
     case "U": // 涉及 F, R, B, L 的顶行 (0,1,2)

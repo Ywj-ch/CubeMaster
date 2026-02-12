@@ -530,7 +530,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-/* 拟物化快门按钮 (保持不变) */
+/* 拟物化快门按钮 */
 .shutter-button {
   width: 72px;
   height: 72px;

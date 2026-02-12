@@ -66,7 +66,6 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     }
-
     // 否则默认跳转回顶部
     return { top: 0 };
   },

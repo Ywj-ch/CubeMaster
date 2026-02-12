@@ -10,7 +10,7 @@ def get_detector():
     """获取全局唯一的检测器实例 (Lazy Initialization)"""
     global _detector_instance
     if _detector_instance is None:
-        print("⚡ [System] 初始化全局 YOLO 检测器单例...")
+        print("[System] 初始化全局 YOLO 检测器单例...")
         _detector_instance = CubeDetector()
     return _detector_instance
 
