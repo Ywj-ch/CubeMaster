@@ -9,13 +9,14 @@
       </div>
       <div class="header-actions">
         <!-- 1. 扫描识别 (Ins风格 -> 蓝青渐变胶囊) -->
-        <button class="btn-scan-glass" @click="openScanner">
+        <button class="btn-scan-glass" @click="openScanner" :disabled="scanning">
           <span class="svgContainer">
-            <el-icon><Camera /></el-icon>
+            <el-icon v-if="scanning" class="is-loading"><Loading /></el-icon>
+            <el-icon v-else><Camera /></el-icon>
           </span>
           <span class="BG"></span>
           <!-- 新增文字，让它变长 -->
-          <span class="btn-text">扫描识别</span>
+          <span class="btn-text">{{ scanning ? "扫描中..." : "扫描识别" }}</span>
         </button>
 
         <!-- 2. 智能求解 (Send风格 -> 搜索飞行) -->
@@ -238,9 +239,10 @@ import {
   VideoPause,
   Loading,
 } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 const loading = ref(false);
+const scanning = ref(false);
 const hasSolved = ref(false);
 const steps = ref([]);
 const currentStep = ref(0);
@@ -265,9 +267,11 @@ let autoPlayTimer = null;
 const demoSpeed = ref(300);
 
 const openScanner = () => {
+  scanning.value = true;
   isScannerVisible.value = true;
 };
 const handleScannedResult = (result) => {
+  scanning.value = false;
   isScannerVisible.value = false;
   const newCube = createCubeFromJson(result);
   cubeState.value.cubies = newCube.cubies;
@@ -360,6 +364,13 @@ watch(demoSpeed, () => {
   }
 });
 
+// 监听扫描器关闭事件，重置扫描状态
+watch(isScannerVisible, (newVal) => {
+  if (!newVal && scanning.value) {
+    scanning.value = false;
+  }
+});
+
 function nextStep(isAuto = false) {
   if (!isAuto) stopAutoPlay();
   if (!hasSolved.value || is3DBusy.value) return;
@@ -402,14 +413,29 @@ function jumpToStep(index) {
   stopAutoPlay();
 }
 
-function resetCube() {
-  stopAutoPlay();
-  cubeState.value = createCubeFromJson();
-  steps.value = [];
-  solutionMoves.value = [];
-  currentStep.value = 0;
-  hasSolved.value = false;
-  activeColor.value = "white";
+async function resetCube() {
+  try {
+    await ElMessageBox.confirm(
+      "确定要重置魔方吗？当前求解进度将丢失。",
+      "重置确认",
+      {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }
+    );
+    stopAutoPlay();
+    cubeState.value = createCubeFromJson();
+    steps.value = [];
+    solutionMoves.value = [];
+    currentStep.value = 0;
+    hasSolved.value = false;
+    activeColor.value = "white";
+    ElMessage.success("魔方已重置");
+  } catch (error) {
+    // 用户点击取消
+    console.log("重置已取消");
+  }
 }
 
 onUnmounted(() => {

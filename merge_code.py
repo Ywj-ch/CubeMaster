@@ -1,4 +1,4 @@
-import os
+from datetime import datetime
 from pathlib import Path
 
 
@@ -20,10 +20,13 @@ def merge_project(root_dir, output_file):
 
     root_path = Path(root_dir)
 
+    now = datetime.now()
+    current_date = now.strftime("%Y-%m-%d")
+
     with open(output_file, 'w', encoding='utf-8') as f:
         # 写入 Markdown 头部信息
         f.write(f"# Project Source Code Context\n")
-        f.write(f"Generated on: 2026-01-31\n")
+        f.write(f"Generated on: {current_date}\n")
         f.write(f"Root Directory: `{root_path.absolute()}`\n\n")
         f.write(f"---\n\n")
 

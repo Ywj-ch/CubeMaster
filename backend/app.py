@@ -1,3 +1,5 @@
+import sys
+import time
 from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 from cube_service import solve_cube
@@ -19,6 +21,18 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有HTTP方法
     allow_headers=["*"],  # 允许所有HTTP头
 )
+
+# 性能监控中间件 - 记录请求处理时间
+@app.middleware("http")
+async def add_process_time_header(request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = f"{process_time:.4f}s"
+    # 可选：在控制台输出日志（生产环境应使用结构化日志）
+    if process_time > 1.0:  # 慢请求警告
+        print(f"[PERF] Slow request: {request.method} {request.url.path} took {process_time:.4f}s")
+    return response
 
 
 # 调用求解魔方接口，并返回求解步骤
@@ -57,3 +71,48 @@ def save_state(payload: dict = Body(...)):
         return {"success": True, "message": "状态已保存"}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+# API根端点 - 返回服务信息
+@app.get("/")
+def root():
+    return {
+        "service": "CubeMaster API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health_check": "/api/health"
+    }
+
+
+# 健康检查端点
+@app.get("/api/health")
+def health_check():
+    try:
+        # 尝试检查模型加载状态
+        model_loaded = False
+        model_error = None
+        
+        try:
+            from cube_service import get_detector
+            detector = get_detector()
+            model_loaded = detector.model is not None
+        except ImportError as e:
+            model_error = f"模型依赖未安装: {str(e)}"
+        except Exception as e:
+            model_error = f"模型加载失败: {str(e)}"
+        
+        return {
+            "status": "healthy",
+            "service": "CubeMaster API",
+            "python_version": sys.version.split()[0],
+            "fastapi_version": "0.104.1",  # 当前使用的FastAPI版本
+            "model_loaded": model_loaded,
+            "model_error": model_error,
+            "timestamp": __import__("datetime").datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": __import__("datetime").datetime.now().isoformat()
+        }
