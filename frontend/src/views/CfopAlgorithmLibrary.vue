@@ -347,7 +347,7 @@ const copyAlgo = (text) => {
   gap: 8px;
   color: #94a3b8;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 1px;
   cursor: pointer;
   margin-bottom: 12px;

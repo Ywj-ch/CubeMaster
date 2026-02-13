@@ -54,6 +54,26 @@ const routes = [
         name: "About",
         component: () => import("../views/About.vue"),
       },
+      {
+        path: "tech/yolo",
+        name: "TechYolo",
+        component: () => import("../views/TechYolo.vue"),
+      },
+      {
+        path: "tech/kociemba",
+        name: "TechKociemba",
+        component: () => import("../views/TechKociemba.vue"),
+      },
+      {
+        path: "tech/threejs",
+        name: "TechThreejs",
+        component: () => import("../views/TechThreejs.vue"),
+      },
+      {
+        path: "tech/architecture",
+        name: "TechArchitecture",
+        component: () => import("../views/TechArchitecture.vue"),
+      },
     ],
   },
 ];
