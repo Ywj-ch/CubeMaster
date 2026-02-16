@@ -26,7 +26,7 @@
           </h1>
 
           <p class="hero-subtitle">
-            深入解析 CubeMaster 的微服务架构、数据流设计和基础设施选择，
+            深入解析 CubeMaster 的服务架构、数据流设计和基础设施选择，
             展示如何将计算机视觉、求解算法和 3D 渲染无缝集成到统一应用。
           </p>
 
@@ -41,7 +41,7 @@
             </div>
             <div class="stat-pill">
               <span class="dot-indicator purple"></span>
-              <span>代码行数：~15,000 行</span>
+              <span>代码行数：20,000+ 行</span>
             </div>
           </div>
         </div>
@@ -79,9 +79,9 @@
             <div class="layer data-layer">
               <div class="layer-title">数据层</div>
               <div class="layer-components">
-                <div class="component">SQLite 数据库</div>
                 <div class="component">模型文件 (.pt)</div>
-                <div class="component">静态资源</div>
+                <div class="component">临时图像存储</div>
+                <div class="component">配置/状态文件</div>
               </div>
             </div>
           </div>
@@ -117,7 +117,6 @@
                 </li>
                 <li><strong>Element Plus</strong>：企业级 UI 组件库</li>
                 <li><strong>Vue Router</strong>：SPA 路由管理，支持嵌套路由</li>
-                <li><strong>Pinia</strong>：状态管理，替代 Vuex 的轻量方案</li>
               </ul>
             </div>
 
@@ -125,7 +124,6 @@
               <h3><span class="module-icon">🎮</span> 3D 引擎</h3>
               <ul>
                 <li><strong>Three.js</strong>：WebGL 渲染库，核心 3D 功能</li>
-                <li><strong>GSAP</strong>：动画库，流畅的补间动画</li>
                 <li><strong>自定义控件</strong>：魔方专用交互系统</li>
                 <li><strong>性能监控</strong>：帧率统计和内存管理</li>
               </ul>
@@ -135,7 +133,6 @@
               <h3><span class="module-icon">🔌</span> 网络层</h3>
               <ul>
                 <li><strong>Axios</strong>：HTTP 客户端，拦截器和错误处理</li>
-                <li><strong>WebSocket</strong>：实时通信（未来扩展）</li>
                 <li><strong>请求队列</strong>：顺序处理，避免竞态条件</li>
                 <li><strong>缓存策略</strong>：本地存储频繁访问数据</li>
               </ul>
@@ -145,7 +142,6 @@
               <h3><span class="module-icon">📱</span> 构建工具</h3>
               <ul>
                 <li><strong>Vite</strong>：极速构建工具，开发服务器</li>
-                <li><strong>TypeScript</strong>：类型安全，代码提示</li>
                 <li><strong>ESLint + Prettier</strong>：代码规范和格式化</li>
                 <li><strong>自动部署</strong>：GitHub Actions + Vercel</li>
               </ul>
@@ -228,27 +224,43 @@ Response:
 
             <div class="service-card">
               <div class="service-header">
-                <div class="service-icon">📊</div>
-                <h3>数据持久化服务</h3>
+                <div class="service-icon">☁️</div>
+                <h3>云端存储与并发考虑</h3>
               </div>
               <div class="service-details">
                 <p>
-                  <strong>职责</strong>：用户进度保存，算法学习记录，统计分析
+                  <strong>挑战</strong>：云端部署时图像存储压力与多用户并发冲突
                 </p>
                 <div class="code-snippet small">
-                  <pre><code># SQLite 数据库设计
-CREATE TABLE user_progress (
-  id INTEGER PRIMARY KEY,
-  user_id TEXT,
-  algorithm TEXT,
-  solve_times JSON,
-  best_time REAL,
-  created_at TIMESTAMP
-);</code></pre>
+                  <pre><code># 解决方案架构
+1. 图片上传流程：
+   前端 → 阿里云 OSS (临时存储) → 后端读取 → 识别 → 自动清理
+
+2. 并发处理机制：
+   每个请求生成唯一 session_id
+   文件命名: {session_id}_face_{index}.jpg
+   线程安全处理，避免状态污染</code></pre>
                 </div>
+                <p><strong>解决方案</strong>：</p>
+                <ul>
+                  <li>
+                    <strong>对象存储</strong
+                    >：使用阿里云OSS存储临时图像，设置生命周期规则自动清理（如24小时后删除）
+                  </li>
+                  <li>
+                    <strong>并发隔离</strong
+                    >：每个识别请求生成唯一session_id，确保文件操作隔离
+                  </li>
+                  <li>
+                    <strong>资源优化</strong>：图像压缩、缓存机制减少服务器负载
+                  </li>
+                  <li>
+                    <strong>队列管理</strong>：高峰时段请求队列化，避免服务过载
+                  </li>
+                </ul>
                 <p>
-                  <strong>技术栈</strong>：SQLAlchemy, SQLite, Alembic (迁移),
-                  JWT 认证
+                  <strong>技术栈</strong>：阿里云 OSS，Python 并发库 (asyncio,
+                  threading)，消息队列 (Redis/RabbitMQ)，Docker 容器化
                 </p>
               </div>
             </div>
@@ -260,77 +272,44 @@ CREATE TABLE user_progress (
       <section class="section-block" v-animate>
         <h2 class="section-heading">数据流设计</h2>
         <div class="data-flow-diagram">
-          <div class="flow-step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <h3>用户输入</h3>
-              <p>用户通过摄像头拍摄魔方六面图像，或手动输入魔方状态。</p>
-              <div class="step-tags">
-                <span class="tag">WebRTC 摄像头</span>
-                <span class="tag">手动输入界面</span>
-                <span class="tag">文件上传</span>
-              </div>
-            </div>
+          <div class="data-flow-image-container">
+            <img
+              src="/images/solver-data-flow.png"
+              alt="求解器数据流图"
+              class="data-flow-image"
+              @click="openImagePreview('/images/solver-data-flow.png')"
+              style="cursor: pointer"
+            />
+            <div class="image-caption">CubeMaster 求解器完整数据流示意图</div>
           </div>
-
-          <div class="flow-arrow">↓</div>
-
-          <div class="flow-step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <h3>前端处理</h3>
-              <p>图像预处理、Base64 编码、状态验证，通过 HTTP 发送到后端。</p>
-              <div class="step-tags">
-                <span class="tag">Canvas 图像处理</span>
-                <span class="tag">Base64 编码</span>
-                <span class="tag">状态验证</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="flow-arrow">↓</div>
-
-          <div class="flow-step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <h3>后端推理</h3>
-              <p>YOLOv8 识别颜色，验证状态合法性，返回标准魔方字符串。</p>
-              <div class="step-tags">
-                <span class="tag">YOLOv8 推理</span>
-                <span class="tag">颜色映射</span>
-                <span class="tag">状态验证</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="flow-arrow">↓</div>
-
-          <div class="flow-step">
-            <div class="step-number">4</div>
-            <div class="step-content">
-              <h3>求解计算</h3>
-              <p>Kociemba 算法求解，优化解法步骤，返回人类可读的解法。</p>
-              <div class="step-tags">
-                <span class="tag">Kociemba 算法</span>
-                <span class="tag">解法优化</span>
-                <span class="tag">步骤分解</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="flow-arrow">↓</div>
-
-          <div class="flow-step">
-            <div class="step-number">5</div>
-            <div class="step-content">
-              <h3>3D 可视化</h3>
-              <p>前端接收解法，通过 Three.js 逐步动画演示还原过程。</p>
-              <div class="step-tags">
-                <span class="tag">Three.js 动画</span>
-                <span class="tag">步骤高亮</span>
-                <span class="tag">交互控制</span>
-              </div>
-            </div>
+          <div class="data-flow-description">
+            <p>数据流清晰展示了从用户输入到3D可视化还原的完整过程：</p>
+            <ul>
+              <li>
+                <strong>用户输入层</strong
+                >：支持摄像头实时拍摄、手动输入、文件上传三种方式
+              </li>
+              <li>
+                <strong>前端处理层</strong
+                >：图像预处理、Base64编码、状态验证与API调用
+              </li>
+              <li>
+                <strong>后端推理层</strong
+                >：YOLOv8颜色识别、状态合法性验证、标准字符串生成
+              </li>
+              <li>
+                <strong>求解计算层</strong
+                >：Kociemba二阶段算法求解、解法优化与步骤分解
+              </li>
+              <li>
+                <strong>3D可视化层</strong
+                >：Three.js动画演示、步骤高亮、交互式控制
+              </li>
+            </ul>
+            <p>
+              各层之间通过定义良好的REST
+              API接口通信，确保系统的可维护性和可扩展性。
+            </p>
           </div>
         </div>
       </section>
@@ -342,26 +321,20 @@ CREATE TABLE user_progress (
           <div class="deploy-card">
             <h3><span class="deploy-icon">🚀</span> 前端部署</h3>
             <ul>
-              <li>
-                <strong>静态托管</strong>：Vercel / Netlify / GitHub Pages
-              </li>
-              <li><strong>CDN 加速</strong>：Cloudflare CDN 全球分发</li>
-              <li><strong>版本管理</strong>：语义化版本，自动更新提示</li>
-              <li>
-                <strong>监控指标</strong>：Google Analytics, Sentry 错误追踪
-              </li>
+              <li><strong>静态托管</strong>：Vercel / 阿里云 OSS + Nginx</li>
+              <li><strong>版本管理</strong>：语义化版本，Git 分支策略</li>
+              <li><strong>持续集成</strong>：GitHub Actions 自动构建与部署</li>
+              <li><strong>访问优化</strong>：浏览器缓存策略，资源压缩</li>
             </ul>
           </div>
 
           <div class="deploy-card">
             <h3><span class="deploy-icon">🛠️</span> 后端部署</h3>
             <ul>
-              <li><strong>容器化</strong>：Docker + Docker Compose</li>
-              <li><strong>云服务</strong>：AWS EC2 / Google Cloud Run</li>
-              <li><strong>负载均衡</strong>：Nginx 反向代理，SSL 终止</li>
-              <li>
-                <strong>自动扩缩</strong>：基于 CPU/内存使用率自动调整实例
-              </li>
+              <li><strong>容器化</strong>：Docker + Docker Compose 编排</li>
+              <li><strong>云服务</strong>：阿里云 ECS 实例部署</li>
+              <li><strong>网络配置</strong>：Nginx 反向代理，SSL/TLS 加密</li>
+              <li><strong>环境管理</strong>：多环境配置（开发、测试、生产）</li>
             </ul>
           </div>
 
@@ -372,19 +345,36 @@ CREATE TABLE user_progress (
               <li><strong>速率限制</strong>：API 调用频率限制，防止滥用</li>
               <li><strong>输入验证</strong>：所有用户输入严格验证和清理</li>
               <li><strong>数据加密</strong>：HTTPS 传输，敏感数据加密存储</li>
+              <li><strong>临时文件清理</strong>：定期清理服务器临时识别图像</li>
+              <li>
+                <strong>模型文件安全</strong>：保护训练模型，防止未授权访问
+              </li>
             </ul>
           </div>
 
           <div class="deploy-card">
             <h3><span class="deploy-icon">📈</span> 监控告警</h3>
             <ul>
-              <li><strong>性能监控</strong>：响应时间、错误率、资源使用率</li>
               <li>
-                <strong>日志聚合</strong>：ELK Stack (Elasticsearch, Logstash,
-                Kibana)
+                <strong>指标监控</strong>：Prometheus 收集 API
+                响应时间、错误率、并发请求数等指标
               </li>
-              <li><strong>健康检查</strong>：定时端点检查，自动重启失败服务</li>
-              <li><strong>告警系统</strong>：Slack/Email 通知关键指标异常</li>
+              <li>
+                <strong>可视化看板</strong>：Grafana
+                仪表盘实时展示系统状态与性能趋势
+              </li>
+              <li>
+                <strong>日志管理</strong>：ELK Stack (Elasticsearch, Logstash,
+                Kibana) 集中化日志收集与分析
+              </li>
+              <li>
+                <strong>告警通知</strong>：Alertmanager
+                集成，支持邮件、Slack、钉钉等多渠道告警
+              </li>
+              <li>
+                <strong>链路追踪</strong>：Jaeger 或 Zipkin
+                实现分布式请求跟踪，快速定位性能瓶颈
+              </li>
             </ul>
           </div>
         </div>
@@ -441,12 +431,9 @@ CREATE TABLE user_progress (
             <div class="stack-tags">
               <span class="stack-tag vue">Vue 3</span>
               <span class="stack-tag vite">Vite</span>
-              <span class="stack-tag typescript">TypeScript</span>
               <span class="stack-tag element">Element Plus</span>
               <span class="stack-tag threejs">Three.js</span>
-              <span class="stack-tag pinia">Pinia</span>
               <span class="stack-tag axios">Axios</span>
-              <span class="stack-tag gsap">GSAP</span>
             </div>
           </div>
 
@@ -459,7 +446,6 @@ CREATE TABLE user_progress (
               <span class="stack-tag yolov8">YOLOv8</span>
               <span class="stack-tag opencv">OpenCV</span>
               <span class="stack-tag kociemba">Kociemba</span>
-              <span class="stack-tag sqlalchemy">SQLAlchemy</span>
               <span class="stack-tag docker">Docker</span>
             </div>
           </div>
@@ -473,7 +459,6 @@ CREATE TABLE user_progress (
               <span class="stack-tag prettier">Prettier</span>
               <span class="stack-tag vercel">Vercel</span>
               <span class="stack-tag nginx">Nginx</span>
-              <span class="stack-tag sentry">Sentry</span>
             </div>
           </div>
         </div>
@@ -510,6 +495,15 @@ CREATE TABLE user_progress (
     >
       <el-icon><ArrowUp /></el-icon>
     </button>
+
+    <!-- 图片预览模态框 -->
+    <div v-if="showImageModal" class="image-modal" @click="closeImagePreview">
+      <div class="modal-content" @click.stop>
+        <button class="modal-close" @click="closeImagePreview">×</button>
+        <img :src="currentImageSrc" alt="预览图片" class="modal-image" />
+        <div class="image-caption-modal">CubeMaster 求解器完整数据流示意图</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -520,6 +514,8 @@ import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const showBackToTop = ref(false);
+const showImageModal = ref(false);
+const currentImageSrc = ref("");
 
 // 滚动动画指令
 const vAnimate = {
@@ -538,6 +534,20 @@ const vAnimate = {
     );
     observer.observe(el);
   },
+};
+
+// 图片预览功能
+const openImagePreview = (src) => {
+  currentImageSrc.value = src;
+  showImageModal.value = true;
+  // 禁止背景滚动
+  document.body.style.overflow = "hidden";
+};
+
+const closeImagePreview = () => {
+  showImageModal.value = false;
+  // 恢复背景滚动
+  document.body.style.overflow = "";
 };
 
 // 返回 About 页面
@@ -1181,27 +1191,50 @@ onUnmounted(() => {
 .backend-architecture {
   background: #ffffff;
   border-radius: 24px;
-  padding: 40px;
+  padding: 80px;
   border: 1px solid #e2e8f0;
 }
 
 .backend-services {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto;
   gap: 30px;
+  align-items: stretch;
+}
+
+.service-card:nth-child(3) {
+  grid-column: span 2;
+  margin-top: 30px;
+  align-self: start;
+}
+
+@media (max-width: 992px) {
+  .backend-services {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
   .backend-services {
     grid-template-columns: 1fr;
   }
+
+  .service-card:nth-child(3) {
+    grid-column: auto;
+    margin-top: 0;
+    align-self: auto;
+  }
 }
 
 .service-card {
   background: #f8fafc;
   border-radius: 20px;
-  padding: 30px;
+  padding: 20px;
   border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .service-header {
@@ -1232,17 +1265,39 @@ onUnmounted(() => {
   color: #1e293b;
 }
 
+.service-details ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 16px 0;
+}
+
+.service-details li {
+  margin-bottom: 10px;
+  color: #64748b;
+  line-height: 1.5;
+  padding-left: 0;
+}
+
+.service-details li strong {
+  color: #1e293b;
+}
+
 .code-snippet.small {
   background: #0f172a;
   border-radius: 12px;
   overflow: hidden;
   margin: 16px 0;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
 }
 
 .code-snippet.small pre {
   margin: 0;
   padding: 16px;
   overflow-x: auto;
+  flex: 1;
+  height: 100%;
 }
 
 .code-snippet.small code {
@@ -1659,6 +1714,150 @@ onUnmounted(() => {
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
+/* 数据流图片样式 */
+.data-flow-image-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.data-flow-image {
+  max-width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.data-flow-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.image-caption {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #64748b;
+  font-style: italic;
+}
+
+.data-flow-description {
+  background: #f8fafc;
+  padding: 24px;
+  border-radius: 16px;
+  border-left: 4px solid #3b82f6;
+}
+
+.data-flow-description p {
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.data-flow-description ul {
+  list-style: none;
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.data-flow-description li {
+  margin-bottom: 8px;
+  color: #475569;
+  position: relative;
+  padding-left: 24px;
+}
+
+.data-flow-description li:before {
+  content: "→";
+  color: #3b82f6;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.data-flow-description li strong {
+  color: #1e293b;
+}
+
+/* 图片预览模态框 */
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: #0f172a;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: calc(90vh - 100px);
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.image-caption-modal {
+  text-align: center;
+  color: #cbd5e1;
+  margin-top: 15px;
+  font-size: 14px;
+  font-style: italic;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
   .back-to-top-btn {
@@ -1666,6 +1865,27 @@ onUnmounted(() => {
     right: 20px;
     width: 45px;
     height: 45px;
+  }
+
+  .modal-content {
+    padding: 15px;
+    max-width: 95%;
+    max-height: 85%;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .modal-image {
+    max-height: calc(85vh - 80px);
+  }
+
+  .image-caption-modal {
+    font-size: 13px;
+    margin-top: 10px;
   }
 }
 </style>

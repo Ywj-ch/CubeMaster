@@ -476,6 +476,8 @@ onMounted(() => {
   width: 100%;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
+  box-sizing: border-box;
   font-family:
     "Inter",
     -apple-system,
