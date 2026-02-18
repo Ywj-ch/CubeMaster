@@ -28,6 +28,7 @@
         <router-link to="/cube" class="nav-item">3D魔方</router-link>
         <router-link to="/solver" class="nav-item">求解器</router-link>
         <router-link to="/learning" class="nav-item">学习</router-link>
+        <router-link to="/customizer" class="nav-item">外观定制</router-link>
         <router-link to="/about" class="nav-item">关于</router-link>
       </nav>
     </header>

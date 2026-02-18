@@ -80,14 +80,14 @@ const handleCellClick = (index) => {
 .cell[style*="rgb(255, 255, 255)"],
 .cell[style*="#FFFFFF"] {
   background: linear-gradient(145deg, #ffffff, #f1f5f9) !important;
-  border: 1px solid rgba(0,0,0,0.05); /* 极细描边防止融入背景 */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* 极细描边防止融入背景 */
 }
 
 /* 黑色块（未还原部分）也优化一下，不要死黑 */
 .cell[style*="rgb(0, 0, 0)"],
 .cell[style*="#000000"] {
   background-color: #334155 !important; /* 改为深岩灰，更有质感 */
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.5); /* 内陷感 */
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5); /* 内陷感 */
 }
 
 /* 只有带有 can-hover 类的组件才会有点击手势和悬停效果 */

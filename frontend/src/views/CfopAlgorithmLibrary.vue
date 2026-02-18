@@ -122,6 +122,7 @@
             ref="tutorialCubeRef"
             :setup="selectedAlgo.setup"
             :algorithm="selectedAlgo.demoAlgorithm || selectedAlgo.algorithm"
+            :customization="config"
           />
         </div>
 
@@ -166,8 +167,10 @@ import TutorialCube from "../components/TutorialCube.vue";
 import { pllAlgorithms, pllCategories } from "../data/cfop/pll.js";
 import { ollAlgorithms, ollCategories } from "../data/cfop/oll.js";
 import { f2lAlgorithms, f2lCategories } from "../data/cfop/f2l.js";
+import { useCubeCustomization } from "../composables/useCubeCustomization.js";
 
 const route = useRoute();
+const { config } = useCubeCustomization();
 
 // --- 1. 数据映射表 ---
 const dataMap = {
@@ -275,12 +278,6 @@ onMounted(() => {
 
 // --- 5. 搜索框筛选逻辑 ---
 const filteredList = computed(() => {
-  console.log(
-    "正在筛选:",
-    currentConfig.value.title,
-    "关键词:",
-    searchQuery.value,
-  );
   return currentConfig.value.list.filter((item) => {
     const catMatch =
       currentCategory.value === "all" ||

@@ -142,8 +142,8 @@
               <h3><span class="module-icon">📱</span> 构建工具</h3>
               <ul>
                 <li><strong>Vite</strong>：极速构建工具，开发服务器</li>
-                <li><strong>ESLint + Prettier</strong>：代码规范和格式化</li>
-                <li><strong>自动部署</strong>：GitHub Actions + Vercel</li>
+                <li><strong>Prettier</strong>：代码格式化工具</li>
+                <li><strong>构建与部署</strong>：Vite 静态构建，手动部署</li>
               </ul>
             </div>
           </div>
@@ -234,33 +234,30 @@ Response:
                 <div class="code-snippet small">
                   <pre><code># 解决方案架构
 1. 图片上传流程：
-   前端 → 阿里云 OSS (临时存储) → 后端读取 → 识别 → 自动清理
+    前端 → 后端临时内存/磁盘存储 → 识别 → 自动清理
 
 2. 并发处理机制：
-   每个请求生成唯一 session_id
-   文件命名: {session_id}_face_{index}.jpg
-   线程安全处理，避免状态污染</code></pre>
+    每个请求生成唯一 session_id
+    线程安全处理，避免状态污染</code></pre>
                 </div>
                 <p><strong>解决方案</strong>：</p>
                 <ul>
                   <li>
-                    <strong>对象存储</strong
-                    >：使用阿里云OSS存储临时图像，设置生命周期规则自动清理（如24小时后删除）
+                    <strong>临时存储</strong
+                    >：使用服务器临时目录存储图像，处理完成后自动清理
                   </li>
                   <li>
                     <strong>并发隔离</strong
-                    >：每个识别请求生成唯一session_id，确保文件操作隔离
+                    >：每个请求生成唯一session_id，确保文件操作隔离
                   </li>
                   <li>
-                    <strong>资源优化</strong>：图像压缩、缓存机制减少服务器负载
+                    <strong>资源优化</strong>：图像压缩、内存缓存减少服务器负载
                   </li>
-                  <li>
-                    <strong>队列管理</strong>：高峰时段请求队列化，避免服务过载
-                  </li>
+                  <li><strong>请求管理</strong>：同步处理，避免并发冲突</li>
                 </ul>
                 <p>
-                  <strong>技术栈</strong>：阿里云 OSS，Python 并发库 (asyncio,
-                  threading)，消息队列 (Redis/RabbitMQ)，Docker 容器化
+                  <strong>技术栈</strong>：Python 并发库 (asyncio,
+                  threading)，本地文件系统
                 </p>
               </div>
             </div>
@@ -321,9 +318,9 @@ Response:
           <div class="deploy-card">
             <h3><span class="deploy-icon">🚀</span> 前端部署</h3>
             <ul>
-              <li><strong>静态托管</strong>：Vercel / 阿里云 OSS + Nginx</li>
+              <li><strong>开发服务器</strong>：Vite 热重载开发环境</li>
+              <li><strong>静态构建</strong>：Vite 生产构建，生成静态资源</li>
               <li><strong>版本管理</strong>：语义化版本，Git 分支策略</li>
-              <li><strong>持续集成</strong>：GitHub Actions 自动构建与部署</li>
               <li><strong>访问优化</strong>：浏览器缓存策略，资源压缩</li>
             </ul>
           </div>
@@ -331,10 +328,12 @@ Response:
           <div class="deploy-card">
             <h3><span class="deploy-icon">🛠️</span> 后端部署</h3>
             <ul>
-              <li><strong>容器化</strong>：Docker + Docker Compose 编排</li>
-              <li><strong>云服务</strong>：阿里云 ECS 实例部署</li>
-              <li><strong>网络配置</strong>：Nginx 反向代理，SSL/TLS 加密</li>
-              <li><strong>环境管理</strong>：多环境配置（开发、测试、生产）</li>
+              <li>
+                <strong>开发服务器</strong>：FastAPI + Uvicorn 本地开发服务
+              </li>
+              <li><strong>API 服务</strong>：RESTful API 接口，支持跨域请求</li>
+              <li><strong>环境配置</strong>：Python 虚拟环境，依赖管理</li>
+              <li><strong>生产部署考虑</strong>：可容器化或云服务部署</li>
             </ul>
           </div>
 
@@ -353,28 +352,14 @@ Response:
           </div>
 
           <div class="deploy-card">
-            <h3><span class="deploy-icon">📈</span> 监控告警</h3>
+            <h3><span class="deploy-icon">📈</span> 日志与调试</h3>
             <ul>
+              <li><strong>日志记录</strong>：Python 标准日志，控制台输出</li>
+              <li><strong>错误追踪</strong>：前端控制台日志，网络请求监控</li>
               <li>
-                <strong>指标监控</strong>：Prometheus 收集 API
-                响应时间、错误率、并发请求数等指标
+                <strong>性能监控</strong>：浏览器开发者工具，API 响应时间记录
               </li>
-              <li>
-                <strong>可视化看板</strong>：Grafana
-                仪表盘实时展示系统状态与性能趋势
-              </li>
-              <li>
-                <strong>日志管理</strong>：ELK Stack (Elasticsearch, Logstash,
-                Kibana) 集中化日志收集与分析
-              </li>
-              <li>
-                <strong>告警通知</strong>：Alertmanager
-                集成，支持邮件、Slack、钉钉等多渠道告警
-              </li>
-              <li>
-                <strong>链路追踪</strong>：Jaeger 或 Zipkin
-                实现分布式请求跟踪，快速定位性能瓶颈
-              </li>
+              <li><strong>调试工具</strong>：Vue DevTools，Python 调试器</li>
             </ul>
           </div>
         </div>
@@ -429,36 +414,32 @@ Response:
           <div class="stack-category">
             <h3>前端技术栈</h3>
             <div class="stack-tags">
-              <span class="stack-tag vue">Vue 3</span>
-              <span class="stack-tag vite">Vite</span>
-              <span class="stack-tag element">Element Plus</span>
-              <span class="stack-tag threejs">Three.js</span>
-              <span class="stack-tag axios">Axios</span>
+              <span class="stack-tag">Vue 3</span>
+              <span class="stack-tag">Vite</span>
+              <span class="stack-tag">Element Plus</span>
+              <span class="stack-tag">Three.js</span>
+              <span class="stack-tag">Axios</span>
             </div>
           </div>
 
           <div class="stack-category">
             <h3>后端技术栈</h3>
             <div class="stack-tags">
-              <span class="stack-tag fastapi">FastAPI</span>
-              <span class="stack-tag python">Python 3.10</span>
-              <span class="stack-tag pytorch">PyTorch</span>
-              <span class="stack-tag yolov8">YOLOv8</span>
-              <span class="stack-tag opencv">OpenCV</span>
-              <span class="stack-tag kociemba">Kociemba</span>
-              <span class="stack-tag docker">Docker</span>
+              <span class="stack-tag">FastAPI</span>
+              <span class="stack-tag">Python 3.10</span>
+              <span class="stack-tag">PyTorch</span>
+              <span class="stack-tag">YOLOv8</span>
+              <span class="stack-tag">OpenCV</span>
+              <span class="stack-tag">Kociemba</span>
             </div>
           </div>
 
           <div class="stack-category">
             <h3>开发运维</h3>
             <div class="stack-tags">
-              <span class="stack-tag git">Git</span>
-              <span class="stack-tag github">GitHub Actions</span>
-              <span class="stack-tag eslint">ESLint</span>
-              <span class="stack-tag prettier">Prettier</span>
-              <span class="stack-tag vercel">Vercel</span>
-              <span class="stack-tag nginx">Nginx</span>
+              <span class="stack-tag">Git</span>
+              <span class="stack-tag">Prettier</span>
+              <span class="stack-tag">Docker</span>
             </div>
           </div>
         </div>
@@ -1513,82 +1494,20 @@ onUnmounted(() => {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: white;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
 }
 
-.stack-tag.vue {
-  background: #42b883;
+/* 分组边框颜色 */
+.stack-category:nth-child(1) .stack-tag {
+  border-color: #42b883;
 }
-.stack-tag.vite {
-  background: #646cff;
+.stack-category:nth-child(2) .stack-tag {
+  border-color: #3b82f6;
 }
-.stack-tag.typescript {
-  background: #3178c6;
-}
-.stack-tag.element {
-  background: #409eff;
-}
-.stack-tag.threejs {
-  background: #000000;
-}
-.stack-tag.pinia {
-  background: #ffd859;
-  color: #333;
-}
-.stack-tag.axios {
-  background: #5a29e4;
-}
-.stack-tag.gsap {
-  background: #88ce02;
-  color: #333;
-}
-
-.stack-tag.fastapi {
-  background: #009688;
-}
-.stack-tag.python {
-  background: #3776ab;
-}
-.stack-tag.pytorch {
-  background: #ee4c2c;
-}
-.stack-tag.yolov8 {
-  background: #000000;
-}
-.stack-tag.opencv {
-  background: #5c3ee8;
-}
-.stack-tag.kociemba {
-  background: #1e88e5;
-}
-.stack-tag.sqlalchemy {
-  background: #d71f49;
-}
-.stack-tag.docker {
-  background: #2496ed;
-}
-
-.stack-tag.git {
-  background: #f05032;
-}
-.stack-tag.github {
-  background: #181717;
-}
-.stack-tag.eslint {
-  background: #4b32c3;
-}
-.stack-tag.prettier {
-  background: #f7b93e;
-  color: #333;
-}
-.stack-tag.vercel {
-  background: #000000;
-}
-.stack-tag.nginx {
-  background: #269539;
-}
-.stack-tag.sentry {
-  background: #362d59;
+.stack-category:nth-child(3) .stack-tag {
+  border-color: #8b5cf6;
 }
 
 /* 导航卡片 */

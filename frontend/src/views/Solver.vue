@@ -9,14 +9,20 @@
       </div>
       <div class="header-actions">
         <!-- 1. 扫描识别 (Ins风格 -> 蓝青渐变胶囊) -->
-        <button class="btn-scan-glass" @click="openScanner" :disabled="scanning">
+        <button
+          class="btn-scan-glass"
+          @click="openScanner"
+          :disabled="scanning"
+        >
           <span class="svgContainer">
             <el-icon v-if="scanning" class="is-loading"><Loading /></el-icon>
             <el-icon v-else><Camera /></el-icon>
           </span>
           <span class="BG"></span>
           <!-- 新增文字，让它变长 -->
-          <span class="btn-text">{{ scanning ? "扫描中..." : "扫描识别" }}</span>
+          <span class="btn-text">{{
+            scanning ? "扫描中..." : "扫描识别"
+          }}</span>
         </button>
 
         <!-- 2. 智能求解 (Send风格 -> 搜索飞行) -->
@@ -52,6 +58,7 @@
             :interactive="!hasSolved"
             :enableControls="true"
             :moveDuration="demoSpeed"
+            :customization="config"
           />
           <div class="step-counter" v-if="steps.length">
             <span class="curr">{{ currentStep }}</span>
@@ -142,9 +149,9 @@
         <div class="speed-control-wrapper">
           <span class="speed-label">速度</span>
           <el-radio-group v-model="demoSpeed" size="small" class="speed-radios">
-            <el-radio-button :label="800">慢</el-radio-button>
-            <el-radio-button :label="300">中</el-radio-button>
-            <el-radio-button :label="150">快</el-radio-button>
+            <el-radio-button :value="800">慢</el-radio-button>
+            <el-radio-button :value="300">中</el-radio-button>
+            <el-radio-button :value="150">快</el-radio-button>
           </el-radio-group>
         </div>
 
@@ -240,6 +247,9 @@ import {
   Loading,
 } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { useCubeCustomization } from "../composables/useCubeCustomization.js";
+
+const { config } = useCubeCustomization();
 
 const loading = ref(false);
 const scanning = ref(false);
@@ -422,7 +432,7 @@ async function resetCube() {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
-      }
+      },
     );
     stopAutoPlay();
     cubeState.value = createCubeFromJson();
@@ -434,7 +444,6 @@ async function resetCube() {
     ElMessage.success("魔方已重置");
   } catch (error) {
     // 用户点击取消
-    console.log("重置已取消");
   }
 }
 

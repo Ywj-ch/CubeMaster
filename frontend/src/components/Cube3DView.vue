@@ -23,6 +23,15 @@ import {
 } from "vue";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry";
+import { TextureLoader } from "three";
+import { getTextureUrl } from "../utils/cubeCustomization";
+
+// 纹理加载器与缓存
+const textureLoader = new TextureLoader();
+const textureCache = new Map();
+// 正在加载的纹理URL集合，防止重复加载和跟踪加载状态
+const loadingTextures = new Set();
 
 // =========================================================
 // 1. 配置与常量
@@ -48,6 +57,7 @@ const props = defineProps({
   cameraPosition: { type: Array, default: () => [6, 6, 6] },
   enableZoom: { type: Boolean, default: true },
   moveDuration: { type: Number, default: 300 },
+  customization: { type: Object, default: null },
 });
 
 /** @description 定义自定义事件，用于通知父组件发生了交互旋转 */
@@ -126,6 +136,7 @@ const normalizedState = computed(() => {
 // =========================================================
 const container = ref(null);
 let scene, camera, renderer, cubeGroup, controls;
+let ambientLight, directionalLight;
 let isAnimating = false;
 let isMouseDown = false;
 let startCubie = null;
@@ -133,6 +144,11 @@ let startNormal = null;
 const mouse = new THREE.Vector2();
 const startMousePos = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
+
+// 调试模式：显示线框
+const debugWireframe = ref(false);
+// 配置更新防抖计时器
+const configUpdateTimer = ref(null);
 
 /**
  * @description 初始化 Three.js 渲染环境
@@ -152,10 +168,15 @@ function initThree() {
   renderer.setPixelRatio(window.devicePixelRatio);
   container.value.appendChild(renderer.domElement);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirLight.position.set(10, 20, 10);
-  scene.add(dirLight);
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+
+  directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(10, 20, 10);
+  scene.add(directionalLight);
+
+  // 初始应用自定义光照配置
+  updateLighting();
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -171,6 +192,27 @@ function initThree() {
 
   cubeGroup = new THREE.Group();
   scene.add(cubeGroup);
+}
+
+/**
+ * @description 更新光照设置基于自定义配置
+ */
+function updateLighting() {
+  if (!ambientLight || !directionalLight) return;
+
+  const config = props.customization;
+  if (!config || !config.lighting) return;
+
+  const lighting = config.lighting;
+
+  // 更新环境光
+  ambientLight.intensity = lighting.ambientIntensity || 0.4;
+
+  // 更新方向光
+  directionalLight.intensity = lighting.directionalIntensity || 0.8;
+  directionalLight.color = new THREE.Color(
+    lighting.directionalColor || "#ffffff",
+  );
 }
 
 /** @description 场景主渲染循环，维持 60fps 刷新并更新控制器状态 */
@@ -254,11 +296,276 @@ function getCubieFaceColors(cubie, faces) {
 }
 
 /**
+ * @description 加载纹理
+ * @param {Object} config 自定义配置
+ * @returns {THREE.Texture|null} 纹理对象
+ */
+function loadTexture(config) {
+  if (!config || !config.texture || config.texture.type === "none") {
+    return null;
+  }
+  const textureUrl = getTextureUrl(config.texture);
+  if (!textureUrl) return null;
+
+  const cacheKey = textureUrl;
+  if (textureCache.has(cacheKey)) {
+    return textureCache.get(cacheKey);
+  }
+
+  loadingTextures.add(cacheKey);
+  const texture = textureLoader.load(
+    textureUrl,
+    (tex) => {
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(1, 1);
+      tex.needsUpdate = true;
+      // 加载成功，从加载中集合移除
+      loadingTextures.delete(cacheKey);
+    },
+    undefined,
+    (error) => {
+      // 从加载中集合移除
+      loadingTextures.delete(cacheKey);
+
+      // 检查是否为可忽略的错误类型
+      let shouldIgnore = false;
+
+      if (!error) {
+        // 错误对象为null/undefined
+        shouldIgnore = true;
+      } else if (!error.target) {
+        // 目标为null（可能已清理或组件已卸载）
+        shouldIgnore = true;
+      } else if (error.target.naturalWidth && error.target.naturalWidth > 0) {
+        // 图片实际上加载成功了（naturalWidth > 0），但可能触发了某些事件
+        shouldIgnore = true;
+      } else if (error.type === "abort") {
+        // 加载被中止
+        shouldIgnore = true;
+      } else if (
+        error.message &&
+        (error.message.includes("cancel") || error.message.includes("load"))
+      ) {
+        // 取消相关错误或一般加载错误
+        shouldIgnore = true;
+      } else if (typeof error === "string" && error.includes("cancel")) {
+        // 字符串类型的取消错误
+        shouldIgnore = true;
+      }
+
+      if (!shouldIgnore) {
+        console.error("纹理加载失败:", error);
+        // 真正的失败，从缓存中移除
+        textureCache.delete(cacheKey);
+      }
+      // 对于可忽略的错误，保留缓存条目（纹理可能实际上已加载成功）
+    },
+  );
+  textureCache.set(cacheKey, texture);
+  return texture;
+}
+
+/**
+ * @description 根据自定义配置创建面材质
+ * @param {string} color 颜色名称
+ * @param {Object} config 自定义配置
+ * @returns {THREE.Material} Three.js材质
+ */
+function createFaceMaterial(color, config) {
+  if (!config) {
+    // 默认材质
+    return new THREE.MeshLambertMaterial({
+      color: color ? COLOR_MAP[color] : COLOR_MAP.internal,
+    });
+  }
+
+  const baseColor = color ? COLOR_MAP[color] : COLOR_MAP.internal;
+  const params = config.materialParams || {};
+  const texture = loadTexture(config);
+
+  // 基础材质选项
+  const baseOptions = {
+    color: baseColor,
+    opacity: params.opacity || 1.0,
+    transparent: params.opacity < 1.0,
+  };
+
+  // 如果存在纹理，添加map属性
+  if (texture) {
+    baseOptions.map = texture;
+  }
+
+  // 根据材质类型创建不同的材质
+  switch (config.materialType) {
+    case "basic":
+      return new THREE.MeshBasicMaterial(baseOptions);
+
+    case "lambert":
+      return new THREE.MeshLambertMaterial(baseOptions);
+
+    case "phong":
+      return new THREE.MeshPhongMaterial({
+        ...baseOptions,
+        shininess: params.shininess || 30,
+      });
+
+    case "standard":
+      return new THREE.MeshStandardMaterial({
+        ...baseOptions,
+        roughness: params.roughness || 0.5,
+        metalness: params.metalness || 0,
+      });
+
+    case "toon":
+      return new THREE.MeshToonMaterial(baseOptions);
+
+    default:
+      return new THREE.MeshLambertMaterial(baseOptions);
+  }
+}
+
+/**
+ * @description 根据自定义配置创建几何体
+ * @param {Object} config 自定义配置
+ * @returns {THREE.BufferGeometry} Three.js几何体
+ */
+function createGeometry(config) {
+  // 检查Three.js环境
+
+  if (!config || !config.geometry || config.geometry.type !== "rounded") {
+    // 标准方块几何体
+
+    return new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
+  }
+
+  // 圆角方块几何体
+
+  // 圆角半径计算：使用配置参数
+  const cornerRadius = config.geometry.cornerRadius || 0.1;
+  let segments = config.geometry.segments || 4;
+  let radius = cornerRadius * CUBIE_SIZE;
+
+  // 验证半径有效性
+  if (isNaN(radius) || radius <= 0) {
+    console.error("❌ 无效的半径值:", radius);
+    return new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
+  }
+  const maxRadius = CUBIE_SIZE * 0.5;
+  if (radius > maxRadius) {
+    console.warn("⚠️ 半径超过最大限制，已截断:", radius, ">", maxRadius);
+    radius = maxRadius;
+  }
+
+  try {
+    // 检查 RoundedBoxGeometry 是否可用
+    if (typeof RoundedBoxGeometry === "undefined") {
+      console.error("RoundedBoxGeometry 未定义，请检查导入");
+      return new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
+    }
+
+    // 测试RoundedBoxGeometry基本功能
+
+    let RoundedBoxGeometryConstructor = RoundedBoxGeometry;
+
+    // 检查是否可以通过THREE访问
+    if (THREE.RoundedBoxGeometry && !RoundedBoxGeometry) {
+      RoundedBoxGeometryConstructor = THREE.RoundedBoxGeometry;
+    }
+
+    try {
+      const testGeometry = new RoundedBoxGeometryConstructor(1, 1, 1, 0.3, 8);
+    } catch (testError) {
+      console.error("🧪 测试失败:", testError.message);
+      // 尝试参数顺序交换
+
+      try {
+        const testGeometry2 = new RoundedBoxGeometryConstructor(
+          1,
+          1,
+          1,
+          8,
+          0.3,
+        );
+
+        // 如果这个成功，更新参数顺序
+        segments = Math.max(segments, 1); // 确保有效
+        radius = Math.min(radius, CUBIE_SIZE * 0.49); // 留有余地
+      } catch (testError2) {
+        console.error("🔄 参数顺序也失败:", testError2.message);
+      }
+    }
+
+    // 确定参数顺序 - 基于测试结果
+    let useSegmentsFirst = false;
+
+    // 测试两种参数顺序
+
+    try {
+      // 测试顺序1: width, height, depth, radius, segments
+      const test1 = new RoundedBoxGeometryConstructor(1, 1, 1, 0.3, 8);
+      const vertices1 = test1.attributes.position?.count || 0;
+
+      // 测试顺序2: width, height, depth, segments, radius
+      const test2 = new RoundedBoxGeometryConstructor(1, 1, 1, 8, 0.3);
+      const vertices2 = test2.attributes.position?.count || 0;
+
+      // 选择顶点数较多的顺序（应该是真正的圆角几何体）
+      if (vertices2 > vertices1 && vertices2 > 36) {
+        useSegmentsFirst = true;
+      } else if (vertices1 > 36) {
+      } else {
+      }
+    } catch (orderError) {
+      console.error("🔄 参数顺序测试失败:", orderError.message);
+    }
+
+    // 创建圆角方块几何体
+    let geometry;
+    if (useSegmentsFirst) {
+      geometry = new RoundedBoxGeometryConstructor(
+        CUBIE_SIZE,
+        CUBIE_SIZE,
+        CUBIE_SIZE,
+        segments,
+        radius,
+      );
+    } else {
+      geometry = new RoundedBoxGeometryConstructor(
+        CUBIE_SIZE,
+        CUBIE_SIZE,
+        CUBIE_SIZE,
+        radius,
+        segments,
+      );
+    }
+
+    // 最终验证
+    const finalVertexCount = geometry.attributes.position?.count;
+    if (finalVertexCount && finalVertexCount <= 36) {
+      console.error("❌ 最终几何体仍是标准方块！顶点数:", finalVertexCount);
+
+      return new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
+    }
+
+    return geometry;
+  } catch (error) {
+    console.error("创建圆角几何体失败:", error);
+    // 回退到标准方块
+    return new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
+  }
+}
+
+/**
  * @description 核心渲染函数：根据逻辑状态构建/刷新 3D 网格模型
- * 包含内存清理机制（旧模型销毁）与基于 MeshLambertMaterial 的多材质构建
+ * 包含内存清理机制（旧模型销毁）与基于自定义配置的多材质构建
  */
 function renderCubies() {
-  if (isAnimating || !cubeGroup) return;
+  if (isAnimating || !cubeGroup) {
+    return;
+  }
+
+  const beforeCount = cubeGroup.children.length;
 
   while (cubeGroup.children.length) cubeGroup.remove(cubeGroup.children[0]);
 
@@ -269,20 +576,63 @@ function renderCubies() {
     ...state.cubies.centers,
   ];
 
-  allCubies.forEach((c) => {
-    const faceColors = getCubieFaceColors(c, state.faces);
-    const geometry = new THREE.BoxGeometry(CUBIE_SIZE, CUBIE_SIZE, CUBIE_SIZE);
-    const materials = faceColors.map(
-      (color) =>
-        new THREE.MeshLambertMaterial({
-          color: color ? COLOR_MAP[color] : COLOR_MAP.internal,
-        }),
-    );
-    const mesh = new THREE.Mesh(geometry, materials);
-    mesh.position.set(...c.pos);
-    mesh.userData = { isCubie: true };
-    cubeGroup.add(mesh);
+  let successCount = 0;
+  let errorCount = 0;
+
+  allCubies.forEach((c, index) => {
+    try {
+      const faceColors = getCubieFaceColors(c, state.faces);
+      const geometry = createGeometry(props.customization);
+      const materials = faceColors.map((color) =>
+        createFaceMaterial(color, props.customization),
+      );
+      const mesh = new THREE.Mesh(geometry, materials);
+      mesh.position.set(...c.pos);
+      mesh.userData = { isCubie: true };
+      cubeGroup.add(mesh);
+
+      if (index === 0) {
+      }
+      successCount++;
+    } catch (error) {
+      errorCount++;
+      console.error(`创建第 ${index} 个网格时出错:`, error);
+      console.error("错误详情:", error.message, error.stack);
+
+      // 尝试使用默认几何体作为后备
+      try {
+        const faceColors = getCubieFaceColors(c, state.faces);
+        const fallbackGeometry = new THREE.BoxGeometry(
+          CUBIE_SIZE,
+          CUBIE_SIZE,
+          CUBIE_SIZE,
+        );
+        const materials = faceColors.map((color) =>
+          createFaceMaterial(color, props.customization),
+        );
+        const mesh = new THREE.Mesh(fallbackGeometry, materials);
+        mesh.position.set(...c.pos);
+        mesh.userData = { isCubie: true };
+        cubeGroup.add(mesh);
+        successCount++;
+      } catch (fallbackError) {
+        console.error(`后备几何体也失败:`, fallbackError);
+      }
+    }
   });
+
+  // 强制更新矩阵
+  cubeGroup.updateMatrixWorld(true);
+
+  // 标记所有对象需要更新矩阵
+  scene.traverse((obj) => {
+    obj.matrixWorldNeedsUpdate = true;
+  });
+
+  // 手动触发一次渲染
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera);
+  }
 }
 
 // =========================================================
@@ -556,6 +906,13 @@ onUnmounted(() => {
     container.value.removeEventListener("mousemove", onMouseMove);
   }
   if (renderer) renderer.dispose();
+  // 清理加载状态，防止组件卸载后错误回调触发
+  loadingTextures.clear();
+  // 清理配置更新计时器
+  if (configUpdateTimer.value) {
+    clearTimeout(configUpdateTimer.value);
+    configUpdateTimer.value = null;
+  }
 });
 
 /** @description 核心数据监听：外部状态变更时触发重绘，但由于带有动画锁，不会打断旋转中的块 */
@@ -575,6 +932,50 @@ watchEffect(() => {
   controls.autoRotateSpeed = props.autoRotateSpeed;
   controls.enableZoom = props.enableZoom;
 });
+
+/** @description 监听自定义配置变化，更新材质和光照（带防抖避免频繁纹理重载） */
+watch(
+  () => props.customization,
+  (newConfig, oldConfig) => {
+    updateLighting();
+    if (!isAnimating) {
+      // 清除之前的计时器
+      if (configUpdateTimer.value) {
+        clearTimeout(configUpdateTimer.value);
+        configUpdateTimer.value = null;
+      }
+      // 设置防抖计时器，150ms后执行渲染
+      configUpdateTimer.value = setTimeout(() => {
+        configUpdateTimer.value = null;
+        renderCubies();
+      }, 150);
+    } else {
+    }
+  },
+  { deep: true },
+);
+
+// 专门监听几何体配置变化，确保圆角参数立即生效
+watch(
+  () => props.customization?.geometry,
+  (newGeometry, oldGeometry) => {
+    if (!isAnimating) {
+      renderCubies();
+    } else {
+    }
+  },
+  { deep: true },
+);
+
+// 专门监听 autoRotateSpeed 变化，确保 Three.js 控件更新
+watch(
+  () => props.autoRotateSpeed,
+  (newSpeed) => {
+    if (controls) {
+      controls.autoRotateSpeed = newSpeed;
+    }
+  },
+);
 
 // =========================================================
 // 8. 方法暴露

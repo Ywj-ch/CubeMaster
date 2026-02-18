@@ -75,6 +75,16 @@
         <el-col :xs="24" :md="12" class="cube-side animate-entry-right">
           <!-- 玻璃拟态容器 -->
           <div class="glass-card-wrap">
+            <!-- 外观定制浮动按钮 -->
+            <el-tooltip content="外观定制" placement="top">
+              <el-button
+                class="customizer-fab"
+                :icon="Brush"
+                circle
+                size="large"
+                @click="() => router.push('/customizer')"
+              />
+            </el-tooltip>
             <div class="cube-stage-3d">
               <Cube3DView
                 :cubeState="homeCubeState"
@@ -84,6 +94,7 @@
                 :autoRotateSpeed="1.5"
                 :cameraPosition="[5, 5, 5]"
                 :enableZoom="false"
+                :customization="config"
               />
             </div>
           </div>
@@ -108,6 +119,8 @@
             :key="idx"
             class="feature-glass-card"
             :style="{ '--r': -15 + idx * 20 }"
+            @click="feat.action && feat.action()"
+            :class="{ clickable: feat.action }"
           >
             <!-- 上半部分：文字内容 -->
             <div class="card-content-top">
@@ -244,6 +257,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Cube3DView from "../components/Cube3DView.vue";
 import { createCubeFromJson } from "../utils/cubeState";
+import { useCubeCustomization } from "../composables/useCubeCustomization.js";
 
 import {
   Camera,
@@ -259,17 +273,21 @@ import {
   Monitor,
   Cpu,
   VideoPlay,
+  Brush,
 } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const activeNames = ref("1");
 const homeCubeState = ref(createCubeFromJson());
 
+// 加载自定义配置
+const { config } = useCubeCustomization();
+
 const handleEnterSolver = () => router.push("/solver");
 const handleEnterPlayground = () => router.push("/cube");
 const handleEnterLearningBasic = () => router.push("/learning/basic");
 const handleEnterLearningLbl = () => router.push("/learning/lbl");
-const handleEnterLearningCfop = () => router.push("cfop");
+const handleEnterLearningCfop = () => router.push("/cfop");
 
 // === 1. 特性板块数据 (Features) ===
 const features = [
@@ -290,6 +308,12 @@ const features = [
     desc: "抛弃晦涩的公式书。步骤分解演示，让逻辑清晰可见。",
     icon: "VideoPlay",
     colorClass: "icon-green",
+  },
+  {
+    title: "外观定制",
+    desc: "自定义材质、纹理、光照和几何形状，打造属于你的独特魔方外观。",
+    icon: "Brush",
+    colorClass: "icon-orange",
   },
 ];
 
@@ -689,7 +713,7 @@ onMounted(() => {
   transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   margin: 0 -60px; /* 初始重叠 */
   transform: rotate(calc(var(--r) * 1deg));
-  cursor: pointer;
+  cursor: default;
   overflow: hidden;
 }
 
@@ -699,6 +723,11 @@ onMounted(() => {
   margin: 0 20px; /* 间距拉开 */
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+}
+
+/* 可点击卡片的光标 */
+.feature-glass-card.clickable {
+  cursor: pointer;
 }
 
 /* 单独悬浮某张卡片时再突出一点 */
@@ -772,6 +801,9 @@ onMounted(() => {
 }
 .icon-green {
   color: #10b981;
+}
+.icon-orange {
+  color: #f97316;
 }
 
 /* 响应式：手机端取消扇形，恢复竖排 */
@@ -1281,5 +1313,49 @@ button.learn-more:hover .button-text {
 }
 .delay-5 {
   animation-delay: 2.5s;
+}
+
+/* === 外观定制浮动按钮 === */
+.customizer-fab {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  color: #f97316; /* 橙色，与外观定制图标颜色一致 */
+}
+
+.customizer-fab:hover {
+  transform: scale(1.1) translateY(-2px);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  color: #ea580c; /* 更深的橙色 */
+}
+
+.customizer-fab:active {
+  transform: scale(0.95);
+}
+
+/* 响应式调整 */
+@media (max-width: 992px) {
+  .customizer-fab {
+    top: 15px;
+    right: 15px;
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .customizer-fab {
+    top: 10px;
+    right: 10px;
+    width: 36px !important;
+    height: 36px !important;
+  }
 }
 </style>

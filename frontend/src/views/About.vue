@@ -153,7 +153,7 @@
             <img src="/icons/logo_fastapi.svg" alt="System Architecture" />
           </div>
           <div class="doc-content">
-            <h3>前后端架构设计</h3>
+            <h3>项目架构设计</h3>
             <p>RESTful API 设计、状态同步机制、性能监控与测试框架详解</p>
             <div class="doc-meta">
               <span class="doc-tag">系统架构</span>

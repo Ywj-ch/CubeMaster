@@ -250,7 +250,7 @@ export const ollPllSteps = [
         recognition: [
           "大灯（两角同色）在左侧",
           "三个角块需要顺时针轮换",
-          "棱块位置无需变动"
+          "棱块位置无需变动",
         ],
         topPattern: [
           "white",
@@ -276,7 +276,7 @@ export const ollPllSteps = [
         recognition: [
           "大灯（两角同色）在右侧",
           "三个角块需要逆时针轮换",
-          "Aa Perm 的镜像情况"
+          "Aa Perm 的镜像情况",
         ],
         topPattern: [
           "white",
@@ -291,7 +291,7 @@ export const ollPllSteps = [
         ],
         algorithm: "L2 F2 L B L' F2 L B' L",
         setup: "L' B L' F2 L B' L' F2 L2",
-        tips: "大灯在右边时使用此公式，或者用左手做 Aa Perm。"
+        tips: "大灯在右边时使用此公式，或者用左手做 Aa Perm。",
       },
       {
         id: "pll-ua",
@@ -365,10 +365,7 @@ export const ollPllSteps = [
         title: "Z Perm (相邻对换)",
         stepsCount: 16,
         tags: ["中等", "#Z"],
-        recognition: [
-          "前/右棱块互换，后/左棱块互换",
-          "没有一面是还原好的",
-        ],
+        recognition: ["前/右棱块互换，后/左棱块互换", "没有一面是还原好的"],
         topPattern: [
           "white",
           "white",
@@ -382,7 +379,7 @@ export const ollPllSteps = [
         ],
         algorithm: "U2 R U R' U R' U' R' U R U' R' U' R2 U R",
         setup: "R' U' R2 U R U R' U' R U R U' R U' R' U2",
-        tips: "这是一个不需要转动中间层（M）的纯右手公式，非常适合单手操作。"
+        tips: "这是一个不需要转动中间层（M）的纯右手公式，非常适合单手操作。",
       },
     ],
   },

@@ -157,7 +157,6 @@ const stopCamera = () => {
     const tracks = activeStream.getTracks();
     tracks.forEach((track) => {
       track.stop(); // 这才是真正关闭硬件指令
-      console.log(`已停止摄像头轨道: ${track.label}`);
     });
     activeStream = null; // 清空变量
   }

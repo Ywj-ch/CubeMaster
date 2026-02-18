@@ -40,7 +40,6 @@ const routes = [
         name: "Learning",
         component: () => import("../views/Learning.vue"),
         beforeEnter: (to, from, next) => {
-          console.log("检查路由参数:", to.params.courseId);
           const validIds = ["basics", "lbl", "advanced"];
           if (validIds.includes(to.params.courseId)) {
             next();
@@ -73,6 +72,11 @@ const routes = [
         path: "tech/architecture",
         name: "TechArchitecture",
         component: () => import("../views/TechArchitecture.vue"),
+      },
+      {
+        path: "customizer",
+        name: "Customizer",
+        component: () => import("../views/Customizer.vue"),
       },
     ],
   },

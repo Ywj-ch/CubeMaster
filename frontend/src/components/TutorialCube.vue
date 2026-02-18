@@ -5,6 +5,7 @@
       :cubeState="displayColors"
       :interactive="true"
       :moveDuration="500"
+      :customization="customization"
       style="width: 100%; height: 100%"
     />
 
@@ -34,6 +35,7 @@ import {
 const props = defineProps({
   setup: { type: String, default: "" }, // 初始设置动作，如 "F2"
   algorithm: { type: String, default: "" }, // 演示动作，如 "R U R'"
+  customization: { type: Object, default: null }, // 自定义外观配置
 });
 
 // 内部状态

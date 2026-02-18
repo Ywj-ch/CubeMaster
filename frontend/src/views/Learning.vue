@@ -221,6 +221,7 @@
                           :ref="(el) => setCubeRef(el, item.id)"
                           :setup="item.setup"
                           :algorithm="item.algorithm"
+                          :customization="config"
                         />
                       </div>
                     </el-col>
@@ -263,6 +264,7 @@
               ref="demoCubeRef"
               :setup="currentDemoItem.setup"
               :algorithm="currentDemoItem.algorithm"
+              :customization="config"
             />
           </div>
 
@@ -315,9 +317,11 @@ import { ElMessage } from "element-plus";
 import { courseList } from "../data/courses.js";
 import TutorialCube from "../components/TutorialCube.vue";
 import Face2DView from "../components/Face2DView.vue";
+import { useCubeCustomization } from "../composables/useCubeCustomization.js";
 
 const route = useRoute();
 const router = useRouter();
+const { config } = useCubeCustomization();
 
 // --- 状态定义 ---
 const currentCourseId = ref(route.params.courseId || courseList[0]?.id);

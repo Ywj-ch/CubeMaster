@@ -53,6 +53,7 @@
           :cubeState="cubeState"
           :interactive="isGameStarted && !isAutoOperating && !isMoving"
           :enableControls="true"
+          :customization="config"
           @move="handle3DMove"
         />
       </div>
@@ -197,6 +198,9 @@ import {
 } from "@element-plus/icons-vue";
 import confetti from "canvas-confetti";
 import DigitRoll from "../components/DigitRoll.vue";
+import { useCubeCustomization } from "../composables/useCubeCustomization.js";
+
+const { config } = useCubeCustomization();
 
 const cubeState = ref(createCubeFromJson());
 const cubeRef = ref(null);
