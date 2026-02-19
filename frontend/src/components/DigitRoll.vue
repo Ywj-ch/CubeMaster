@@ -74,4 +74,15 @@ defineProps({
 .slide-up-leave-active {
   position: absolute;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .digit-box {
+  background: var(--dm-bg-card);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .num {
+  color: var(--dm-text-primary);
+}
 </style>

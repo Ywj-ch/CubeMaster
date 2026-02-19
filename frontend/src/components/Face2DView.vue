@@ -100,4 +100,10 @@ const handleCellClick = (index) => {
   transform: scale(1.05);
   z-index: 2;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .face {
+  background: var(--dm-bg-page);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
 </style>

@@ -1017,4 +1017,282 @@ const handleDemoPlay = () => {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==================== Dark Mode Styles ==================== */
+[data-theme="dark"] .learning-container {
+  background-color: var(--dm-bg-page);
+}
+
+[data-theme="dark"] .tutorial-sidebar {
+  background-color: var(--dm-bg-card);
+  border-right-color: var(--dm-border);
+}
+
+[data-theme="dark"] .sidebar-header {
+  background: var(--dm-bg-card);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .course-desc {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] :deep(.el-select__wrapper) {
+  background-color: var(--dm-bg-hover);
+  box-shadow: 0 0 0 1px var(--dm-border) inset;
+}
+
+[data-theme="dark"] :deep(.el-select__wrapper:hover) {
+  background-color: var(--dm-border);
+}
+
+[data-theme="dark"] :deep(.el-select__selected-item),
+[data-theme="dark"] :deep(.el-select__placeholder) {
+  color: var(--dm-text-primary) !important;
+}
+
+[data-theme="dark"] :deep(.el-select__suffix) {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .sidebar-menu :deep(.el-menu-item) {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .sidebar-menu :deep(.el-menu-item.is-active) {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: var(--dm-accent);
+  border-right-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .tutorial-content {
+  background-color: var(--dm-bg-page);
+}
+
+[data-theme="dark"] .step-header h1 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .step-desc {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .styled-card {
+  background-color: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-md) !important;
+}
+
+[data-theme="dark"] .case-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .concept-image-box {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .placeholder-img {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .point-text {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .notation-desc {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .notation-item {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .notation-item:hover {
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .keycap {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  border-bottom-color: var(--dm-border-hover);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .note-name {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .note-desc {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .instruction-text p {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .algorithm-box {
+  background-color: var(--dm-bg-hover);
+  border-left-color: var(--dm-border);
+}
+
+[data-theme="dark"] .algorithm-box:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .algo-text {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .tip-alert {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .cube-container {
+  background-color: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .algo-3d-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .algo-3d-card:hover {
+  border-color: var(--dm-accent);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .algo-thumb-box {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .algo-no {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .algo-title-text {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .algo-formula-zone {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .formula-code {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .steps-tag {
+  color: var(--dm-text-muted);
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .rec-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .rec-list li {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .algo-card-footer {
+  border-top-color: var(--dm-border);
+}
+
+[data-theme="dark"] .view-demo-link {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .algo-3d-card:hover .view-demo-link {
+  color: var(--dm-accent);
+}
+
+/* 弹窗暗色模式 */
+html[data-theme="dark"] .learning-container :deep(.el-dialog) {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  outline: none !important;
+}
+
+html[data-theme="dark"] .learning-container :deep(.el-dialog__header) {
+  border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .learning-container :deep(.el-dialog__body) {
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .learning-container .dialog-id-badge {
+  background: var(--dm-bg-hover);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .dialog-header-custom h2 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .cube-viewport {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .viewport-bg {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(96, 165, 250, 0.1) 0%,
+    transparent 70%
+  );
+}
+
+[data-theme="dark"] .info-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .big-formula-box {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .huge-mono {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .copy-btn {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .copy-btn:hover {
+  color: var(--dm-accent);
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .recog-desc {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .primary-action-btn {
+  background: var(--dm-accent);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .primary-action-btn:hover {
+  background: var(--dm-accent-hover);
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+}
 </style>

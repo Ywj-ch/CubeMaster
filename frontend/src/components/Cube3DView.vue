@@ -1001,4 +1001,13 @@ defineExpose({
 .cube-3d-container.can-control:active {
   cursor: grabbing;
 }
+
+/* ============================================
+   暗色模式覆盖
+   ============================================ */
+
+/* 3D容器在暗色模式下可以添加微妙的背景 */
+[data-theme="dark"] .cube-3d-container {
+  /* 3D渲染器背景由组件内部控制 */
+}
 </style>

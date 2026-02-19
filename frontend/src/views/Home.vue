@@ -5,7 +5,7 @@
 
     <!-- === Hero Section (层级 z-1) === -->
     <section class="hero-section-wrapper">
-      <el-row :gutter="40" align="middle" class="hero-content">
+      <el-row :gutter="40" class="hero-content">
         <!-- 左侧文本区 -->
         <el-col :xs="24" :md="12" class="text-side relative-position">
           <!-- 氛围光晕 -->
@@ -499,11 +499,13 @@ onMounted(() => {
 .hero-content {
   width: 100%;
   max-width: 1200px;
+  align-items: flex-start;
 }
 
 /* --- Hero 文本区域 --- */
 .relative-position {
   position: relative;
+  text-align: left;
 }
 
 /* 氛围光 */
@@ -968,7 +970,8 @@ onMounted(() => {
 
 /* --- FAQ Section 整体布局 --- */
 .faq-modern-section {
-  background: transparent !important;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
   padding-bottom: 80px;
 }
 
@@ -992,7 +995,7 @@ onMounted(() => {
 }
 
 /* 悬停效果：背景微亮 */
-:deep(.el-collapse-item:hover) {
+[data-theme="light"] :deep(.el-collapse-item:hover) {
   background-color: rgba(248, 250, 252, 0.8);
 }
 
@@ -1032,26 +1035,27 @@ onMounted(() => {
 }
 
 /* 激活状态（展开时）的样式 */
-:deep(.el-collapse-item.is-active) {
+[data-theme="light"] :deep(.el-collapse-item.is-active) {
   background-color: #ffffff;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-  border-bottom-color: transparent !important;
+  border-bottom-color: #f1f5f9 !important;
 }
 
-:deep(.el-collapse-item.is-active) .faq-index {
+[data-theme="light"] :deep(.el-collapse-item.is-active) .faq-index {
   color: #2563eb; /* 展开时序号变蓝 */
 }
 
-:deep(.el-collapse-item.is-active) .faq-question {
+[data-theme="light"] :deep(.el-collapse-item.is-active) .faq-question {
   color: #2563eb;
 }
 
 /* 回答内容的排版 */
 .faq-answer-content {
-  padding: 0 20px 30px 54px; /* 54px 是为了对齐序号后的文字 */
+  padding: 20px 0 10px 54px;
   line-height: 1.8;
   color: #64748b;
   font-size: 1rem;
+  text-align: left;
 }
 
 /* ------------- 底部关于区域 -------------- */
@@ -1148,7 +1152,7 @@ button.learn-more {
   padding: 0;
   font-size: inherit;
   font-family: inherit;
-  width: 12rem;
+  width: 10rem;
   height: auto;
 }
 button.learn-more .circle {
@@ -1291,28 +1295,34 @@ button.learn-more:hover .button-text {
 
 /* 3. 激活类：大幅度拉长时间，并使用更平滑的曲线 */
 .animate-entry.is-visible {
-  animation: fadeInUp 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation-name: fadeInUp;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  animation-fill-mode: forwards;
 }
 
 .animate-entry-right.is-visible {
-  animation: fadeInRight 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  animation-name: fadeInRight;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  animation-fill-mode: forwards;
 }
 
 /* 4. 延迟梯度 */
 .delay-1 {
-  animation-delay: 0.5s;
+  animation-delay: 0.2s;
 }
 .delay-2 {
-  animation-delay: 1s;
+  animation-delay: 0.5s;
 }
 .delay-3 {
-  animation-delay: 1.5s;
+  animation-delay: 0.8s;
 }
 .delay-4 {
-  animation-delay: 2s;
+  animation-delay: 1.1s;
 }
 .delay-5 {
-  animation-delay: 2.5s;
+  animation-delay: 1.4s;
 }
 
 /* === 外观定制浮动按钮 === */
@@ -1357,5 +1367,322 @@ button.learn-more:hover .button-text {
     width: 36px !important;
     height: 36px !important;
   }
+}
+
+/* ==================== Dark Mode Styles ==================== */
+/* 页面背景 */
+[data-theme="dark"] .home-page-scroller {
+  color: var(--dm-text-primary);
+  background-color: var(--dm-bg-page);
+}
+
+/* 网格背景 */
+[data-theme="dark"] .grid-background {
+  --color: var(--dm-grid-line);
+  background-color: var(--dm-grid-bg);
+}
+
+/* 氛围光晕 */
+[data-theme="dark"] .text-glow {
+  background: radial-gradient(
+    circle at center,
+    rgba(96, 165, 250, 0.15) 0%,
+    transparent 70%
+  );
+}
+
+/* 徽章 */
+[data-theme="dark"] .badge-pill {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-muted);
+  box-shadow: var(--dm-shadow-sm);
+}
+
+[data-theme="dark"] .dot {
+  background: var(--dm-accent);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+/* 主标题 */
+[data-theme="dark"] .main-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .gradient-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 副标题 */
+[data-theme="dark"] .sub-title {
+  color: var(--dm-text-body);
+}
+
+/* 高亮标签 */
+[data-theme="dark"] .highlight-tag {
+  background: rgba(96, 165, 250, 0.15);
+  color: var(--dm-accent);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+/* 技术标签 */
+[data-theme="dark"] .tech-label {
+  color: var(--dm-text-muted);
+}
+
+/* 玻璃卡片容器 */
+[data-theme="dark"] .glass-card-wrap {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-glass-border);
+  box-shadow:
+    0 20px 50px -12px rgba(0, 0, 0, 0.3),
+    0 0 0 1px var(--dm-glass-border) inset;
+}
+
+/* 外观定制浮动按钮 */
+[data-theme="dark"] .customizer-fab {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-glass-border);
+  box-shadow: var(--dm-shadow-md);
+  color: #fb923c;
+}
+
+[data-theme="dark"] .customizer-fab:hover {
+  background: var(--dm-glass-bg-light);
+  box-shadow: var(--dm-shadow-lg);
+  color: #f97316;
+}
+
+/* Section 标题 */
+[data-theme="dark"] .section-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .section-desc {
+  color: var(--dm-text-muted);
+}
+
+/* 特性卡片 */
+[data-theme="dark"] .feature-glass-card {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-glass-border);
+  box-shadow: var(--dm-shadow-md);
+}
+
+[data-theme="dark"] .features-spread-container:hover .feature-glass-card {
+  background: var(--dm-glass-bg-light);
+  box-shadow: var(--dm-shadow-lg);
+}
+
+[data-theme="dark"] .feature-glass-card:hover {
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .card-content-top h3 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .card-content-top p {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .card-icon-bottom {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: var(--dm-glass-border);
+}
+
+[data-theme="dark"] .feature-glass-card:hover .card-icon-bottom {
+  background: rgba(96, 165, 250, 0.15);
+}
+
+/* 图标颜色 */
+[data-theme="dark"] .icon-blue {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .icon-purple {
+  color: #a78bfa;
+}
+
+[data-theme="dark"] .icon-green {
+  color: #34d399;
+}
+
+[data-theme="dark"] .icon-orange {
+  color: #fb923c;
+}
+
+/* 课程卡片 */
+[data-theme="dark"] .course-modern-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-md);
+}
+
+[data-theme="dark"] .course-modern-card:hover {
+  box-shadow: var(--dm-shadow-lg);
+  border-color: var(--dm-border-light);
+}
+
+[data-theme="dark"] .course-header {
+  background: linear-gradient(
+    135deg,
+    var(--dm-bg-hover) 0%,
+    var(--dm-bg-card) 100%
+  );
+}
+
+[data-theme="dark"] .level-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--dm-text-secondary);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .course-icon-box {
+  background: transparent;
+}
+
+[data-theme="dark"] .inner-glow {
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--glow-color, #60a5fa) 0%,
+    transparent 70%
+  );
+  opacity: 0.25;
+}
+
+[data-theme="dark"] .course-body h4 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .course-body p {
+  color: var(--dm-text-body);
+}
+
+[data-theme="dark"] .meta-info {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .learn-arrow-btn {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .learn-arrow-btn:hover {
+  color: var(--dm-accent-hover);
+}
+
+/* FAQ 部分 */
+html[data-theme="dark"] .faq-modern-section {
+  background: var(--dm-bg-card);
+  border-bottom: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .faq-list-container {
+  background: transparent;
+}
+
+[data-theme="dark"] .custom-modern-collapse {
+  border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item) {
+  border-bottom-color: var(--dm-border) !important;
+  transition: all 0.3s ease;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item:hover) {
+  background-color: var(--dm-bg-hover);
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item__header) {
+  background-color: var(--dm-bg-card) !important;
+  color: var(--dm-text-primary);
+  border: none !important;
+  transition: all 0.3s;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item__wrap) {
+  background-color: transparent;
+  border: none !important;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item__content) {
+  background-color: transparent;
+  color: var(--dm-text-body);
+}
+
+html[data-theme="dark"] .faq-index {
+  color: var(--dm-text-muted);
+}
+
+html[data-theme="dark"] .faq-question {
+  color: var(--dm-text-primary);
+}
+
+html[data-theme="dark"] .faq-answer-content {
+  color: var(--dm-text-body);
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item.is-active) {
+  background-color: var(--dm-bg-card);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  border-bottom-color: var(--dm-border) !important;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item.is-active) .faq-index,
+html[data-theme="dark"] :deep(.el-collapse-item.is-active) .faq-question {
+  color: var(--dm-accent);
+}
+
+/* 关于链接 */
+[data-theme="dark"] .about-cta-content p {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .modern-about-link {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .modern-about-link:hover {
+  background-color: rgba(96, 165, 250, 0.1);
+  color: var(--dm-accent-hover);
+}
+
+[data-theme="dark"] .footer-divider {
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--dm-border),
+    transparent
+  );
+}
+
+/* 主按钮 */
+[data-theme="dark"] button.learn-more .circle {
+  background: var(--dm-accent);
+}
+
+[data-theme="dark"] button.learn-more .button-text {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] button.learn-more:hover .button-text {
+  color: #f8fafc;
+}
+
+/* 次级按钮 */
+[data-theme="dark"] .secondary-btn-uiverse {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .secondary-btn-uiverse:hover {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border-hover);
+  color: var(--dm-accent);
+  box-shadow: var(--dm-shadow-sm);
 }
 </style>

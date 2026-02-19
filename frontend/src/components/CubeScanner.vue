@@ -563,4 +563,54 @@ onUnmounted(() => {
 .fade-leave-to {
   opacity: 0;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .scanner-overlay-backdrop {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+[data-theme="dark"] .scanner-card {
+  background: var(--dm-bg-card);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .scanner-header {
+  border-bottom: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .header-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .close-icon-btn {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .close-icon-btn:hover {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .scanner-footer {
+  background: var(--dm-bg-card);
+}
+
+[data-theme="dark"] .preview-slot {
+  background: var(--dm-bg-page);
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .preview-slot.active {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .shutter-button {
+  border-color: var(--dm-border);
+  background: var(--dm-bg-card);
+}
+
+[data-theme="dark"] .inner-circle {
+  background: linear-gradient(145deg, var(--dm-bg-card), var(--dm-bg-page));
+  border: 1px solid var(--dm-border);
+}
 </style>

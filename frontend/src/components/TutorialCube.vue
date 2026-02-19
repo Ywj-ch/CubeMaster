@@ -123,4 +123,9 @@ onMounted(() => {
   right: 10px;
   z-index: 10;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .tutorial-cube-wrapper {
+  background: var(--dm-bg-page);
+}
 </style>

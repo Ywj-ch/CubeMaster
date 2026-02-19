@@ -74,7 +74,7 @@
 
             <div class="preview-info">
               <div class="preview-info-group">
-                <span class="info-icon">🎨</span>
+                <span class="preview-emoji">🎨</span>
                 <div class="info-content">
                   <strong>材质设置</strong>
                   <span>{{ materialSummary }}</span>
@@ -82,7 +82,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="info-icon">🖼️</span>
+                <span class="preview-emoji">🖼️</span>
                 <div class="info-content">
                   <strong>纹理系统</strong>
                   <span>{{ textureLabel }}</span>
@@ -90,7 +90,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="info-icon">🔷</span>
+                <span class="preview-emoji">🔷</span>
                 <div class="info-content">
                   <strong>几何体</strong>
                   <span>{{ geometrySummary }}</span>
@@ -98,7 +98,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="info-icon">💡</span>
+                <span class="preview-emoji">💡</span>
                 <div class="info-content">
                   <strong>光照环境</strong>
                   <span>{{ lightingSummary }}</span>
@@ -1181,6 +1181,13 @@ const handleSave = () => {
   margin-top: 2px;
 }
 
+.preview-emoji {
+  font-size: 1.2rem;
+  min-width: 24px;
+  text-align: center;
+  margin-top: 2px;
+}
+
 .info-content {
   flex: 1;
   display: flex;
@@ -1476,5 +1483,331 @@ const handleSave = () => {
   .preview-container {
     height: 350px; /* 移动端减小高度 */
   }
+}
+
+/* ==================== Dark Mode Styles ==================== */
+/* 页面背景 */
+[data-theme="dark"] .customizer-page {
+  background: var(--dm-bg-page);
+}
+
+/* 页面标题 */
+[data-theme="dark"] .page-header h1 .title-text {
+  background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .page-header .subtitle {
+  color: var(--dm-text-muted);
+}
+
+/* 主卡片 */
+[data-theme="dark"] .customizer-main-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-md);
+}
+
+[data-theme="dark"] .customizer-main-card :deep(.el-card__header) {
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .card-header {
+  color: var(--dm-text-primary);
+}
+
+/* 预览列 */
+[data-theme="dark"] .preview-column {
+  background: rgba(96, 165, 250, 0.05);
+  border-color: rgba(96, 165, 250, 0.1);
+}
+
+[data-theme="dark"] .config-column {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-glass-border);
+}
+
+[data-theme="dark"] .config-column::before {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--dm-border),
+    transparent
+  );
+}
+
+/* 预览区域 */
+[data-theme="dark"] .preview-container {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .preview-controls {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .control-label {
+  color: var(--dm-text-muted);
+}
+
+/* 预览信息 */
+[data-theme="dark"] .preview-info {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-glass-border);
+}
+
+[data-theme="dark"] .preview-info-group {
+  background: var(--dm-glass-bg-light);
+}
+
+[data-theme="dark"] .preview-info-group:hover {
+  background: var(--dm-glass-bg);
+}
+
+[data-theme="dark"] .info-content strong {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .info-content span {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .color-indicator {
+  border-color: var(--dm-border);
+}
+
+/* 配置面板 - 折叠面板 */
+html[data-theme="dark"]
+  .customizer-page
+  .config-collapse
+  :deep(.el-collapse-item) {
+  background: var(--dm-glass-bg);
+  border: none;
+}
+
+html[data-theme="dark"]
+  .customizer-page
+  .config-collapse
+  :deep(.el-collapse-item__header) {
+  background: var(--dm-glass-bg);
+  color: var(--dm-text-primary);
+  border-bottom: 1px solid var(--dm-border);
+}
+
+html[data-theme="dark"]
+  .customizer-page
+  .config-collapse
+  :deep(.el-collapse-item__header:hover) {
+  background: var(--dm-bg-hover);
+}
+
+html[data-theme="dark"]
+  .customizer-page
+  .config-collapse
+  :deep(.el-collapse-item__wrap) {
+  background: transparent;
+  border: none;
+}
+
+html[data-theme="dark"]
+  .customizer-page
+  .config-collapse
+  :deep(.el-collapse-item__content) {
+  background: transparent;
+  color: var(--dm-text-body);
+}
+
+/* 参数行 */
+[data-theme="dark"] .param-row {
+  border: none;
+  background: var(--dm-glass-bg);
+}
+
+[data-theme="dark"] .param-label {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .param-value {
+  color: var(--dm-text-primary);
+}
+
+/* 颜色选择器 */
+[data-theme="dark"] .color-picker-wrapper {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .color-label {
+  color: var(--dm-text-muted);
+}
+
+/* 纹理选择 */
+[data-theme="dark"] .texture-item {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .texture-item:hover {
+  border-color: var(--dm-border-hover);
+}
+
+[data-theme="dark"] .texture-item.active {
+  border-color: var(--dm-accent);
+  background: rgba(96, 165, 250, 0.1);
+}
+
+[data-theme="dark"] .texture-name {
+  color: var(--dm-text-secondary);
+}
+
+html[data-theme="dark"] .customizer-page .texture-label {
+  color: var(--dm-text-primary);
+}
+
+/* 上传区域 */
+html[data-theme="dark"] .customizer-page .upload-area {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .customizer-page .upload-area:hover {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-accent);
+}
+
+html[data-theme="dark"] .customizer-page .el-upload-dragger {
+  background: transparent;
+  border: none;
+}
+
+html[data-theme="dark"] .customizer-page .upload-icon {
+  color: var(--dm-text-muted);
+}
+
+html[data-theme="dark"] .customizer-page .upload-area:hover .upload-icon {
+  color: var(--dm-accent);
+}
+
+html[data-theme="dark"] .customizer-page .upload-text p {
+  color: var(--dm-text-secondary);
+}
+
+html[data-theme="dark"] .customizer-page .upload-hint {
+  color: var(--dm-text-muted);
+}
+
+/* 滑块 */
+[data-theme="dark"] .param-slider :deep(.el-slider__runway),
+[data-theme="dark"] .control-slider :deep(.el-slider__runway) {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+[data-theme="dark"] .param-slider :deep(.el-slider__bar),
+[data-theme="dark"] .control-slider :deep(.el-slider__bar) {
+  background-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .param-slider :deep(.el-slider__button),
+[data-theme="dark"] .control-slider :deep(.el-slider__button) {
+  background-color: var(--dm-accent);
+  border-color: var(--dm-accent);
+}
+
+/* 操作按钮 */
+[data-theme="dark"] .action-buttons {
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .action-btn {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .action-btn:hover {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border-hover);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .action-btn.primary {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .action-btn.primary:hover {
+  background: var(--dm-accent-hover);
+  border-color: var(--dm-accent-hover);
+}
+
+[data-theme="dark"] .action-btn.danger {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-accent-error);
+}
+
+[data-theme="dark"] .action-btn.danger:hover {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+/* 复选框 */
+[data-theme="dark"] .custom-checkbox :deep(.el-checkbox__label) {
+  color: var(--dm-text-secondary);
+}
+
+/* 单选按钮 */
+[data-theme="dark"] .custom-radio :deep(.el-radio__label) {
+  color: var(--dm-text-secondary);
+}
+
+/* 标签 */
+[data-theme="dark"] .config-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .config-value {
+  color: var(--dm-text-primary);
+}
+
+/* 提示文本 */
+[data-theme="dark"] .hint-text {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .hint-text .highlight {
+  color: var(--dm-accent);
+}
+
+/* 配置区块标题 */
+[data-theme="dark"] .config-section h3 {
+  color: var(--dm-text-primary);
+}
+
+/* 段描述文字 */
+[data-theme="dark"] .section-description {
+  color: var(--dm-text-muted);
+}
+
+/* 使用说明卡片 */
+[data-theme="dark"] .instructions-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .instructions-card :deep(.el-card__header) {
+  color: var(--dm-text-primary);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .instructions-list {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .instructions-list li {
+  color: var(--dm-text-secondary);
 }
 </style>

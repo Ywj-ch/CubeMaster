@@ -780,4 +780,170 @@ const copyAlgo = (text) => {
     display: none;
   }
 }
+
+/* ==================== Dark Mode Styles ==================== */
+[data-theme="dark"] .cfop-lib-page {
+  background-color: var(--dm-bg-page);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .glow-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .glow-title .thin {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .minimal-back-btn {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .minimal-back-btn:hover {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .wave-group .input {
+  border-bottom-color: var(--dm-border);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .wave-group .input:focus {
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .wave-group .label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .wave-group .input:focus ~ label .label-char,
+[data-theme="dark"] .wave-group .input:valid ~ label .label-char {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .glass-radio-group {
+  --bg: var(--dm-glass-bg);
+  background: var(--bg);
+  border-color: var(--dm-glass-border);
+}
+
+[data-theme="dark"] .glass-radio-group label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .glass-radio-group input:checked + label {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .glass-glider {
+  background: var(--dm-accent);
+}
+
+[data-theme="dark"] .premium-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .algo-name {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .dot {
+  background: var(--dm-border);
+}
+
+[data-theme="dark"] .dot.active {
+  background: var(--dm-accent);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+}
+
+[data-theme="dark"] .formula-display {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .formula-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .mono-text {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .card-footer p {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .mini-tag {
+  color: var(--dm-text-muted);
+  background: var(--dm-bg-hover);
+}
+
+[data-theme="dark"] .play-icon-circle {
+  background: var(--dm-accent);
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+}
+
+html[data-theme="dark"] .cfop-lib-page :deep(.el-dialog) {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  outline: none !important;
+}
+
+html[data-theme="dark"] .cfop-lib-page :deep(.el-dialog__header) {
+  border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .cfop-lib-page :deep(.el-dialog__body) {
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .cfop-lib-page .dialog-id-badge {
+  background: var(--dm-bg-hover);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .cube-viewport {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .info-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .big-formula-box {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .huge-mono {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .copy-btn {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .copy-btn:hover {
+  color: var(--dm-accent);
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .recog-desc {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .primary-action-btn {
+  background: var(--dm-accent);
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .primary-action-btn:hover {
+  background: var(--dm-accent-hover);
+}
 </style>

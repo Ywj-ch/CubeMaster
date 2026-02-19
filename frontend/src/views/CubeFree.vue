@@ -25,24 +25,28 @@
     <!-- 帮助按钮 -->
     <div class="help-btn-wrapper">
       <button class="faq-button" @click="showHelp = true">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
           <path
-            d="M80 160c0-35.3 28.7-64 64-64h32c35.3 0 64 28.7 64 64v3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74V320c0 17.7 14.3 32 32 32s32-14.3 32-32v-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7V160c0-70.7-57.3-128-128-128H144C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"
-          ></path>
+            d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
+          />
         </svg>
         <span class="tooltip">操作指南</span>
       </button>
     </div>
 
-    <!-- 头部区域：标题 + 状态胶囊 -->
+    <!-- 头部区域：标题 -->
     <div class="header-section">
       <h2 class="mode-title gradient-text">自由探索</h2>
+    </div>
 
-      <!-- 升级后的状态指示器 -->
-      <div class="status-badge" :class="statusClass">
-        <span class="status-dot"></span>
-        <span class="status-text">{{ statusText }}</span>
-      </div>
+    <!-- 状态指示器 -->
+    <div class="status-badge" :class="statusClass">
+      <span class="status-dot"></span>
+      <span class="status-text">{{ statusText }}</span>
     </div>
 
     <div class="main-display-area">
@@ -494,6 +498,7 @@ onUnmounted(() => {
 /* 头部标题区 */
 .header-section {
   margin-top: 50px;
+  margin-bottom: 40px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -512,6 +517,9 @@ onUnmounted(() => {
 
 /* 状态胶囊 */
 .status-badge {
+  position: absolute;
+  top: 120px;
+  left: 60px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -521,6 +529,7 @@ onUnmounted(() => {
   font-weight: 600;
   width: fit-content;
   transition: all 0.3s ease;
+  z-index: 100;
 }
 
 .status-dot {
@@ -591,7 +600,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 0;
-  transform: translateY(-20px);
+  transform: translateY(-10px);
 }
 
 .cube-container-box {
@@ -660,33 +669,45 @@ onUnmounted(() => {
 /* === 帮助按钮 === */
 .help-btn-wrapper {
   position: absolute;
-  top: 140px;
-  left: 220px;
+  top: 120px;
+  left: 180px;
   z-index: 100;
 }
 
 .faq-button {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
+  margin-top: 4px;
+  min-width: 26px;
+  flex-shrink: 0;
   border-radius: 50%;
   border: none;
-  background-color: #2563eb;
-  background-image: linear-gradient(147deg, #2563eb 0%, #06b6d4 74%);
+  outline: none;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
   position: relative;
-  transition: transform 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
+}
+
+.faq-button:focus-visible {
+  outline: 2px solid #64748b;
+  outline-offset: 2px;
 }
 
 .faq-button svg {
-  height: 1.2em;
-  fill: white;
+  width: 22px;
+  height: 22px;
+  color: #64748b;
+  flex-shrink: 0;
 }
 .faq-button:hover {
   transform: translateY(-2px);
+  opacity: 0.8;
 }
 .faq-button:hover svg {
   animation: jello-vertical 0.7s both;
@@ -719,6 +740,8 @@ onUnmounted(() => {
 .tooltip {
   position: absolute;
   top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
   opacity: 0;
   background-color: #2563eb;
   background-image: linear-gradient(147deg, #2563eb 0%, #06b6d4 74%);
@@ -1003,5 +1026,388 @@ onUnmounted(() => {
   opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(1);
+}
+
+/* ==================== Dark Mode Styles ==================== */
+/* 页面背景 */
+[data-theme="dark"] .cube-free-page {
+  background-color: var(--dm-bg-page);
+}
+
+/* 计时器 */
+[data-theme="dark"] .timer-label-small {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .colon,
+[data-theme="dark"] .dot {
+  color: var(--dm-border-light);
+}
+
+[data-theme="dark"] .ms-card {
+  background: var(--dm-accent);
+  box-shadow: 0 10px 20px rgba(96, 165, 250, 0.4);
+}
+
+/* 头部区域 */
+[data-theme="dark"] .header-section {
+  background: transparent;
+}
+
+[data-theme="dark"] .mode-title {
+  background: linear-gradient(
+    135deg,
+    var(--dm-text-primary) 0%,
+    var(--dm-accent) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 状态胶囊 */
+[data-theme="dark"] .status-badge {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .status-ready {
+  background: var(--dm-bg-card);
+  color: var(--dm-text-muted);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .status-ready .status-dot {
+  background: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .status-active {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+[data-theme="dark"] .status-active .status-dot {
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+[data-theme="dark"] .status-busy {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+[data-theme="dark"] .status-busy .status-dot {
+  background: #fb923c;
+}
+
+/* 主显示区 */
+[data-theme="dark"] .main-display-area {
+  background: transparent;
+}
+
+[data-theme="dark"] .cube-container-box {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+/* 底部控制栏 */
+[data-theme="dark"] .bottom-controls {
+  background: transparent;
+}
+
+/* 开始游戏按钮 */
+[data-theme="dark"] .start-challenge-btn {
+  background-color: #10b981;
+}
+
+[data-theme="dark"] .start-challenge-btn:hover {
+  background-color: #059669;
+}
+
+/* 序列显示 */
+[data-theme="dark"] .sequence-display {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .seq-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .seq-tag {
+  background: var(--dm-bg-hover);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .seq-empty {
+  color: var(--dm-text-muted);
+}
+
+/* 帮助按钮 */
+[data-theme="dark"] .faq-button svg {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .faq-button:focus-visible {
+  outline-color: var(--dm-text-muted);
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog) {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  outline: none !important;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog__header) {
+  border-bottom: 1px solid #334155 !important;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog__body) {
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-overlay) {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: none !important;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog__wrapper) {
+  background: transparent !important;
+}
+
+[data-theme="dark"] :deep(.el-dialog__title) {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .help-section h4 {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .help-section p {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .key {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+  border-bottom-color: var(--dm-border-hover);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .key-item:hover .key {
+  background: var(--dm-bg-card);
+}
+
+[data-theme="dark"] .tip-text {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .help-content {
+  background: transparent;
+}
+
+[data-theme="dark"] .help-section {
+  background: var(--dm-bg-hover);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .key-map-grid {
+  background: var(--dm-bg-card);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+[data-theme="dark"] .key-item {
+  color: var(--dm-text-secondary);
+}
+
+/* 胜利结算 */
+[data-theme="dark"] .victory-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .victory-card {
+  background: var(--dm-bg-card);
+  border: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .victory-card h3 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .stat-item .label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .stat-item .value {
+  color: var(--dm-accent);
+}
+
+/* 页面标题 */
+[data-theme="dark"] .page-header h1 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .page-header .subtitle {
+  color: var(--dm-text-muted);
+}
+
+/* 主卡片 */
+[data-theme="dark"] .main-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-md);
+}
+
+/* 3D视图区域 */
+[data-theme="dark"] .cube-view-section {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+/* 控制面板 */
+[data-theme="dark"] .control-panel {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .panel-title {
+  color: var(--dm-text-primary);
+}
+
+/* 方向按钮 */
+[data-theme="dark"] .dir-btn {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .dir-btn:hover:not(:disabled) {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border-hover);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .dir-btn.active {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+  color: #0f172a;
+}
+
+/* 操作按钮 */
+[data-theme="dark"] .action-btn {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .action-btn:hover:not(:disabled) {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border-hover);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .action-btn.primary {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .action-btn.primary:hover {
+  background: var(--dm-accent-hover);
+  border-color: var(--dm-accent-hover);
+}
+
+/* 次级按钮 */
+[data-theme="dark"] .btn-secondary {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-muted);
+  box-shadow: var(--dm-shadow-sm);
+}
+
+[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
+  background: var(--dm-bg-hover);
+  box-shadow: var(--dm-shadow-md);
+}
+
+[data-theme="dark"] .scramble-btn:hover:not(:disabled) {
+  color: var(--dm-accent);
+  border-color: var(--dm-border-hover);
+}
+
+[data-theme="dark"] .reset-btn:hover {
+  color: var(--dm-accent-error) !important;
+  background-color: rgba(248, 113, 113, 0.1) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+}
+
+/* 状态指示器 */
+[data-theme="dark"] .status-indicator {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .status-text {
+  color: var(--dm-text-muted);
+}
+
+/* 统计信息 */
+[data-theme="dark"] .stats-container {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--dm-text-primary);
+}
+
+/* 计时器 */
+[data-theme="dark"] .timer-display {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .timer-label {
+  color: var(--dm-text-muted);
+}
+
+/* 操作历史 */
+[data-theme="dark"] .history-panel {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .history-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .history-item {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .history-item:hover {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border-hover);
+}
+
+/* 提示信息 */
+[data-theme="dark"] .hint-text {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .hint-text .highlight {
+  color: var(--dm-accent);
 }
 </style>

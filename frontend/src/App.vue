@@ -10,4 +10,9 @@ body {
   font-family: sans-serif;
   background-color: #f8f9fa;
 }
+
+/* 暗色模式全局背景 */
+[data-theme="dark"] body {
+  background-color: #0f172a;
+}
 </style>

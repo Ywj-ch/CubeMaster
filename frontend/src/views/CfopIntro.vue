@@ -269,33 +269,41 @@
       </section>
 
       <!-- ================= 8. FAQ (常见问题) ================= -->
-      <section class="section-block">
-        <h2 class="section-heading text-center">常见问题</h2>
-        <div class="faq-container">
-          <el-collapse
-            v-model="activeNames"
-            accordion
-            class="custom-modern-collapse"
-          >
-            <el-collapse-item
-              v-for="(faq, index) in faqs"
-              :key="faq.id"
-              :name="faq.id"
-              class="faq-item"
-            >
-              <!-- 自定义标题插槽：增加序号 -->
-              <template #title>
-                <div class="faq-header-content">
-                  <span class="faq-index">0{{ index + 1 }}</span>
-                  <span class="faq-question">{{ faq.title }}</span>
-                </div>
-              </template>
+      <section class="section-wrapper faq-modern-section">
+        <div class="container">
+          <!-- 标题：加入入场动画 -->
+          <div class="section-header center animate-entry delay-1">
+            <h2 class="section-title">常见问题</h2>
+            <p class="section-desc">关于 CFOP，你想知道的都在这里</p>
+          </div>
 
-              <div class="faq-answer-content">
-                {{ faq.content }}
-              </div>
-            </el-collapse-item>
-          </el-collapse>
+          <!-- 容器：移除默认边框 -->
+          <div class="faq-list-container animate-entry delay-2">
+            <el-collapse
+              v-model="activeNames"
+              accordion
+              class="custom-modern-collapse"
+            >
+              <el-collapse-item
+                v-for="(faq, index) in faqs"
+                :key="faq.id"
+                :name="faq.id"
+                class="faq-item"
+              >
+                <!-- 自定义标题插槽：增加序号 -->
+                <template #title>
+                  <div class="faq-header-content">
+                    <span class="faq-index">0{{ index + 1 }}</span>
+                    <span class="faq-question">{{ faq.title }}</span>
+                  </div>
+                </template>
+
+                <div class="faq-answer-content">
+                  {{ faq.content }}
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
         </div>
       </section>
     </div>
@@ -328,6 +336,30 @@ const vAnimate = {
     observer.observe(el);
   },
 };
+
+// === 核心逻辑：滚动触发动画 ===
+onMounted(() => {
+  const observerOptions = {
+    threshold: 0.15, // 元素露出 15% 时触发
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // 当元素进入视野，添加 is-visible 类触发 CSS 动画
+        entry.target.classList.add("is-visible");
+        // 触发后停止观察，保证动画只跑一次
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // 扫描所有需要入场动画的元素
+  const animElements = document.querySelectorAll(
+    ".animate-entry, .animate-entry-right",
+  );
+  animElements.forEach((el) => observer.observe(el));
+});
 
 // --- 数据区 ---
 const learningPoints = [
@@ -624,6 +656,12 @@ onMounted(() => {
 }
 
 /* --- 通用 Section --- */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
 .section-block {
   margin-bottom: 100px;
 }
@@ -1226,11 +1264,96 @@ onMounted(() => {
   color: #b91c1c;
 }
 
-/* --- 8. FAQ --- */
-.faq-container {
+/* --- 8. FAQ Section 整体布局 --- */
+.faq-modern-section {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.faq-list-container {
   max-width: 800px;
   margin: 0 auto;
 }
+
+/* Section标题样式 */
+.section-header.center {
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
+  letter-spacing: -1px;
+}
+
+.section-desc {
+  font-size: 1.15rem;
+  color: #64748b;
+}
+
+/* === 入场动画系统 === */
+
+/* 1. 定义动画关键帧 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 2. 修改动画类：默认不执行动画，只设置初始隐藏状态 */
+.animate-entry,
+.animate-entry-right {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* 3. 激活类：大幅度拉长时间，并使用更平滑的曲线 */
+.animate-entry.is-visible {
+  animation: fadeInUp 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+.animate-entry-right.is-visible {
+  animation: fadeInRight 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* 4. 延迟梯度 */
+.delay-1 {
+  animation-delay: 0.5s;
+}
+.delay-2 {
+  animation-delay: 1s;
+}
+.delay-3 {
+  animation-delay: 1.5s;
+}
+.delay-4 {
+  animation-delay: 2s;
+}
+.delay-5 {
+  animation-delay: 2.5s;
+}
+
+/* --- 深度重塑 Element Collapse --- */
 .custom-modern-collapse {
   border: none !important;
 }
@@ -1245,7 +1368,7 @@ onMounted(() => {
 }
 
 /* 悬停效果：背景微亮 */
-:deep(.el-collapse-item:hover) {
+[data-theme="light"] :deep(.el-collapse-item:hover) {
   background-color: rgba(248, 250, 252, 0.8);
 }
 
@@ -1285,26 +1408,27 @@ onMounted(() => {
 }
 
 /* 激活状态（展开时）的样式 */
-:deep(.el-collapse-item.is-active) {
+[data-theme="light"] :deep(.el-collapse-item.is-active) {
   background-color: #ffffff;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-  border-bottom-color: transparent !important;
+  border-bottom-color: #f1f5f9 !important;
 }
 
-:deep(.el-collapse-item.is-active) .faq-index {
+[data-theme="light"] :deep(.el-collapse-item.is-active) .faq-index {
   color: #2563eb; /* 展开时序号变蓝 */
 }
 
-:deep(.el-collapse-item.is-active) .faq-question {
+[data-theme="light"] :deep(.el-collapse-item.is-active) .faq-question {
   color: #2563eb;
 }
 
 /* 回答内容的排版 */
 .faq-answer-content {
-  padding: 0 20px 30px 54px; /* 54px 是为了对齐序号后的文字 */
+  padding: 20px 0 10px 54px;
   line-height: 1.8;
   color: #64748b;
   font-size: 1rem;
+  text-align: left;
 }
 
 /* 响应式 */
@@ -1326,5 +1450,320 @@ onMounted(() => {
   .node-marker {
     display: none;
   }
+}
+
+/* ==================== Dark Mode Styles ==================== */
+[data-theme="dark"] .cfop-intro-page {
+  background-color: var(--dm-bg-page);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .hero-section {
+  background: transparent;
+}
+
+[data-theme="dark"] .badge-pill {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .pulse-dot {
+  background: var(--dm-accent);
+}
+
+[data-theme="dark"] .hero-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--dm-text-primary) 0%,
+    var(--dm-accent) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .hero-subtitle {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .stat-pill {
+  background: var(--dm-glass-bg);
+  border-color: var(--dm-glass-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .section-heading {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .section-sub {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .learning-list-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .check-list li {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .simulator-promo {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .promo-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .promo-text {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .promo-text strong {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .decision-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-md);
+}
+
+[data-theme="dark"] .decision-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .decision-card p {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .decision-card.emerald {
+  background: linear-gradient(
+    to bottom right,
+    rgba(16, 185, 129, 0.1),
+    var(--dm-bg-card)
+  );
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .decision-card.blue {
+  background: linear-gradient(
+    to bottom right,
+    rgba(59, 130, 246, 0.1),
+    var(--dm-bg-card)
+  );
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .decision-card.purple {
+  background: linear-gradient(
+    to bottom right,
+    rgba(139, 92, 246, 0.1),
+    var(--dm-bg-card)
+  );
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+[data-theme="dark"] .stat-box {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .stat-box .bg {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+[data-theme="dark"] .stat-box:hover .bg {
+  background: rgba(30, 41, 59, 0.7);
+}
+
+[data-theme="dark"] .stat-num {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .stat-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .timeline-item {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .time-content h3 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .time-content p {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .progress-bar-wrap {
+  background: var(--dm-bg-hover);
+}
+
+[data-theme="dark"] .roadmap-line {
+  background: var(--dm-border);
+}
+
+[data-theme="dark"] .marker-circle {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .roadmap-node:hover .marker-circle {
+  border-color: var(--dm-accent);
+  color: var(--dm-accent);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .node-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .roadmap-node.is-clickable:hover .node-card {
+  border-color: var(--dm-accent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .roadmap-node:not(.is-clickable) .node-card {
+  background: var(--dm-bg-hover);
+}
+
+[data-theme="dark"] .step-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .header-right {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .card-body p {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .meta-tag {
+  background: var(--dm-bg-hover);
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .meta-tag.highlight {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .table-wrapper {
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .comparison-table {
+  background: var(--dm-bg-card);
+}
+
+[data-theme="dark"] .comparison-table th {
+  background: var(--dm-bg-hover);
+  color: var(--dm-text-secondary);
+  border-bottom-color: var(--dm-border);
+}
+
+[data-theme="dark"] .comparison-table td {
+  border-bottom-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .highlight-row {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="dark"] .rec-badge {
+  background: var(--dm-text-primary);
+  color: var(--dm-bg-page);
+}
+
+[data-theme="dark"] .tag.simple {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+[data-theme="dark"] .tag.medium {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .tag.hard {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+/* FAQ 部分深色模式 */
+html[data-theme="dark"] .faq-modern-section {
+  /* 移除背景和边框，让FAQ融入页面背景 */
+}
+
+[data-theme="dark"] .section-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .section-desc {
+  color: var(--dm-text-muted);
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item) {
+  border-bottom-color: var(--dm-border) !important;
+  transition: all 0.3s ease;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item:hover) {
+  /* 移除背景色，让内容融入页面背景 */
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item__header) {
+  background-color: var(--dm-bg-card) !important;
+  color: var(--dm-text-primary);
+  border: none !important;
+  transition: all 0.3s;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item__wrap) {
+  background-color: transparent;
+  border: none !important;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item__content) {
+  background-color: transparent;
+  color: var(--dm-text-secondary);
+}
+
+html[data-theme="dark"] .faq-index {
+  color: var(--dm-text-muted);
+}
+
+html[data-theme="dark"] .faq-question {
+  color: var(--dm-text-primary);
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item.is-active) {
+  background-color: var(--dm-bg-card);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  border-bottom-color: var(--dm-border) !important;
+}
+
+html[data-theme="dark"] :deep(.el-collapse-item.is-active) .faq-index,
+html[data-theme="dark"] :deep(.el-collapse-item.is-active) .faq-question {
+  color: var(--dm-accent);
+}
+
+html[data-theme="dark"] .faq-answer-content {
+  color: var(--dm-text-secondary);
+  text-align: left;
 }
 </style>

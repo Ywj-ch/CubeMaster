@@ -935,4 +935,310 @@ onUnmounted(() => {
 :deep(.el-scrollbar__bar) {
   bottom: 0px;
 }
+
+/* ==================== Dark Mode Styles ==================== */
+/* 页面背景 */
+[data-theme="dark"] .cube-solver-page {
+  background: radial-gradient(
+    circle at 50% 50%,
+    var(--dm-bg-page) 0%,
+    #0a0f1a 100%
+  );
+}
+
+/* 顶部 Header */
+[data-theme="dark"] .solver-header {
+  background: transparent;
+}
+
+[data-theme="dark"] .main-title {
+  background: linear-gradient(120deg, var(--dm-text-primary), var(--dm-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .sub-title {
+  color: var(--dm-text-muted);
+}
+
+/* 页面标题 */
+[data-theme="dark"] .page-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .page-title .highlight {
+  color: var(--dm-accent);
+}
+
+/* 扫描按钮 */
+[data-theme="dark"] .btn-scan-glass .svgContainer {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+[data-theme="dark"] .btn-scan-glass:hover .svgContainer {
+  background-color: rgba(96, 165, 250, 0.2);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+/* 求解按钮 */
+[data-theme="dark"] .btn-solve-fly {
+  background: var(--dm-accent);
+  box-shadow: 0 4px 15px rgba(96, 165, 250, 0.4);
+}
+
+[data-theme="dark"] .btn-solve-fly:hover {
+  background: var(--dm-accent-hover);
+}
+
+/* 重置按钮 */
+[data-theme="dark"] .btn-reset-minimal {
+  background: transparent;
+  border-color: rgba(248, 113, 113, 0.4);
+  color: var(--dm-accent-error);
+}
+
+[data-theme="dark"] .btn-reset-minimal:hover {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: var(--dm-accent-error);
+}
+
+/* 3D 视图区域 */
+[data-theme="dark"] .view-3d-box {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .step-counter {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .curr {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .total {
+  color: var(--dm-text-muted);
+}
+
+/* 2D 编辑区域 */
+[data-theme="dark"] .view-2d-box {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .box-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .palette-toolbar {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .palette-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .palette-item {
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-sm);
+}
+
+[data-theme="dark"] .palette-item.active {
+  border-color: var(--dm-accent);
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+}
+
+[data-theme="dark"] .face-wrapper {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .face-wrapper:hover {
+  border-color: var(--dm-border-light);
+  background: var(--dm-bg-card);
+}
+
+[data-theme="dark"] .face-id {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .hint-text {
+  color: var(--dm-text-muted);
+}
+
+/* 底部控制区域 */
+[data-theme="dark"] .solver-footer {
+  background: var(--dm-bg-card);
+  box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .speed-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .play-btn {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+}
+
+[data-theme="dark"] .play-btn:not(:disabled):hover {
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.5);
+}
+
+/* 主卡片 */
+[data-theme="dark"] .solver-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  box-shadow: var(--dm-shadow-md);
+}
+
+/* 扫描状态 */
+[data-theme="dark"] .scan-status {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .scan-status.status-ready {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
+[data-theme="dark"] .scan-status.status-active {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+[data-theme="dark"] .scan-status.status-busy {
+  background: rgba(251, 146, 60, 0.1);
+  border-color: rgba(251, 146, 60, 0.2);
+}
+
+[data-theme="dark"] .status-text {
+  color: var(--dm-text-secondary);
+}
+
+/* 预览区域 */
+[data-theme="dark"] .preview-section {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .preview-label {
+  color: var(--dm-text-muted);
+}
+
+/* 控制按钮 */
+[data-theme="dark"] .action-btn {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .action-btn:hover {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border-hover);
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .action-btn.primary {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .action-btn.primary:hover {
+  background: var(--dm-accent-hover);
+  border-color: var(--dm-accent-hover);
+}
+
+/* 步骤面板 */
+[data-theme="dark"] .steps-panel {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .panel-header {
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .panel-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .step-count {
+  color: var(--dm-text-muted);
+}
+
+/* 速度控制 */
+[data-theme="dark"] .speed-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .nav-btn {
+  border-color: var(--dm-border);
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .nav-btn:not(:disabled):hover {
+  border-color: var(--dm-accent);
+  color: var(--dm-accent);
+  background: rgba(96, 165, 250, 0.1);
+}
+
+/* 步骤进度条 */
+[data-theme="dark"] .steps-progress-bar {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .step-node {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .step-node.is-active {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+  box-shadow: 0 10px 20px rgba(96, 165, 250, 0.3);
+}
+
+[data-theme="dark"] .step-node.is-active .node-move {
+  color: #0f172a;
+}
+
+[data-theme="dark"] .step-node.is-active .node-idx {
+  color: rgba(15, 23, 42, 0.7);
+}
+
+[data-theme="dark"] .node-move {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .node-idx {
+  color: var(--dm-text-muted);
+}
+
+/* 结果区域 */
+[data-theme="dark"] .result-section {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .result-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .result-value {
+  color: var(--dm-text-primary);
+}
+
+/* 错误提示 */
+[data-theme="dark"] .error-message {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.2);
+  color: var(--dm-accent-error);
+}
 </style>

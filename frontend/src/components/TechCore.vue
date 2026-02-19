@@ -287,4 +287,50 @@ input[type="range"] {
   margin-top: 8px;
   line-height: 1.4;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] .lab-container {
+  background: var(--dm-bg-card);
+  border: 2px solid var(--dm-border);
+}
+
+[data-theme="dark"] .control-panel {
+  background: var(--dm-bg-page);
+  border-left: 2px solid var(--dm-border);
+  color: var(--dm-text-body);
+}
+
+[data-theme="dark"] .title {
+  border-bottom: 2px solid var(--dm-accent);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .module {
+  border-bottom: 1px solid var(--dm-border);
+}
+
+[data-theme="dark"] .module h3 {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .toggle-group label {
+  color: var(--dm-text-body);
+}
+
+[data-theme="dark"] button {
+  background: var(--dm-accent);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] button:hover {
+  background: var(--dm-accent-hover);
+}
+
+[data-theme="dark"] .slider-item {
+  color: var(--dm-text-body);
+}
+
+[data-theme="dark"] .tip {
+  color: var(--dm-text-muted);
+}
 </style>
