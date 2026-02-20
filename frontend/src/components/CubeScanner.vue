@@ -88,6 +88,13 @@
           </div>
         </div>
       </div>
+
+      <!-- 识别加载遮罩 -->
+      <Transition name="loading-fade">
+        <div v-if="isRecognizing" class="recognize-loading-overlay">
+          <CubeSpinner size="large" text="正在识别魔方颜色..." />
+        </div>
+      </Transition>
     </div>
   </transition>
 </template>
@@ -95,14 +102,16 @@
 <script setup>
 import { ref, watch, nextTick, computed, onUnmounted } from "vue";
 import { Close, Aim } from "@element-plus/icons-vue";
-import { ElMessage, ElLoading } from "element-plus";
+import { ElMessage } from "element-plus";
 import { recognizeCube } from "../api/cubeService.js";
+import CubeSpinner from "./CubeSpinner.vue";
 
 const props = defineProps({ visible: Boolean });
 const emit = defineEmits(["close", "scanned"]);
 
 const videoRef = ref(null);
 const isProcessing = ref(false);
+const isRecognizing = ref(false);
 let activeStream = null;
 
 // 扫描顺序 F L R B U D
@@ -203,50 +212,31 @@ const capture = () => {
 const finishScanning = async () => {
   if (isProcessing.value) return;
   isProcessing.value = true;
-
-  // 使用 Element Plus 的全屏 Loading，给用户一种正在“深度计算”的视觉感
-  const loading = ElLoading.service({
-    lock: true,
-    text: "正在上传并识别魔方颜色...",
-    background: "rgba(255, 255, 255, 0.7)",
-  });
+  isRecognizing.value = true;
 
   try {
-    // 1. 构造请求体，与后端 Body(payload) 对应
     const payload = {
-      images: scannedImages.value, // { 'F': 'base64...', 'L': '...', ... }
+      images: scannedImages.value,
     };
 
-    // 2. 发送请求给 FastAPI 后端
     const response = await recognizeCube(payload);
 
     if (response.data.success) {
       ElMessage.success("识别成功！");
-
-      // 3. 将后端返回的识别结果 (3x3矩阵数据) 发给父组件
-      // 这样 SolverView 就可以打开“颜色纠错面板”了
       emit("scanned", response.data.data);
-
-      // 4. 识别成功才自动关闭扫描器
       close();
     } else {
-      // 后端返回识别不全 (比如只识别了 4/6)
       throw new Error(response.data.error || "识别失败，请检查魔方放置位置");
     }
   } catch (error) {
     console.error("Recognition Error:", error);
-
-    // 如果失败了，不要关闭扫描器，让用户有机会重拍
     ElMessage({
       message: error.message || "网络连接失败，请检查后端服务是否开启",
       type: "error",
       duration: 5000,
     });
-
-    // 可以在这里提供一个“重置”当前进度的选项
-    // 或者保持当前已经拍好的图片，让用户手动点“重拍”
   } finally {
-    loading.close();
+    isRecognizing.value = false;
     isProcessing.value = false;
   }
 };
@@ -562,6 +552,34 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.loading-fade-enter-active,
+.loading-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.loading-fade-enter-from,
+.loading-fade-leave-to {
+  opacity: 0;
+}
+
+.recognize-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border-radius: 24px;
+  z-index: 10;
+}
+
+[data-theme="dark"] .recognize-loading-overlay {
+  background: rgba(15, 23, 42, 0.9);
 }
 
 /* Dark Mode Styles */

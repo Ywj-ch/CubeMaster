@@ -12,7 +12,7 @@
         <button
           class="btn-scan-glass"
           @click="openScanner"
-          :disabled="scanning"
+          :disabled="scanning || loading || hasSolved"
         >
           <span class="svgContainer">
             <el-icon v-if="scanning" class="is-loading"><Loading /></el-icon>
@@ -29,7 +29,7 @@
         <button
           class="btn-solve-fly"
           @click="fetchSolution"
-          :disabled="loading"
+          :disabled="loading || hasSolved"
         >
           <div class="svg-wrapper-1">
             <div class="svg-wrapper">
@@ -424,16 +424,28 @@ function jumpToStep(index) {
 }
 
 async function resetCube() {
+  let message = "";
+  let title = "重置确认";
+
+  if (hasSolved.value) {
+    title = "开始新的求解";
+    message =
+      "求解已完成。如需重新扫描识别或重新求解，请先重置魔方状态。\n\n当前求解进度将丢失，确定要重置吗？";
+  } else if (scanning.value || loading.value) {
+    title = "取消当前操作";
+    message = "当前正在进行操作，确定要取消并重置吗？";
+  } else {
+    message = "确定要重置魔方吗？当前状态将被清空。";
+  }
+
   try {
-    await ElMessageBox.confirm(
-      "确定要重置魔方吗？当前求解进度将丢失。",
-      "重置确认",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      },
-    );
+    await ElMessageBox.confirm(message, title, {
+      confirmButtonText: "确定重置",
+      cancelButtonText: "取消",
+      type: "warning",
+      customClass: "reset-confirm-dialog",
+      distinguishCancelAndClose: true,
+    });
     stopAutoPlay();
     cubeState.value = createCubeFromJson();
     steps.value = [];
@@ -441,7 +453,7 @@ async function resetCube() {
     currentStep.value = 0;
     hasSolved.value = false;
     activeColor.value = "white";
-    ElMessage.success("魔方已重置");
+    ElMessage.success("魔方已重置，可以开始新的扫描");
   } catch (error) {
     // 用户点击取消
   }
@@ -1240,5 +1252,126 @@ onUnmounted(() => {
   background: rgba(248, 113, 113, 0.1);
   border-color: rgba(248, 113, 113, 0.2);
   color: var(--dm-accent-error);
+}
+</style>
+
+<!-- 全局样式：重置确认弹窗美化 -->
+<style>
+.reset-confirm-dialog {
+  border-radius: 16px !important;
+  padding: 8px !important;
+  overflow: hidden;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+.reset-confirm-dialog .el-message-box__header {
+  padding: 20px 20px 10px !important;
+  background: linear-gradient(135deg, #fef3f2 0%, #fff 100%);
+  border-bottom: 1px solid #fee2e2;
+}
+
+.reset-confirm-dialog .el-message-box__title {
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  color: #334155 !important;
+}
+
+.reset-confirm-dialog .el-message-box__content {
+  padding: 20px !important;
+}
+
+.reset-confirm-dialog .el-message-box__message {
+  color: #64748b !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  white-space: pre-line !important;
+}
+
+.reset-confirm-dialog .el-message-box__btns {
+  padding: 15px 20px 20px !important;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.reset-confirm-dialog .el-message-box__btns button {
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.reset-confirm-dialog .el-button--primary {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+.reset-confirm-dialog .el-button--primary:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4) !important;
+}
+
+.reset-confirm-dialog .el-button--default {
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+  background: #fff !important;
+}
+
+.reset-confirm-dialog .el-button--default:hover {
+  border-color: #cbd5e1 !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+}
+
+.reset-confirm-dialog .el-message-box__status {
+  font-size: 24px !important;
+}
+
+/* 黑夜模式适配 */
+[data-theme="dark"] .reset-confirm-dialog {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-message-box__header {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+  border-bottom-color: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-message-box__title {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-message-box__content {
+  background: transparent;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-message-box__message {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-button--primary {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-button--primary:hover {
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5) !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-button--default {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-button--default:hover {
+  background: #475569 !important;
+  border-color: #64748b !important;
+  color: #f1f5f9 !important;
 }
 </style>

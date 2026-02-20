@@ -29,11 +29,11 @@
         <div class="stats-pills">
           <div class="stat-pill">
             <span class="dot-indicator blue"></span>
-            <span>70+ 天开发周期</span>
+            <span>90+ 天开发周期</span>
           </div>
           <div class="stat-pill">
             <span class="dot-indicator green"></span>
-            <span>150+ 次代码提交</span>
+            <span>100+ 次代码提交</span>
           </div>
           <div class="stat-pill">
             <span class="dot-indicator purple"></span>
@@ -48,7 +48,7 @@
       <h2 class="section-heading">开发历程时间轴</h2>
       <p class="section-sub">从项目初始化到功能完善的完整记录</p>
 
-      <div class="roadmap-wrapper">
+      <div class="roadmap-wrapper" ref="roadmapRef">
         <!-- 贯穿线 -->
         <div class="roadmap-line"></div>
 
@@ -57,30 +57,72 @@
           v-for="(milestone, index) in milestones"
           :key="index"
           class="roadmap-node"
+          :class="{ 'is-expanded': expandedIndex === index }"
         >
           <div class="node-marker">
             <div class="marker-circle">{{ milestone.icon }}</div>
           </div>
 
-          <div class="node-card">
-            <div class="card-header">
-              <div class="header-left">
-                <h3 class="step-title">{{ milestone.title }}</h3>
-                <span class="step-date">{{ milestone.date }}</span>
+          <div class="node-content-wrapper">
+            <div
+              class="node-card"
+              :class="{ 'is-expanded': expandedIndex === index }"
+              @click="toggleNode(index)"
+            >
+              <div class="card-header">
+                <div class="header-left">
+                  <h3 class="step-title">{{ milestone.title }}</h3>
+                  <span class="step-date">{{ milestone.date }}</span>
+                </div>
+                <div
+                  class="expand-indicator"
+                  v-if="milestone.subNodes && milestone.subNodes.length"
+                >
+                  <el-icon :class="{ 'is-rotated': expandedIndex === index }"
+                    ><ArrowRight
+                  /></el-icon>
+                </div>
+              </div>
+              <div class="card-body">
+                <p>{{ milestone.description }}</p>
+                <div class="step-meta">
+                  <span class="meta-tag">{{ milestone.phase }}</span>
+                </div>
+                <div class="tech-tags" v-if="milestone.tech.length">
+                  <span
+                    class="tech-tag"
+                    v-for="tech in milestone.tech"
+                    :key="tech"
+                    >{{ tech }}</span
+                  >
+                </div>
               </div>
             </div>
-            <div class="card-body">
-              <p>{{ milestone.description }}</p>
-              <div class="step-meta">
-                <span class="meta-tag">{{ milestone.phase }}</span>
-              </div>
-              <div class="tech-tags" v-if="milestone.tech.length">
-                <span
-                  class="tech-tag"
-                  v-for="tech in milestone.tech"
-                  :key="tech"
-                  >{{ tech }}</span
+
+            <!-- 子节点面板 -->
+            <div
+              class="sub-nodes-panel"
+              v-if="milestone.subNodes && milestone.subNodes.length"
+              :class="{ 'is-visible': expandedIndex === index }"
+            >
+              <div class="sub-nodes-header">
+                <span class="sub-label">详细记录</span>
+                <span class="sub-count"
+                  >{{ milestone.subNodes.length }} 项</span
                 >
+              </div>
+              <div class="sub-nodes-grid">
+                <div
+                  class="sub-node-card"
+                  v-for="(sub, subIdx) in milestone.subNodes"
+                  :key="subIdx"
+                >
+                  <div class="sub-date">{{ sub.date }}</div>
+                  <div class="sub-content">
+                    <h4 class="sub-title">{{ sub.title }}</h4>
+                    <p class="sub-desc">{{ sub.desc }}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -312,7 +354,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import {
   ArrowRight,
@@ -324,6 +366,8 @@ import {
 
 const router = useRouter();
 const activeNames = ref("1");
+const expandedIndex = ref(null);
+const roadmapRef = ref(null);
 
 // --- 自定义指令：滚动入场动画 ---
 const vAnimate = {
@@ -378,6 +422,18 @@ const milestones = [
     description:
       "完成项目结构初始化，确立前后端分离架构。创建基础工程结构、配置开发环境，为后续开发奠定基础。",
     tech: ["Vue 3", "FastAPI", "Python"],
+    subNodes: [
+      {
+        date: "12-03",
+        title: "项目结构创建",
+        desc: "初始化工程目录与依赖配置",
+      },
+      {
+        date: "12-03",
+        title: "kociemba算法集成",
+        desc: "引入二阶段求解算法核心",
+      },
+    ],
   },
   {
     date: "2025-12-22",
@@ -387,6 +443,19 @@ const milestones = [
     description:
       "引入Vue3 + Vite构建前端，后端通过API提供魔方求解服务。建立前后端通信机制，实现基础数据流。",
     tech: ["Vite", "RESTful API", "CORS"],
+    subNodes: [
+      { date: "12-22", title: "Vue3前端工程", desc: "使用Vite构建现代化前端" },
+      {
+        date: "12-26",
+        title: "魔方状态模型",
+        desc: "抽离状态模块，实现转动逻辑",
+      },
+      {
+        date: "12-27",
+        title: "2D展开图建模",
+        desc: "搭建六面展开布局与旋转联动",
+      },
+    ],
   },
   {
     date: "2026-01-01",
@@ -396,6 +465,30 @@ const milestones = [
     description:
       "完成3D魔方建模、渲染与还原流程。实现Cube3DView组件，支持原子化旋转动画和矩阵烘焙。",
     tech: ["Three.js", "WebGL", "动画系统"],
+    subNodes: [
+      { date: "12-28", title: "2D复原展示", desc: "完成魔方识别到2D展示功能" },
+      {
+        date: "01-01",
+        title: "3D建模渲染",
+        desc: "实现Cube3DView组件与动画系统",
+      },
+      { date: "01-04", title: "代码重构", desc: "优化后端注释，整理项目结构" },
+    ],
+  },
+  {
+    date: "2026-01-13",
+    icon: "✨",
+    title: "UI交互与系统架构",
+    phase: "交互优化",
+    description:
+      "完善系统路由架构，优化首页、3D练习与求解模块UI。增强3D交互体验与动画同步稳定性。",
+    tech: ["Vue Router", "Element Plus", "动画优化"],
+    subNodes: [
+      { date: "01-12", title: "路由架构", desc: "完善系统路由与页面布局" },
+      { date: "01-13", title: "3D交互增强", desc: "提升动画同步稳定性" },
+      { date: "01-15", title: "首页重构", desc: "重新设计首页视觉风格" },
+      { date: "01-16", title: "页眉页脚优化", desc: "美化全局布局组件" },
+    ],
   },
   {
     date: "2026-01-22",
@@ -405,15 +498,27 @@ const milestones = [
     description:
       "集成YOLOv8识别模型，实现魔方状态自动识别。重构3D交互组件，建立视觉识别全链路。",
     tech: ["YOLOv8", "OpenCV", "PyTorch"],
+    subNodes: [
+      { date: "01-18", title: "视觉识别全链路", desc: "实现双向状态同步逻辑" },
+      { date: "01-19", title: "前端路由重构", desc: "统一API请求管理" },
+      { date: "01-22", title: "YOLO模型集成", desc: "重构3D交互组件" },
+      { date: "01-25", title: "自由练习闭环", desc: "微调模型精度，单例重构" },
+    ],
   },
   {
     date: "2026-01-28",
     icon: "📚",
-    title: "学习模块框架搭建",
+    title: "学习模块与教学系统",
     phase: "教学系统",
     description:
       "完成学习模块框架，封装TutorialCube组件，实现层先法教学，建立算法教学体系。",
     tech: ["组件封装", "算法教学", "交互设计"],
+    subNodes: [
+      { date: "01-26", title: "胜利动画", desc: "添加撒花动效与调色板" },
+      { date: "01-28", title: "教学框架搭建", desc: "封装TutorialCube组件" },
+      { date: "01-31", title: "全站动效优化", desc: "深度优化交互动画" },
+      { date: "02-04", title: "2-Look章节", desc: "完善学习界面样式布局" },
+    ],
   },
   {
     date: "2026-02-05",
@@ -423,15 +528,29 @@ const milestones = [
     description:
       "新增CFOP简介独立页面，完成OLL/PLL算法库录入，重构通用算法教学框架。",
     tech: ["CFOP", "算法库", "UI美化"],
+    subNodes: [
+      { date: "02-05", title: "CFOP简介页", desc: "新增独立页面与导航" },
+      { date: "02-06", title: "PLL算法库", desc: "完善算法教学框架" },
+      { date: "02-07", title: "OLL算法库", desc: "录入21个OLL公式" },
+      { date: "02-09", title: "F2L算法库", desc: "完成CFOP完整算法集" },
+      { date: "02-12", title: "代码注释", desc: "完善核心模块文档" },
+    ],
   },
   {
-    date: "2026-02-13",
-    icon: "🧪",
-    title: "测试框架与性能优化",
+    date: "2026-02-19",
+    icon: "🌙",
+    title: "测试框架与黑夜模式",
     phase: "质量保障",
     description:
-      "后端添加API健康检查与测试框架，前端优化交互逻辑，完善项目文档与开发指南。",
-    tech: ["pytest", "性能监控", "文档完善"],
+      "后端添加API健康检查与测试框架，前端实现完整黑夜模式支持，添加魔方外观定制系统。",
+    tech: ["pytest", "黑夜模式", "定制系统"],
+    subNodes: [
+      { date: "02-13", title: "测试框架", desc: "添加pytest与API健康检查" },
+      { date: "02-13", title: "技术文档系统", desc: "新增4个深度技术文档页" },
+      { date: "02-16", title: "架构文档", desc: "更新数据流图与布局" },
+      { date: "02-18", title: "外观定制系统", desc: "材质/纹理/光照自定义" },
+      { date: "02-19", title: "黑夜模式", desc: "全站暗色主题适配" },
+    ],
   },
 ];
 
@@ -500,7 +619,30 @@ onMounted(() => {
     ".animate-entry, .animate-entry-right",
   );
   animElements.forEach((el) => observer.observe(el));
+
+  // 点击外部关闭展开的节点
+  document.addEventListener("click", handleOutsideClick);
 });
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleOutsideClick);
+});
+
+// 切换节点展开状态
+function toggleNode(index) {
+  if (expandedIndex.value === index) {
+    expandedIndex.value = null;
+  } else {
+    expandedIndex.value = index;
+  }
+}
+
+// 点击外部区域关闭展开
+function handleOutsideClick(e) {
+  if (roadmapRef.value && !roadmapRef.value.contains(e.target)) {
+    expandedIndex.value = null;
+  }
+}
 </script>
 
 <style scoped>
@@ -743,7 +885,7 @@ onMounted(() => {
 /* --- 2. 时间轴样式 --- */
 .roadmap-wrapper {
   position: relative;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding-left: 40px;
 }
@@ -768,21 +910,11 @@ onMounted(() => {
   margin-bottom: 0;
 }
 
-.roadmap-node:hover {
-  cursor: default;
-}
-
-.roadmap-node:hover .marker-circle {
-  border-color: #3b82f6;
-  color: #3b82f6;
-  transform: scale(1.1);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-}
-
-.roadmap-node:hover .node-card {
-  border-color: #3b82f6;
-  transform: translateX(10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+.node-content-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .node-marker {
@@ -811,12 +943,65 @@ onMounted(() => {
 }
 
 .node-card {
+  flex: 0 0 auto;
+  width: 400px;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
   padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  cursor: pointer;
+  transform: translateX(200px);
+}
+
+.node-card:hover {
+  border-color: #3b82f6;
+  transform: translateX(200px) translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.node-card.is-expanded {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+  transform: translateX(0);
+}
+
+.roadmap-node.is-expanded .node-marker .marker-circle {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.expand-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.expand-indicator .el-icon {
+  font-size: 14px;
+  color: #64748b;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expand-indicator .el-icon.is-rotated {
+  transform: rotate(90deg);
+  color: #3b82f6;
+}
+
+.node-card:hover .expand-indicator {
+  background: #eff6ff;
+}
+
+.node-card:hover .expand-indicator .el-icon {
+  color: #3b82f6;
 }
 
 .card-header {
@@ -885,6 +1070,106 @@ onMounted(() => {
   font-size: 12px;
   color: #475569;
   font-weight: 500;
+}
+
+/* --- 子节点面板样式 --- */
+.sub-nodes-panel {
+  flex: 1;
+  min-width: 0;
+  opacity: 0;
+  transform: translateX(20px);
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.sub-nodes-panel.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+  max-height: 600px;
+  pointer-events: auto;
+}
+
+.sub-nodes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.sub-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sub-count {
+  font-size: 12px;
+  color: #94a3b8;
+  background: #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.sub-nodes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sub-node-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  transition: all 0.25s;
+}
+
+.sub-node-card:hover {
+  border-color: #3b82f6;
+  background: #fafbff;
+  transform: translateX(4px);
+}
+
+.sub-date {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.sub-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sub-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.sub-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
 }
 
 /* --- 3. 技术文档导航 --- */
@@ -1270,6 +1555,40 @@ onMounted(() => {
 }
 
 /* --- 8. 响应式设计 --- */
+@media (max-width: 1024px) {
+  .node-content-wrapper {
+    flex-direction: column;
+  }
+
+  .node-card {
+    width: 100%;
+    max-width: 500px;
+    transform: translateX(0);
+  }
+
+  .node-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .node-card.is-expanded {
+    transform: translateX(0);
+  }
+
+  .sub-nodes-panel {
+    transform: translateY(10px);
+  }
+
+  .sub-nodes-panel.is-visible {
+    transform: translateY(0);
+    max-width: 100%;
+  }
+
+  .roadmap-node.is-expanded .node-marker .marker-circle {
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+}
+
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2.5rem;
@@ -1302,6 +1621,13 @@ onMounted(() => {
 
   .node-card {
     margin-left: 0;
+    width: 100%;
+    max-width: none;
+    transform: translateX(0);
+  }
+
+  .node-card:hover {
+    transform: translateY(-2px);
   }
 
   .docs-grid,
@@ -1312,6 +1638,20 @@ onMounted(() => {
 
   .tech-icons {
     grid-template-columns: 1fr;
+  }
+
+  .sub-nodes-panel {
+    max-width: 100%;
+  }
+
+  .sub-node-card {
+    padding: 12px;
+  }
+
+  .sub-date {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
   }
 }
 
@@ -1445,6 +1785,70 @@ onMounted(() => {
 [data-theme="dark"] .tech-tag {
   background: var(--dm-bg-hover);
   color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .expand-indicator {
+  background: var(--dm-bg-hover);
+}
+
+[data-theme="dark"] .expand-indicator .el-icon {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .expand-indicator .el-icon.is-rotated {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .node-card:hover .expand-indicator {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .node-card:hover .expand-indicator .el-icon {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .sub-nodes-header {
+  background: linear-gradient(
+    135deg,
+    var(--dm-bg-hover) 0%,
+    rgba(59, 130, 246, 0.05) 100%
+  );
+}
+
+[data-theme="dark"] .sub-label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .sub-count {
+  background: var(--dm-border);
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .sub-node-card {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .sub-node-card:hover {
+  border-color: var(--dm-accent);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+[data-theme="dark"] .sub-date {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2) 0%,
+    rgba(59, 130, 246, 0.1) 100%
+  );
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .sub-title {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .sub-desc {
+  color: var(--dm-text-muted);
 }
 
 [data-theme="dark"] .doc-card {

@@ -34,10 +34,7 @@
 
       <!-- 主题切换按钮 -->
       <div class="theme-toggle-wrapper">
-        <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '切换到亮色模式' : '切换到暗色模式'">
-          <el-icon v-if="isDark" class="theme-icon"><Sunny /></el-icon>
-          <el-icon v-else class="theme-icon"><Moon /></el-icon>
-        </button>
+        <ThemeSwitch :model-value="isDark" @update:model-value="toggleTheme" />
       </div>
     </header>
 
@@ -57,7 +54,7 @@
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useTheme } from "../composables/useTheme.js";
-import { Sunny, Moon } from "@element-plus/icons-vue";
+import ThemeSwitch from "../components/ThemeSwitch.vue";
 
 const showHeader = ref(true);
 const isScrolled = ref(false);
@@ -215,29 +212,6 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.theme-toggle-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  transform: scale(1.1);
-}
-
-.theme-icon {
-  font-size: 18px;
-  color: #64748b;
-}
-
 /* --- Content Area --- */
 .main-content {
   flex: 1;
@@ -277,13 +251,6 @@ onUnmounted(() => {
   }
   .site-name {
     display: none;
-  }
-  .theme-toggle-btn {
-    width: 32px;
-    height: 32px;
-  }
-  .theme-icon {
-    font-size: 16px;
   }
 }
 
@@ -331,19 +298,6 @@ onUnmounted(() => {
 
 [data-theme="dark"] .router-link-exact-active::after {
   background-color: var(--dm-accent);
-}
-
-/* 主题切换按钮 */
-[data-theme="dark"] .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-[data-theme="dark"] .theme-icon {
-  color: var(--dm-text-secondary);
 }
 
 /* 页脚版权 */
