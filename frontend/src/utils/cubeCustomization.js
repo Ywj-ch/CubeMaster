@@ -1,5 +1,16 @@
-// cubeCustomization.js
-// 魔方外观自定义配置管理
+/**
+ * @fileoverview 魔方外观自定义配置管理模块
+ * 
+ * 提供魔方 3D 渲染的外观配置管理功能，包括：
+ * - 材质类型和参数配置
+ * - 纹理系统（内置纹理和自定义上传）
+ * - 光照环境设置
+ * - 几何体形状配置
+ * 
+ * 配置数据持久化存储在 localStorage 中。
+ * 
+ * @module utils/cubeCustomization
+ */
 
 /**
  * 默认配置结构

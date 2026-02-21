@@ -1,5 +1,14 @@
-// useTheme.js
-// 主题管理组合式函数
+/**
+ * @fileoverview 主题管理组合式函数
+ * 
+ * 提供全局主题切换功能，支持：
+ * - 亮色/暗色主题切换
+ * - 跟随系统偏好 (auto 模式)
+ * - localStorage 持久化
+ * - Element Plus 暗色模式集成
+ * 
+ * @module composables/useTheme
+ */
 
 import { ref, onMounted, watch } from "vue";
 

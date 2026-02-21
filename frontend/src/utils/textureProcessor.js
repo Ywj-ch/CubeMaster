@@ -1,5 +1,13 @@
-// textureProcessor.js
-// 纹理图片处理工具
+/**
+ * @fileoverview 纹理图片处理工具模块
+ * 
+ * 提供用户上传纹理图片的处理功能，包括：
+ * - 图片压缩和尺寸调整
+ * - Base64 编码转换
+ * - 文件格式和大小验证
+ * 
+ * @module utils/textureProcessor
+ */
 
 /**
  * 压缩图片文件
