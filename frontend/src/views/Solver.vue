@@ -1338,7 +1338,11 @@ onUnmounted(() => {
 }
 
 [data-theme="dark"] .reset-confirm-dialog .el-message-box__header {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    transparent 100%
+  );
   border-bottom-color: rgba(239, 68, 68, 0.2);
 }
 

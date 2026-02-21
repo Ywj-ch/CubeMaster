@@ -15,10 +15,10 @@
 </template>
 
 <script setup>
-import { useLoading } from './composables/useLoading'
-import CubeSpinner from './components/CubeSpinner.vue'
+import { useLoading } from "./composables/useLoading";
+import CubeSpinner from "./components/CubeSpinner.vue";
 
-const { isLoading, loadingText } = useLoading()
+const { isLoading, loadingText } = useLoading();
 </script>
 
 <style>

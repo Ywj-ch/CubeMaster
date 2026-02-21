@@ -962,7 +962,11 @@ onUnmounted(() => {
 }
 
 [data-theme="dark"] .gradient-text {
-  background: linear-gradient(135deg, var(--dm-text-primary) 0%, var(--dm-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--dm-text-primary) 0%,
+    var(--dm-accent) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

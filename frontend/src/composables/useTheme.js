@@ -1,12 +1,12 @@
 /**
  * @fileoverview 主题管理组合式函数
- * 
+ *
  * 提供全局主题切换功能，支持：
  * - 亮色/暗色主题切换
  * - 跟随系统偏好 (auto 模式)
  * - localStorage 持久化
  * - Element Plus 暗色模式集成
- * 
+ *
  * @module composables/useTheme
  */
 
@@ -25,10 +25,10 @@ export function useTheme() {
 
   // 当前主题模式（light/dark/auto）
   const themeMode = ref(THEME_AUTO);
-  
+
   // 实际应用的主题（light/dark）
   const currentTheme = ref(THEME_LIGHT);
-  
+
   // 是否启用暗色主题
   const isDark = ref(false);
 
@@ -37,8 +37,8 @@ export function useTheme() {
    * @returns {string} 'light' 或 'dark'
    */
   function getSystemPreference() {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches 
-      ? THEME_DARK 
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? THEME_DARK
       : THEME_LIGHT;
   }
 
@@ -48,7 +48,11 @@ export function useTheme() {
   function loadSavedTheme() {
     try {
       const saved = localStorage.getItem(THEME_KEY);
-      if (saved === THEME_LIGHT || saved === THEME_DARK || saved === THEME_AUTO) {
+      if (
+        saved === THEME_LIGHT ||
+        saved === THEME_DARK ||
+        saved === THEME_AUTO
+      ) {
         themeMode.value = saved;
       } else {
         // 如果没有保存的设置，使用auto
@@ -76,20 +80,20 @@ export function useTheme() {
    */
   function updateAppliedTheme() {
     let applied;
-    
+
     if (themeMode.value === THEME_AUTO) {
       applied = getSystemPreference();
     } else {
       applied = themeMode.value;
     }
-    
+
     currentTheme.value = applied;
     isDark.value = applied === THEME_DARK;
-    
+
     // 更新html元素的data-theme属性
     const html = document.documentElement;
     html.setAttribute("data-theme", applied);
-    
+
     // 同时设置dark类名，用于Element Plus
     if (applied === THEME_DARK) {
       html.classList.add("dark");
@@ -107,7 +111,7 @@ export function useTheme() {
       console.warn(`无效的主题模式: ${mode}`);
       return;
     }
-    
+
     themeMode.value = mode;
     saveTheme();
     updateAppliedTheme();
@@ -134,7 +138,7 @@ export function useTheme() {
   function initTheme() {
     loadSavedTheme();
     updateAppliedTheme();
-    
+
     // 监听系统主题变化（仅当主题模式为auto时）
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleSystemChange = () => {
@@ -142,9 +146,9 @@ export function useTheme() {
         updateAppliedTheme();
       }
     };
-    
+
     mediaQuery.addEventListener("change", handleSystemChange);
-    
+
     // 返回清理函数
     return () => {
       mediaQuery.removeEventListener("change", handleSystemChange);
@@ -154,12 +158,12 @@ export function useTheme() {
   // 组件挂载时初始化
   onMounted(() => {
     const cleanup = initTheme();
-    
+
     // 监听themeMode变化
     const stopWatch = watch(themeMode, () => {
       updateAppliedTheme();
     });
-    
+
     // 组件卸载时清理
     return () => {
       cleanup();
@@ -172,12 +176,12 @@ export function useTheme() {
     themeMode,
     currentTheme,
     isDark,
-    
+
     // 方法
     setTheme,
     toggleTheme,
     getSystemPreference,
-    
+
     // 常量（用于UI）
     THEME_LIGHT,
     THEME_DARK,

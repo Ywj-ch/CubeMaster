@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { COLOR_MAP } from '../constants/colors'
+import { COLOR_MAP } from "../constants/colors";
 
 const props = defineProps({
   face: { type: Array, required: true },

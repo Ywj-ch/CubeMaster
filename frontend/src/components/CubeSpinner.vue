@@ -16,14 +16,14 @@
 defineProps({
   size: {
     type: String,
-    default: 'medium',
-    validator: (value) => ['small', 'medium', 'large'].includes(value)
+    default: "medium",
+    validator: (value) => ["small", "medium", "large"].includes(value),
   },
   text: {
     type: String,
-    default: ''
-  }
-})
+    default: "",
+  },
+});
 </script>
 
 <style scoped>

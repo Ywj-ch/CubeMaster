@@ -94,19 +94,19 @@ button:focus-visible {
   --dm-bg-section: #1e293b;
   --dm-bg-hover: #334155;
   --dm-bg-code: #020617;
-  
+
   /* 文字颜色 */
   --dm-text-primary: #f8fafc;
   --dm-text-secondary: #c4c7cb;
   --dm-text-body: #cbd5e1;
   --dm-text-muted: #94a3b8;
   --dm-text-light: #64748b;
-  
+
   /* 边框颜色 */
   --dm-border: #334155;
   --dm-border-light: #475569;
   --dm-border-hover: #64748b;
-  
+
   /* 强调色（暗色模式下提亮） */
   --dm-accent: #60a5fa;
   --dm-accent-hover: #93c5fd;
@@ -114,19 +114,19 @@ button:focus-visible {
   --dm-accent-success: #34d399;
   --dm-accent-warning: #fb923c;
   --dm-accent-error: #f87171;
-  
+
   /* 玻璃拟态效果 */
   --dm-glass-bg: rgba(30, 41, 59, 0.6);
   --dm-glass-bg-light: rgba(30, 41, 59, 0.4);
   --dm-glass-border: rgba(255, 255, 255, 0.1);
   --dm-glass-border-light: rgba(255, 255, 255, 0.05);
-  
+
   /* 阴影 */
   --dm-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
   --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --dm-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
   --dm-shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
-  
+
   /* 网格背景 */
   --dm-grid-bg: #0f172a;
   --dm-grid-line: #1e293b;
@@ -368,7 +368,11 @@ button:focus-visible {
   border-color: var(--dm-border);
 }
 
-[data-theme="dark"] .el-table--striped .el-table__body tr.el-table__row--striped td {
+[data-theme="dark"]
+  .el-table--striped
+  .el-table__body
+  tr.el-table__row--striped
+  td {
   background-color: var(--dm-bg-hover);
 }
 
@@ -417,7 +421,12 @@ button:focus-visible {
 }
 
 [data-theme="dark"] .el-skeleton__item {
-  background: linear-gradient(90deg, var(--dm-border) 25%, var(--dm-border-light) 37%, var(--dm-border) 63%);
+  background: linear-gradient(
+    90deg,
+    var(--dm-border) 25%,
+    var(--dm-border-light) 37%,
+    var(--dm-border) 63%
+  );
 }
 
 [data-theme="dark"] .el-empty__description {
