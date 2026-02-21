@@ -26,6 +26,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry";
 import { TextureLoader } from "three";
 import { getTextureUrl } from "../utils/cubeCustomization";
+import { COLOR_MAP } from "../constants/colors";
 
 // 纹理加载器与缓存
 const textureLoader = new TextureLoader();
@@ -67,21 +68,6 @@ const emit = defineEmits(["move"]);
 const DRAG_THRESHOLD = 35;
 /** @constant {Number} CUBIE_SIZE 单个小方块的几何尺寸 */
 const CUBIE_SIZE = 0.95;
-
-/**
- * @constant {Object} COLOR_MAP 颜色名称到 Hex 值的映射表
- * 包含内部暗色（internal）和未激活色（black）
- */
-const COLOR_MAP = {
-  white: "#FFFFFF",
-  yellow: "#FFD500",
-  red: "#C41E3A",
-  orange: "#FF5800",
-  blue: "#0051BA",
-  green: "#009E60",
-  internal: "#222222",
-  black: "#000000",
-};
 
 // =========================================================
 // 2. 核心：数据适配层 (Adapter)

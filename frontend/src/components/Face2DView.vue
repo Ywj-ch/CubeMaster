@@ -12,32 +12,22 @@
       v-for="(cell, index) in face.flat()"
       :key="index"
       class="cell"
-      :style="{ backgroundColor: colorMap[cell] }"
+      :style="{ backgroundColor: COLOR_MAP[cell] }"
       @click="handleCellClick(index)"
     ></div>
   </div>
 </template>
 
 <script setup>
+import { COLOR_MAP } from '../constants/colors'
+
 const props = defineProps({
   face: { type: Array, required: true },
-  // 新增：单元格大小，默认为 40px
   cellSize: { type: Number, default: 40 },
-  // 新增：是否可交互，默认为 true
   interactive: { type: Boolean, default: true },
 });
 
 const emit = defineEmits(["cell-click"]);
-
-const colorMap = {
-  white: "#FFFFFF",
-  yellow: "#FFD500",
-  red: "#C41E3A",
-  orange: "#FF5800",
-  blue: "#0051BA",
-  green: "#009E60",
-  black: "#000000",
-};
 
 const handleCellClick = (index) => {
   // 只有在可交互模式下才发送点击事件
