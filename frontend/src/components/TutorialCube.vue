@@ -26,74 +26,61 @@
 import { ref, onMounted, watch } from "vue";
 import Cube3DView from "../components/Cube3DView.vue";
 import {
-  SOLVED_STATE,
-  cloneState,
-  applyMove,
-  stateToColors,
-} from "../utils/cubeLogic.js";
+  SOLVED_STATE_NUMERIC,
+  cloneStateNumeric,
+  applyMoveNumeric,
+  numericToColors,
+} from "../utils/cubeMoves.js";
 
 const props = defineProps({
-  setup: { type: String, default: "" }, // 初始设置动作，如 "F2"
-  algorithm: { type: String, default: "" }, // 演示动作，如 "R U R'"
-  customization: { type: Object, default: null }, // 自定义外观配置
+  setup: { type: String, default: "" },
+  algorithm: { type: String, default: "" },
+  customization: { type: Object, default: null },
 });
 
-// 内部状态
-const currentLogicState = ref(cloneState(SOLVED_STATE)); // 数字状态
-const displayColors = ref([]); // 传给 3DView 的颜色字符串数组
+const currentLogicState = ref(cloneStateNumeric(SOLVED_STATE_NUMERIC));
+const displayColors = ref([]);
 const isAnimating = ref(false);
-const cubeViewRef = ref(null); // 获取 3DView 实例
+const cubeViewRef = ref(null);
 
-// 初始化魔方状态
 const initCube = () => {
-  // 1. 拿一个复原的魔方
-  let state = cloneState(SOLVED_STATE);
+  let state = cloneStateNumeric(SOLVED_STATE_NUMERIC);
 
-  // 2. 如果有 setup 步骤，瞬间执行完（不播放动画）
   if (props.setup) {
     const moves = props.setup.split(" ");
     moves.forEach((move) => {
-      if (move) state = applyMove(state, move);
+      if (move) state = applyMoveNumeric(state, move);
     });
   }
 
-  // 3. 更新 UI
   currentLogicState.value = state;
-  displayColors.value = stateToColors(state);
+  displayColors.value = numericToColors(state);
 };
 
-// 播放演示动画
 const playAlgorithm = async () => {
   if (isAnimating.value || !props.algorithm) return;
   isAnimating.value = true;
 
   const moves = props.algorithm.split(" ");
 
-  // 逐个执行动画
   for (const move of moves) {
     if (!move) continue;
 
-    // 1. 触发 3D 动画 (通过 ref 调用子组件方法，或者通过 prop 传递 trigger)
-    // 这里我们假设 Cube3DView 暴露了 executeMove 方法，或者我们通过更新状态来驱动
-    // 为了平滑动画，最好是调用 Cube3DView 的方法
     if (cubeViewRef.value) {
-      await cubeViewRef.value.triggerMove(move); // 假设子组件有这个方法
+      await cubeViewRef.value.triggerMove(move);
     }
 
-    // 2. 逻辑层同步更新 (防止动画和数据脱节)
-    currentLogicState.value = applyMove(currentLogicState.value, move);
+    currentLogicState.value = applyMoveNumeric(currentLogicState.value, move);
   }
 
   isAnimating.value = false;
 };
 
-// 暴露给父组件的方法
 defineExpose({
   play: playAlgorithm,
   reset: initCube,
 });
 
-// 监听 setup 变化（比如切换章节时），重置魔方
 watch(
   () => props.setup,
   () => {

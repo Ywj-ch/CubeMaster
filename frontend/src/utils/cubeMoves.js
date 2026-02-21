@@ -1,5 +1,131 @@
 // 控制魔方转动
-// 顺时针旋转一个面（3x3）
+import { COLOR_NAMES, COLOR_INDEX } from '../constants/colors'
+
+/**
+ * @fileoverview 魔方旋转逻辑模块
+ * 
+ * 提供魔方状态管理和旋转操作，支持对象格式和数字数组格式的状态表示。
+ * 对象格式: { faces: { U:[], D:[], F:[], B:[], L:[], R:[] } }
+ * 数字数组格式: [[9个颜色], [9个颜色], ...] 共6面
+ * 
+ * @module utils/cubeMoves
+ */
+
+/**
+ * 复原状态的魔方（对象格式）
+ * @constant {Object}
+ */
+export const SOLVED_STATE = {
+  faces: {
+    U: Array(9).fill('white'),
+    D: Array(9).fill('yellow'),
+    F: Array(9).fill('red'),
+    B: Array(9).fill('orange'),
+    L: Array(9).fill('blue'),
+    R: Array(9).fill('green')
+  }
+}
+
+/**
+ * 复原状态的魔方（数字数组格式）
+ * 索引顺序: 0=U(白), 1=D(黄), 2=F(红), 3=B(橙), 4=L(蓝), 5=R(绿)
+ * @constant {number[][]}
+ */
+export const SOLVED_STATE_NUMERIC = [
+  Array(9).fill(0),
+  Array(9).fill(1),
+  Array(9).fill(2),
+  Array(9).fill(3),
+  Array(9).fill(4),
+  Array(9).fill(5)
+]
+
+/**
+ * 深拷贝魔方状态（对象格式）
+ * @param {Object} cube - 魔方状态对象
+ * @returns {Object} 深拷贝的状态
+ */
+export function cloneState(cube) {
+  return {
+    faces: {
+      U: [...cube.faces.U],
+      D: [...cube.faces.D],
+      F: [...cube.faces.F],
+      B: [...cube.faces.B],
+      L: [...cube.faces.L],
+      R: [...cube.faces.R]
+    }
+  }
+}
+
+/**
+ * 深拷贝魔方状态（数字数组格式）
+ * @param {number[][]} state - 数字数组状态
+ * @returns {number[][]} 深拷贝的状态
+ */
+export function cloneStateNumeric(state) {
+  return state.map(face => [...face])
+}
+
+/**
+ * 将数字数组状态转换为对象状态
+ * @param {number[][]} numericState - 6x9 数字数组
+ * @returns {Object} 对象格式的魔方状态
+ */
+export function numericToObject(numericState) {
+  const faceOrder = ['U', 'D', 'F', 'B', 'L', 'R']
+  const faces = {}
+  
+  faceOrder.forEach((face, idx) => {
+    faces[face] = numericState[idx].map(colorIdx => COLOR_NAMES[colorIdx])
+  })
+  
+  return { faces }
+}
+
+/**
+ * 将对象状态转换为数字数组状态
+ * @param {Object} objectState - 对象格式的魔方状态
+ * @returns {number[][]} 6x9 数字数组
+ */
+export function objectToNumeric(objectState) {
+  const faceOrder = ['U', 'D', 'F', 'B', 'L', 'R']
+  
+  return faceOrder.map(face => 
+    objectState.faces[face].map(color => COLOR_INDEX[color] ?? 0)
+  )
+}
+
+/**
+ * 将对象状态转换为 Cube3DView 需要的颜色数组格式
+ * @param {Object} cube - 对象格式的魔方状态
+ * @returns {string[][]} 颜色字符串数组 [[U的9色], [R的9色], [F的9色], [D的9色], [L的9色], [B的9色]]
+ */
+export function stateToColors(cube) {
+  return [
+    cube.faces.U,
+    cube.faces.R,
+    cube.faces.F,
+    cube.faces.D,
+    cube.faces.L,
+    cube.faces.B
+  ]
+}
+
+/**
+ * 将数字数组状态转换为颜色字符串数组
+ * @param {number[][]} state - 数字数组状态
+ * @returns {string[][]} 颜色字符串数组
+ */
+export function numericToColors(state) {
+  return state.map(face => face.map(colorIdx => COLOR_NAMES[colorIdx]))
+}
+
+/**
+ * 顺时针旋转一个面（3x3）
+ * @param {Array} face - 面的9个元素数组
+ * @returns {Array} 旋转后的面
+ */
 function rotateFaceCW(face) {
   return [
     face[6],
@@ -166,4 +292,16 @@ export function invertMove(move) {
   if (suffix === "'") return face;
   if (suffix === "2") return move;
   return face + "'";
+}
+
+/**
+ * 对数字数组状态应用移动（兼容 cubeLogic 接口）
+ * @param {number[][]} state - 数字数组状态
+ * @param {string} move - 移动指令
+ * @returns {number[][]} 新状态
+ */
+export function applyMoveNumeric(state, move) {
+  const cube = numericToObject(state)
+  applyMove(cube, move)
+  return objectToNumeric(cube)
 }
