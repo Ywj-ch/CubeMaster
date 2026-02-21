@@ -79,3 +79,6 @@ yolo_train/runs/
 /twophase/move_u_edges
 /twophase/move_ud_edges
 
+/scripts/Export-GitLogs.ps1
+/scripts/project_context.md
+/scripts/Project_Dev_Context.md

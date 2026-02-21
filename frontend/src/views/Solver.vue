@@ -215,6 +215,12 @@
           </div>
         </el-scrollbar>
       </div>
+
+      <div class="keyboard-hint" v-if="hasSolved">
+        <span><kbd>←</kbd> 上一步</span>
+        <span><kbd>→</kbd> 下一步</span>
+        <span><kbd>Space</kbd> 播放/暂停</span>
+      </div>
     </div>
   </div>
 
@@ -228,7 +234,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onUnmounted, watch } from "vue";
+import { ref, nextTick, onMounted, onUnmounted, watch } from "vue";
 import { solveCube, saveCubeState } from "../api/cubeService.js";
 import { createCubeFromJson } from "../utils/cubeState";
 import { applyMove, invertMove } from "../utils/cubeMoves";
@@ -367,6 +373,34 @@ function stopAutoPlay() {
   }
 }
 
+function handleKeydown(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  
+  switch (e.key) {
+    case 'ArrowLeft':
+      e.preventDefault();
+      prevStep();
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      nextStep();
+      break;
+    case ' ':
+      e.preventDefault();
+      toggleAutoPlay();
+      break;
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown);
+  stopAutoPlay();
+});
+
 watch(demoSpeed, () => {
   if (isAutoPlaying.value) {
     stopAutoPlay();
@@ -458,10 +492,6 @@ async function resetCube() {
     // 用户点击取消
   }
 }
-
-onUnmounted(() => {
-  stopAutoPlay();
-});
 </script>
 
 <style scoped>
@@ -1377,5 +1407,38 @@ onUnmounted(() => {
   background: #475569 !important;
   border-color: #64748b !important;
   color: #f1f5f9 !important;
+}
+
+/* 键盘快捷键提示 */
+.keyboard-hint {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.keyboard-hint kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin-right: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .keyboard-hint {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .keyboard-hint kbd {
+  background: var(--dm-bg-hover);
+  border-color: var(--dm-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 </style>

@@ -41,7 +41,7 @@
             </div>
             <div class="stat-pill">
               <span class="dot-indicator purple"></span>
-              <span>代码行数：20,000+ 行</span>
+              <span>代码行数：30,000+ 行</span>
             </div>
           </div>
         </div>

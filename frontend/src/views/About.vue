@@ -33,7 +33,7 @@
           </div>
           <div class="stat-pill">
             <span class="dot-indicator green"></span>
-            <span>100+ 次代码提交</span>
+            <span>60+ 次代码提交</span>
           </div>
           <div class="stat-pill">
             <span class="dot-indicator purple"></span>

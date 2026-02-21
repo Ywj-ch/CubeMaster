@@ -21,31 +21,31 @@
 
 ### 1. 首页展示
 
-> ![首页展示图1](doc/images/首页展示图1.png)
+> ![首页展示图1](docs/images/首页展示图1.png)
 >
-> ![首页展示图2](doc/images/首页展示图2.png)
+> ![首页展示图2](docs/images/首页展示图2.png)
 >
-> ![首页展示图3](doc/images/首页展示图3.png)
+> ![首页展示图3](docs/images/首页展示图3.png)
 
 ### 2. 自由练习模式展示
 
-> ![自由练习展示图](doc/images/自由练习展示图.png)
+> ![自由练习展示图](docs/images/自由练习展示图.png)
 
 ### 3. 求解器展示
 
-> ![求解器界面展示图](doc/images/求解器界面展示图.png)
+> ![求解器界面展示图](docs/images/求解器界面展示图.png)
 >
-> ![状态识别展示图](doc/images/状态识别展示图.png)
+> ![状态识别展示图](docs/images/状态识别展示图.png)
 >
-> ![求解过程中展示](doc/images/求解过程中展示.png)
+> ![求解过程中展示](docs/images/求解过程中展示.png)
 
 ### 4. 教学模块展示
 
-> ![教学展示1](doc/images/教学展示1.png)
+> ![教学展示1](docs/images/教学展示1.png)
 >
-> ![教学展示2](doc/images/教学展示2.png)
+> ![教学展示2](docs/images/教学展示2.png)
 >
-> ![教学展示3](doc/images/教学展示3.png)
+> ![教学展示3](docs/images/教学展示3.png)
 
 ---
 
@@ -53,11 +53,11 @@
 
 ### 系统整体框架图
 
-> <img src="doc/images/系统整体框架图.png" alt="系统整体框架图" style="zoom:25%;" />
+> <img src="docs/images/系统整体框架图.png" alt="系统整体框架图" style="zoom:25%;" />
 
 ### 求解器数据流图
 
-> <img src="doc/images/求解器数据流图.png" alt="求解器数据流图" style="zoom:25%;" />
+> <img src="docs/images/求解器数据流图.png" alt="求解器数据流图" style="zoom:25%;" />
 
 ### 技术栈详细列表
 
@@ -164,7 +164,7 @@ npm run dev
 
 ### 2. 二维视角
 
-<img src="doc/images/2D魔方展开图.png" alt="2D魔方展开图" style="zoom:60%;" />
+<img src="docs/images/2D魔方展开图.png" alt="2D魔方展开图" style="zoom:60%;" />
 
 ### 3. 面位缩写
 - **U (Up)**：顶面（白色中心）  

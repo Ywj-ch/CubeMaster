@@ -76,11 +76,19 @@ def merge_project(root_dir, output_file):
 
 
 if __name__ == "__main__":
-    # 配置：如果你想合并当前文件夹下的代码，就用 '.'
-    # 结果会保存到 project_context.md
-    target_project = '.'
-    output_filename = 'project_context.md'
-
-    print(f"开始合并项目: {Path(target_project).absolute()}")
-    merge_project(target_project, output_filename)
+    # 获取脚本所在目录
+    script_dir = Path(__file__).parent.resolve()
+    
+    # 从脚本目录向上查找项目根目录（通过 .git 文件夹识别）
+    project_root = script_dir
+    while project_root != project_root.parent:
+        if (project_root / '.git').exists():
+            break
+        project_root = project_root.parent
+    
+    # 输出文件保存在脚本所在目录
+    output_filename = script_dir / 'project_context.md'
+    
+    print(f"开始合并项目: {project_root}")
+    merge_project(project_root, output_filename)
     print(f"\n✅ 完成！合并结果已保存至: {output_filename}")
