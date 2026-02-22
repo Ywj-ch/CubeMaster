@@ -35,6 +35,7 @@ __pycache__/
 venv/
 env/
 backend/cube_results/
+backend/images/*.png
 
 # 环境变量
 .env
