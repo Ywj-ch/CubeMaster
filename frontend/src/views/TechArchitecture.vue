@@ -533,7 +533,7 @@ const closeImagePreview = () => {
 
 // 返回 About 页面
 const goBackToAbout = () => {
-  router.push("/about");
+  router.push({ path: "/about", state: { scrollTarget: "tech-docs" } });
 };
 
 // 返回顶部
@@ -1139,6 +1139,7 @@ onUnmounted(() => {
   background: #f8fafc;
   border-radius: 16px;
   border-left: 4px solid #42b883;
+  text-align: left;
 }
 
 .frontend-module h3 {
@@ -1234,6 +1235,10 @@ onUnmounted(() => {
   font-weight: 800;
   color: #1e293b;
   margin: 0;
+}
+
+.service-details {
+  text-align: left;
 }
 
 .service-details p {
@@ -1378,6 +1383,7 @@ onUnmounted(() => {
   border-radius: 20px;
   padding: 30px;
   border: 1px solid #e2e8f0;
+  text-align: left;
 }
 
 .deploy-card h3 {
@@ -1419,6 +1425,7 @@ onUnmounted(() => {
   border-radius: 20px;
   padding: 30px;
   border: 1px solid #e2e8f0;
+  text-align: left;
 }
 
 .scaling-card h3 {
@@ -1667,6 +1674,7 @@ onUnmounted(() => {
   padding: 24px;
   border-radius: 16px;
   border-left: 4px solid #3b82f6;
+  text-align: left;
 }
 
 .data-flow-description p {
@@ -1872,6 +1880,7 @@ onUnmounted(() => {
 
 [data-theme="dark"] .frontend-module {
   background: var(--dm-bg-hover);
+  text-align: left;
 }
 
 [data-theme="dark"] .frontend-module h3,
@@ -1911,6 +1920,7 @@ onUnmounted(() => {
 [data-theme="dark"] .data-flow-description {
   background: var(--dm-bg-hover);
   border-left-color: var(--dm-accent);
+  text-align: left;
 }
 
 [data-theme="dark"] .data-flow-description p,
@@ -1931,6 +1941,7 @@ onUnmounted(() => {
 [data-theme="dark"] .scaling-card {
   background: var(--dm-bg-card);
   border-color: var(--dm-border);
+  text-align: left;
 }
 
 [data-theme="dark"] .deploy-card h3,
@@ -2014,5 +2025,22 @@ onUnmounted(() => {
 
 [data-theme="dark"] .image-caption-modal {
   color: var(--dm-text-muted);
+}
+
+/* 修复 strong 标签在暗色模式下的颜色 */
+[data-theme="dark"] .frontend-module li strong,
+[data-theme="dark"] .service-details p strong,
+[data-theme="dark"] .service-details li strong,
+[data-theme="dark"] .overview-description p strong,
+[data-theme="dark"] .deploy-card li strong,
+[data-theme="dark"] .scaling-card p strong,
+[data-theme="dark"] .data-flow-description li strong {
+  color: var(--dm-text-primary);
+}
+
+/* 修复代码块居中问题 */
+[data-theme="dark"] .service-details,
+[data-theme="dark"] .service-details .code-snippet {
+  text-align: left;
 }
 </style>

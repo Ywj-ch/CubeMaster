@@ -27,7 +27,7 @@
 
           <p class="hero-subtitle">
             探索 CubeMaster 如何利用 Three.js 和 WebGL 在浏览器中实现流畅的 3D
-            魔方渲染、 旋转动画和交互操作，提供沉浸式的学习体验。
+            魔方渲染、旋转动画和交互操作，提供沉浸式的学习体验。
           </p>
 
           <div class="stats-pills">
@@ -50,68 +50,63 @@
       <!-- Core Architecture -->
       <section class="section-block" v-animate>
         <h2 class="section-heading">核心架构</h2>
-        <div class="architecture-diagram">
-          <div class="arch-layer">
-            <div class="layer-header">
-              <div class="layer-number">1</div>
-              <h3>场景图 (Scene Graph)</h3>
+        <div class="architecture-grid">
+          <div class="arch-card">
+            <div class="arch-header">
+              <div class="arch-number">01</div>
+              <h3>场景图</h3>
             </div>
-            <div class="layer-content">
-              <p>层次化对象管理，父子关系定义魔方块的空间位置</p>
-              <ul>
-                <li><strong>Scene</strong>：根容器，包含所有渲染对象</li>
-                <li><strong>Group</strong>：魔方整体容器，便于整体变换</li>
-                <li>
-                  <strong>Mesh</strong>：27 个立方体网格，每个代表一个小块
-                </li>
-                <li><strong>Material</strong>：PBR 材质，支持光泽和反射</li>
-              </ul>
-            </div>
+            <p class="arch-desc">
+              层次化对象管理，父子关系定义魔方块的空间位置
+            </p>
+            <ul class="arch-list">
+              <li><strong>Scene</strong>：根容器，包含所有渲染对象</li>
+              <li><strong>Group</strong>：魔方整体容器，便于整体变换</li>
+              <li><strong>Mesh</strong>：27 个立方体网格，每个代表一个小块</li>
+              <li><strong>Material</strong>：PBR 材质，支持光泽和反射</li>
+            </ul>
           </div>
 
-          <div class="arch-layer">
-            <div class="layer-header">
-              <div class="layer-number">2</div>
-              <h3>渲染管线 (Render Pipeline)</h3>
+          <div class="arch-card">
+            <div class="arch-header">
+              <div class="arch-number">02</div>
+              <h3>渲染管线</h3>
             </div>
-            <div class="layer-content">
-              <p>WebGL 底层渲染优化，确保流畅性能</p>
-              <ul>
-                <li><strong>Renderer</strong>：WebGLRenderer，硬件加速</li>
-                <li><strong>Camera</strong>：PerspectiveCamera，透视投影</li>
-                <li><strong>Lighting</strong>：环境光 + 方向光 + 点光源</li>
-                <li><strong>Shadow</strong>：软阴影映射，增强立体感</li>
-              </ul>
-            </div>
+            <p class="arch-desc">WebGL 底层渲染优化，确保流畅性能</p>
+            <ul class="arch-list">
+              <li><strong>Renderer</strong>：WebGLRenderer，硬件加速</li>
+              <li><strong>Camera</strong>：PerspectiveCamera，透视投影</li>
+              <li><strong>Lighting</strong>：环境光 + 方向光 + 点光源</li>
+              <li><strong>Shadow</strong>：软阴影映射，增强立体感</li>
+            </ul>
           </div>
 
-          <div class="arch-layer">
-            <div class="layer-header">
-              <div class="layer-number">3</div>
-              <h3>交互系统 (Interaction)</h3>
+          <div class="arch-card">
+            <div class="arch-header">
+              <div class="arch-number">03</div>
+              <h3>交互系统</h3>
             </div>
-            <div class="layer-content">
-              <p>用户输入处理与动画系统</p>
-              <ul>
-                <li><strong>Raycaster</strong>：鼠标/触摸点击检测</li>
-                <li><strong>OrbitControls</strong>：摄像机轨道控制</li>
-                <li>
-                  <strong>Animation Loop</strong>：requestAnimationFrame 循环
-                </li>
-                <li><strong>Tweening</strong>：GSAP 补间动画库</li>
-              </ul>
-            </div>
+            <p class="arch-desc">用户输入处理与动画系统</p>
+            <ul class="arch-list">
+              <li><strong>Raycaster</strong>：鼠标/触摸点击检测</li>
+              <li><strong>OrbitControls</strong>：摄像机轨道控制</li>
+              <li>
+                <strong>Animation Loop</strong>：requestAnimationFrame 循环
+              </li>
+              <li><strong>Tweening</strong>：GSAP 补间动画库</li>
+            </ul>
           </div>
         </div>
       </section>
 
-      <!-- Cube Representation -->
+      <!-- Data Structure -->
       <section class="section-block" v-animate>
         <h2 class="section-heading">魔方数据结构</h2>
-        <div class="data-representation">
-          <div class="data-card">
-            <h3><span class="data-icon">🧊</span> 几何表示</h3>
-            <div class="code-snippet">
+        <div class="two-column-grid">
+          <div class="content-card">
+            <h3>几何表示</h3>
+            <p class="card-desc">3x3 离散点阵坐标系生成基础魔方块位置</p>
+            <div class="code-block">
               <pre><code>// 生成基础 3x3 离散点阵坐标系
 const generateBaseCubies = () => {
   const positions = [];
@@ -128,20 +123,21 @@ const generateBaseCubies = () => {
 // 小方块类型分类
 const getCubieType = (x, y, z) => {
   const sum = Math.abs(x) + Math.abs(y) + Math.abs(z);
-  if (sum === 3) return 'corner';     // 角块 (x,y,z 均不为 0)
-  if (sum === 2) return 'edge';       // 棱块 (两个坐标不为 0)
-  if (sum === 1) return 'center';     // 中心块 (一个坐标不为 0)
-  return 'core';                      // 核心块 (0,0,0)
+  if (sum === 3) return 'corner';     // 角块
+  if (sum === 2) return 'edge';       // 棱块
+  if (sum === 1) return 'center';     // 中心块
+  return 'core';                      // 核心块
 };</code></pre>
             </div>
           </div>
 
-          <div class="data-card">
-            <h3><span class="data-icon">🎨</span> 颜色映射</h3>
-            <ul>
+          <div class="content-card">
+            <h3>颜色映射</h3>
+            <p class="card-desc">标准配色方案，支持多种材质和纹理</p>
+            <ul class="feature-list">
               <li>
                 <strong>标准配色</strong
-                >：白(U)、红(R)、蓝(B)、橙(O)、绿(G)、黄(D)
+                >：白(U)、红(R)、蓝(L)、橙(F)、绿(B)、黄(D)
               </li>
               <li>
                 <strong>材质系统</strong>：每个面独立 Material，支持高光和反光
@@ -149,7 +145,7 @@ const getCubieType = (x, y, z) => {
               <li>
                 <strong>纹理选项</strong>：纯色、磨砂、光泽、半透明多种预设
               </li>
-              <li><strong>状态同步</strong>：颜色数组 ↔ 3D 渲染实时同步</li>
+              <li><strong>状态同步</strong>：颜色数组与 3D 渲染实时同步</li>
             </ul>
             <div class="color-preview">
               <div class="color-swatch" style="background: #ffffff">U</div>
@@ -163,13 +159,102 @@ const getCubieType = (x, y, z) => {
         </div>
       </section>
 
+      <!-- Customization System -->
+      <section class="section-block" v-animate>
+        <h2 class="section-heading">魔方外观定制系统</h2>
+        <p class="section-desc">
+          通过 useCubeCustomization
+          组合式函数，用户可以自定义魔方的材质、纹理、光照和几何参数，打造独特的视觉体验。
+        </p>
+
+        <div class="customization-grid">
+          <div class="custom-card">
+            <div class="custom-icon">🎨</div>
+            <h3>材质系统</h3>
+            <p class="custom-desc">四种材质类型，满足不同视觉效果需求</p>
+            <ul class="custom-list">
+              <li><strong>Standard</strong>：标准材质，平衡性能与效果</li>
+              <li><strong>Metal</strong>：金属材质，高反光质感</li>
+              <li><strong>Glass</strong>：玻璃材质，半透明效果</li>
+              <li><strong>Toon</strong>：卡通材质，漫画风格渲染</li>
+            </ul>
+          </div>
+
+          <div class="custom-card">
+            <div class="custom-icon">🖼️</div>
+            <h3>纹理系统</h3>
+            <p class="custom-desc">内置纹理与自定义上传双重支持</p>
+            <ul class="custom-list">
+              <li><strong>内置纹理</strong>：木纹、碳纤维、金属拉丝等</li>
+              <li><strong>自定义上传</strong>：支持 JPG/PNG 格式图片</li>
+              <li><strong>Base64 转换</strong>：前端处理，无需后端存储</li>
+              <li><strong>UV 映射</strong>：正确的纹理坐标映射</li>
+            </ul>
+          </div>
+
+          <div class="custom-card">
+            <div class="custom-icon">💡</div>
+            <h3>光照配置</h3>
+            <p class="custom-desc">动态调节光照参数，改变魔方视觉效果</p>
+            <ul class="custom-list">
+              <li><strong>环境光强度</strong>：控制整体亮度</li>
+              <li><strong>方向光强度</strong>：主光源明暗调节</li>
+              <li><strong>方向光颜色</strong>：支持自定义光源色温</li>
+              <li><strong>实时预览</strong>：参数调整即时生效</li>
+            </ul>
+          </div>
+
+          <div class="custom-card">
+            <div class="custom-icon">🔷</div>
+            <h3>几何体参数</h3>
+            <p class="custom-desc">调整魔方块形状，创造不同风格</p>
+            <ul class="custom-list">
+              <li><strong>圆角半径</strong>：0-0.5 可调节</li>
+              <li><strong>方块间隙</strong>：控制块间缝隙大小</li>
+              <li><strong>整体尺寸</strong>：缩放比例调节</li>
+              <li><strong>比例保持</strong>：等比缩放防止变形</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="config-code">
+          <h3>配置持久化</h3>
+          <p class="code-desc">
+            使用 localStorage 保存用户配置，刷新页面后自动恢复
+          </p>
+          <div class="code-block">
+            <pre><code>// useCubeCustomization.js
+export function useCubeCustomization() {
+  const config = ref(loadConfig()); // 从 localStorage 加载
+  
+  // 自动保存（防抖）
+  watch(config, () => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveConfig(config.value);
+    }, 1000);
+  }, { deep: true });
+  
+  return {
+    config,
+    updateConfig,
+    resetToDefault,
+    uploadCustomTexture,
+    // ... 其他方法
+  };
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
       <!-- Animation System -->
       <section class="section-block" v-animate>
         <h2 class="section-heading">动画系统</h2>
-        <div class="animation-system">
-          <div class="anim-card">
-            <h3><span class="anim-icon">🔄</span> 旋转动画</h3>
-            <div class="code-snippet">
+        <div class="animation-layout">
+          <div class="animation-main">
+            <h3>旋转动画实现</h3>
+            <p class="anim-desc">基于 requestAnimationFrame 的高性能旋转动画</p>
+            <div class="code-block">
               <pre><code>// 执行单层旋转动画
 async function rotateLayer(layer, direction, angle = 90) {
   // 1. 确定受影响的小块
@@ -190,17 +275,13 @@ async function rotateLayer(layer, direction, angle = 90) {
       const progress = Math.min(elapsed / duration, 1);
       const eased = easeOutCubic(progress);
       
-      // 计算当前角度
       const currentAngle = angle * eased * (direction === 'clockwise' ? 1 : -1);
-      
-      // 应用旋转
       const axis = getAxisForLayer(layer);
       container.rotation[axis] = THREE.MathUtils.degToRad(currentAngle);
       
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // 动画完成，更新逻辑状态
         updateCubeStateAfterRotation(layer, direction);
         scene.remove(container);
         resolve();
@@ -213,9 +294,9 @@ async function rotateLayer(layer, direction, angle = 90) {
             </div>
           </div>
 
-          <div class="anim-card">
-            <h3><span class="anim-icon">⚡</span> 性能优化</h3>
-            <ul>
+          <div class="animation-side">
+            <h3>性能优化</h3>
+            <ul class="optimization-list">
               <li>
                 <strong>对象复用</strong>：几何体和材质实例共享，减少内存占用
               </li>
@@ -230,56 +311,54 @@ async function rotateLayer(layer, direction, angle = 90) {
         </div>
       </section>
 
-      <!-- Interaction Implementation -->
+      <!-- Interaction -->
       <section class="section-block" v-animate>
         <h2 class="section-heading">交互实现</h2>
-        <div class="interaction-details">
-          <div class="interaction-step">
-            <div class="step-number">1</div>
-            <div class="step-content">
+        <div class="interaction-list">
+          <div class="interaction-item">
+            <div class="item-number">1</div>
+            <div class="item-content">
               <h3>点击检测</h3>
               <p>
                 使用 Raycaster
                 从鼠标位置发射射线，与魔方块求交，确定点击的面和层。
               </p>
-              <div class="code-snippet small">
+              <div class="code-snippet-small">
                 <pre><code>const raycaster = new THREE.Raycaster();
 raycaster.setFromCamera(mouse, camera);
 const intersects = raycaster.intersectObjects(cubies);
 if (intersects.length > 0) {
   const clickedCubie = intersects[0].object;
   const faceNormal = getClickedFace(intersects[0].face);
-  return { cubie: clickedCubie, face: faceNormal };
 }</code></pre>
               </div>
             </div>
           </div>
 
-          <div class="interaction-step">
-            <div class="step-number">2</div>
-            <div class="step-content">
+          <div class="interaction-item">
+            <div class="item-number">2</div>
+            <div class="item-content">
               <h3>拖动识别</h3>
               <p>跟踪鼠标移动向量，确定旋转方向和层，阈值处理避免误操作。</p>
-              <div class="code-snippet small">
+              <div class="code-snippet-small">
                 <pre><code>const dragVector = new THREE.Vector2(
   currentMouse.x - startMouse.x,
   currentMouse.y - startMouse.y
 );
 if (dragVector.length() > DRAG_THRESHOLD) {
   const axis = determineRotationAxis(dragVector, clickedFace);
-  const direction = determineRotationDirection(dragVector, axis);
   rotateLayer(getLayerFromAxisAndFace(axis, clickedFace), direction);
 }</code></pre>
               </div>
             </div>
           </div>
 
-          <div class="interaction-step">
-            <div class="step-number">3</div>
-            <div class="step-content">
+          <div class="interaction-item">
+            <div class="item-number">3</div>
+            <div class="item-content">
               <h3>动画队列</h3>
               <p>顺序执行旋转动画，支持撤销/重做，确保状态一致性。</p>
-              <div class="code-snippet small">
+              <div class="code-snippet-small">
                 <pre><code>class AnimationQueue {
   constructor() {
     this.queue = [];
@@ -294,8 +373,7 @@ if (dragVector.length() > DRAG_THRESHOLD) {
   async process() {
     this.isAnimating = true;
     while (this.queue.length > 0) {
-      const animation = this.queue.shift();
-      await animation();
+      await this.queue.shift()();
     }
     this.isAnimating = false;
   }
@@ -306,54 +384,45 @@ if (dragVector.length() > DRAG_THRESHOLD) {
         </div>
       </section>
 
-      <!-- Performance Metrics -->
+      <!-- Performance -->
       <section class="section-block" v-animate>
         <h2 class="section-heading">性能指标</h2>
-        <div class="performance-metrics">
-          <div class="metric-grid">
-            <div class="metric-card">
-              <div class="metric-value">60</div>
-              <div class="metric-label">FPS</div>
-              <div class="metric-desc">目标帧率 (vsync 同步)</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">&lt; 16ms</div>
-              <div class="metric-label">帧时间</div>
-              <div class="metric-desc">每帧渲染时间</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">27</div>
-              <div class="metric-label">绘制调用</div>
-              <div class="metric-desc">InstancedMesh 优化</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">12MB</div>
-              <div class="metric-label">内存占用</div>
-              <div class="metric-desc">几何体 + 纹理 + 程序</div>
-            </div>
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <div class="metric-value">60</div>
+            <div class="metric-label">FPS</div>
+            <div class="metric-desc">目标帧率 (vsync 同步)</div>
           </div>
+          <div class="metric-item">
+            <div class="metric-value">&lt; 16ms</div>
+            <div class="metric-label">帧时间</div>
+            <div class="metric-desc">每帧渲染时间</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value">27</div>
+            <div class="metric-label">绘制调用</div>
+            <div class="metric-desc">InstancedMesh 优化</div>
+          </div>
+        </div>
 
-          <div class="optimization-tips">
-            <h3>优化技巧</h3>
-            <ul>
-              <li>
-                <strong>几何体合并</strong>：将多个 Mesh 合并为单个，减少 draw
-                calls
-              </li>
-              <li>
-                <strong>纹理图集</strong>：将多个小纹理合并为大图，减少纹理切换
-              </li>
-              <li>
-                <strong>细节层次 (LOD)</strong
-                >：远距离使用简化模型，提升渲染速度
-              </li>
-              <li><strong>视锥剔除</strong>：只渲染摄像机可见范围内的对象</li>
-              <li>
-                <strong>WebWorker</strong>：复杂计算移至 Worker
-                线程，避免阻塞渲染
-              </li>
-            </ul>
-          </div>
+        <div class="optimization-tips-box">
+          <h3>优化技巧</h3>
+          <ul class="tips-list">
+            <li>
+              <strong>几何体合并</strong>：将多个 Mesh 合并为单个，减少 draw
+              calls
+            </li>
+            <li>
+              <strong>纹理图集</strong>：将多个小纹理合并为大图，减少纹理切换
+            </li>
+            <li>
+              <strong>细节层次 (LOD)</strong>：远距离使用简化模型，提升渲染速度
+            </li>
+            <li><strong>视锥剔除</strong>：只渲染摄像机可见范围内的对象</li>
+            <li>
+              <strong>WebWorker</strong>：复杂计算移至 Worker 线程，避免阻塞渲染
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -361,8 +430,9 @@ if (dragVector.length() > DRAG_THRESHOLD) {
       <section class="section-block" v-animate>
         <h2 class="section-heading">技术挑战</h2>
         <div class="challenges-grid">
-          <div class="challenge-card">
-            <h3><span class="challenge-icon">📱</span> 移动端适配</h3>
+          <div class="challenge-box">
+            <div class="challenge-icon">📱</div>
+            <h3>移动端适配</h3>
             <p>
               <strong>问题</strong>：移动设备 GPU 性能有限，触摸交互精度要求高
             </p>
@@ -371,8 +441,9 @@ if (dragVector.length() > DRAG_THRESHOLD) {
               >：响应式设计，简化阴影和反射，增大触摸热区
             </p>
           </div>
-          <div class="challenge-card">
-            <h3><span class="challenge-icon">🌐</span> 浏览器兼容</h3>
+          <div class="challenge-box">
+            <div class="challenge-icon">🌐</div>
+            <h3>浏览器兼容</h3>
             <p>
               <strong>问题</strong>：不同浏览器 WebGL 实现差异，扩展支持不一致
             </p>
@@ -381,8 +452,9 @@ if (dragVector.length() > DRAG_THRESHOLD) {
               3D)
             </p>
           </div>
-          <div class="challenge-card">
-            <h3><span class="challenge-icon">⚙️</span> 状态同步</h3>
+          <div class="challenge-box">
+            <div class="challenge-icon">⚙️</div>
+            <h3>状态同步</h3>
             <p><strong>问题</strong>：3D 渲染状态与逻辑状态需要严格同步</p>
             <p>
               <strong>解决方案</strong>：单一数据源，状态变更通过中央控制器分发
@@ -454,7 +526,7 @@ const vAnimate = {
 
 // 返回 About 页面
 const goBackToAbout = () => {
-  router.push("/about");
+  router.push({ path: "/about", state: { scrollTarget: "tech-docs" } });
 };
 
 // 返回顶部
@@ -469,7 +541,6 @@ const handleScroll = () => {
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
-  // 初始检查
   handleScroll();
 });
 
@@ -479,12 +550,16 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* === 基础样式 (从 TechYolo.vue 复制) === */
+/* 基础样式 */
 .tech-doc-page {
   width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
-  font-family: "Inter", sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   color: #0f172a;
   padding-bottom: 100px;
   overflow-x: hidden;
@@ -541,6 +616,7 @@ onUnmounted(() => {
   z-index: 1;
   max-width: 800px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .badge-pill {
@@ -561,19 +637,16 @@ onUnmounted(() => {
   background: #2563eb;
   border-radius: 50%;
   margin-right: 8px;
-  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 6px rgba(37, 99, 235, 0);
-  }
+  0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }
 
@@ -601,6 +674,7 @@ onUnmounted(() => {
 .stats-pills {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
 }
 
@@ -616,7 +690,6 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 600;
   color: #334155;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .dot-indicator {
@@ -642,463 +715,149 @@ onUnmounted(() => {
   font-size: 2rem;
   font-weight: 800;
   color: #0f172a;
+  margin-bottom: 24px;
+}
+.section-desc {
+  font-size: 1.125rem;
+  color: #64748b;
   margin-bottom: 40px;
+  line-height: 1.6;
 }
 .text-center {
   text-align: center;
 }
 
-/* 技术概览网格 */
-.tech-overview-card {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #e2e8f0;
+/* 核心架构 - 3列网格 */
+.architecture-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
 
-.overview-grid {
+.arch-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.arch-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.arch-number {
+  width: 36px;
+  height: 36px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.arch-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.arch-desc {
+  color: #64748b;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.arch-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.arch-list li {
+  color: #64748b;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.arch-list li strong {
+  color: #1e293b;
+}
+
+/* 两列布局 */
+.two-column-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 30px;
 }
 
-@media (max-width: 768px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.overview-item {
-  text-align: center;
-}
-
-.overview-icon {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-}
-
-.overview-item h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #1e293b;
-}
-
-.overview-item p {
-  color: #64748b;
-  line-height: 1.6;
-}
-
-/* 工作流程 */
-.workflow-diagram {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #e2e8f0;
-}
-
-.workflow-step {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 30px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid #f1f5f9;
-}
-.workflow-step:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.step-number {
-  width: 50px;
-  height: 50px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.step-content h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #1e293b;
-}
-
-.step-content p {
-  color: #64748b;
-  line-height: 1.6;
-}
-
-/* 训练详情 */
-.training-details {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-@media (max-width: 992px) {
-  .training-details {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .training-details {
-    grid-template-columns: 1fr;
-  }
-}
-
-.detail-card {
+.content-card {
   background: #ffffff;
   border-radius: 20px;
   padding: 30px;
   border: 1px solid #e2e8f0;
+  text-align: left;
 }
 
-.detail-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.detail-card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.detail-card li {
-  margin-bottom: 12px;
-  color: #64748b;
-  line-height: 1.6;
-  padding-left: 0;
-}
-
-.detail-card li strong {
-  color: #1e293b;
-}
-
-/* 集成卡片 */
-.integration-card {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #e2e8f0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-
-.code-snippet {
-  background: #0f172a;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.snippet-header {
-  background: #1e293b;
-  color: #cbd5e1;
-  padding: 16px 24px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.code-snippet pre {
-  margin: 0;
-  padding: 24px;
-  overflow-x: auto;
-}
-
-.code-snippet code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  color: #e2e8f0;
-  line-height: 1.6;
-}
-
-.integration-note h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #1e293b;
-}
-
-.integration-note ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.integration-note li {
-  margin-bottom: 12px;
-  color: #64748b;
-  line-height: 1.6;
-  padding-left: 0;
-}
-
-.integration-note li strong {
-  color: #1e293b;
-}
-
-/* 挑战网格 */
-.challenges-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-@media (max-width: 992px) {
-  .challenges-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .challenges-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.challenge-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #e2e8f0;
-}
-
-.challenge-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.challenge-emoji {
-  font-size: 2rem;
-}
-
-.challenge-card h3 {
+.content-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: #1e293b;
-  margin: 0;
-}
-
-.challenge-card p {
-  color: #64748b;
-  line-height: 1.6;
   margin-bottom: 12px;
 }
 
-/* 导航卡片 */
-.navigation-section {
-  margin-top: 80px;
-}
-
-.nav-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-@media (max-width: 768px) {
-  .nav-cards {
-    grid-template-columns: 1fr;
-  }
-}
-
-.nav-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #e2e8f0;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s;
-  text-align: center;
-}
-
-.nav-card:hover {
-  transform: translateY(-5px);
-  border-color: #3b82f6;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.nav-icon {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-}
-
-.nav-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #1e293b;
-}
-
-.nav-card p {
+.card-desc {
   color: #64748b;
-  font-size: 0.95rem;
-}
-
-/* 响应式基础 */
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
-  }
-  .integration-card {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* === 特定于 Three.js 页面的样式 === */
-
-/* 架构图示 */
-.architecture-diagram {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #e2e8f0;
-}
-
-.arch-layer {
-  display: flex;
-  gap: 24px;
-  padding: 30px;
-  background: #f8fafc;
-  border-radius: 20px;
-  border-left: 4px solid #3b82f6;
-}
-
-.layer-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-width: 200px;
-}
-
-.layer-number {
-  width: 40px;
-  height: 40px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.layer-header h3 {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #1e293b;
-  margin: 0;
-}
-
-.layer-content {
-  flex: 1;
-}
-
-.layer-content p {
-  color: #64748b;
-  margin-bottom: 16px;
-  font-weight: 600;
-}
-
-.layer-content ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.layer-content li {
-  color: #64748b;
-  margin-bottom: 8px;
-  padding-left: 0;
-}
-
-.layer-content li strong {
-  color: #1e293b;
-}
-
-/* 数据表示 */
-.data-representation {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 40px;
-}
-
-.data-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #e2e8f0;
-}
-
-.data-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
   margin-bottom: 20px;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  line-height: 1.5;
 }
 
-.code-snippet {
-  background: #0f172a;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.code-snippet pre {
-  margin: 0;
-  padding: 24px;
-  overflow-x: auto;
-}
-
-.code-snippet code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  color: #e2e8f0;
-  line-height: 1.6;
-}
-
-.data-card ul {
+.feature-list {
   list-style: none;
   padding: 0;
   margin: 0 0 20px 0;
 }
 
-.data-card li {
-  margin-bottom: 12px;
+.feature-list li {
   color: #64748b;
-  line-height: 1.6;
-  padding-left: 0;
+  margin-bottom: 12px;
+  line-height: 1.5;
 }
 
-.data-card li strong {
+.feature-list li strong {
   color: #1e293b;
 }
 
+/* 代码块 */
+.code-block {
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.code-block code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+
+/* 颜色预览 */
 .color-preview {
   display: flex;
   gap: 12px;
@@ -1106,129 +865,230 @@ onUnmounted(() => {
 }
 
 .color-swatch {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
+  font-size: 14px;
   color: rgba(0, 0, 0, 0.7);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
-/* 动画系统 */
-.animation-system {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 40px;
-}
-
-.anim-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #e2e8f0;
-}
-
-.anim-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* 交互步骤 */
-.interaction-details {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #e2e8f0;
-}
-
-.interaction-step {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 40px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid #f1f5f9;
-}
-.interaction-step:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.step-number {
-  width: 50px;
-  height: 50px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.step-content {
-  flex: 1;
-}
-
-.step-content h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #1e293b;
-}
-
-.step-content p {
-  color: #64748b;
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
-
-.code-snippet.small {
-  background: #0f172a;
-  border: 1px solid #334155;
-}
-
-.code-snippet.small pre {
-  padding: 16px;
-}
-
-.code-snippet.small code {
-  color: #e2e8f0;
-  font-size: 13px;
-}
-
-/* 性能指标 */
-.performance-metrics {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #e2e8f0;
-}
-
-.metric-grid {
+/* 定制系统 - 4列网格 */
+.customization-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 40px;
 }
 
-.metric-card {
-  background: #f8fafc;
-  border-radius: 16px;
-  padding: 30px;
-  text-align: center;
+.custom-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
   border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.custom-icon {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+.custom-card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.custom-desc {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.custom-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.custom-list li {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.custom-list li strong {
+  color: #1e293b;
+}
+
+.config-code {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.config-code h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.code-desc {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+/* 动画系统 */
+.animation-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.animation-main {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.animation-main h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.anim-desc {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.animation-side {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.animation-side h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.optimization-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.optimization-list li {
+  color: #64748b;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.optimization-list li strong {
+  color: #1e293b;
+}
+
+/* 交互实现 - 垂直列表 */
+.interaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.interaction-item {
+  display: flex;
+  gap: 24px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.item-number {
+  width: 36px;
+  height: 36px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.item-content {
+  flex: 1;
+}
+
+.item-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.item-content p {
+  color: #64748b;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.code-snippet-small {
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.code-snippet-small pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.code-snippet-small code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: #e2e8f0;
+  line-height: 1.5;
+}
+
+/* 性能指标 */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.metric-item {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
 }
 
 .metric-value {
@@ -1248,40 +1108,42 @@ onUnmounted(() => {
 }
 
 .metric-desc {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: #64748b;
 }
 
-.optimization-tips h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #1e293b;
+.optimization-tips-box {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
 }
 
-.optimization-tips ul {
+.optimization-tips-box h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.tips-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 
-@media (max-width: 768px) {
-  .optimization-tips ul {
-    grid-template-columns: 1fr;
-  }
-}
-
-.optimization-tips li {
+.tips-list li {
   color: #64748b;
-  line-height: 1.6;
+  line-height: 1.5;
   padding-left: 24px;
   position: relative;
 }
 
-.optimization-tips li:before {
+.tips-list li:before {
   content: "✓";
   color: #10b981;
   position: absolute;
@@ -1289,50 +1151,45 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
-.optimization-tips li strong {
+.tips-list li strong {
   color: #1e293b;
 }
 
-/* 挑战网格 */
+/* 技术挑战 */
 .challenges-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-@media (max-width: 992px) {
-  .challenges-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .challenges-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.challenge-card {
+.challenge-box {
   background: #ffffff;
   border-radius: 20px;
   padding: 30px;
   border: 1px solid #e2e8f0;
+  text-align: left;
 }
 
-.challenge-card h3 {
+.challenge-icon {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+.challenge-box h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 16px;
   color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.challenge-card p {
+.challenge-box p {
   color: #64748b;
-  line-height: 1.6;
   margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.challenge-box p strong {
+  color: #1e293b;
 }
 
 /* 导航卡片 */
@@ -1344,12 +1201,6 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-}
-
-@media (max-width: 768px) {
-  .nav-cards {
-    grid-template-columns: 1fr;
-  }
 }
 
 .nav-card {
@@ -1386,34 +1237,7 @@ onUnmounted(() => {
   font-size: 0.95rem;
 }
 
-/* 响应式 */
-@media (max-width: 992px) {
-  .architecture-diagram {
-    padding: 24px;
-  }
-  .arch-layer {
-    flex-direction: column;
-    gap: 16px;
-  }
-  .data-representation,
-  .animation-system {
-    grid-template-columns: 1fr;
-  }
-  .metric-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .challenges-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 576px) {
-  .metric-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 技术文档头部和返回按钮 */
+/* 返回按钮 */
 .tech-doc-header {
   margin-top: 30px;
   margin-bottom: 20px;
@@ -1468,13 +1292,61 @@ onUnmounted(() => {
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
-/* 移动端适配 */
+/* 响应式 */
+@media (max-width: 992px) {
+  .architecture-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .customization-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .animation-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  .back-to-top-btn {
-    bottom: 20px;
-    right: 20px;
-    width: 45px;
-    height: 45px;
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .architecture-grid {
+    grid-template-columns: 1fr;
+  }
+  .two-column-grid {
+    grid-template-columns: 1fr;
+  }
+  .customization-grid {
+    grid-template-columns: 1fr;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .challenges-grid {
+    grid-template-columns: 1fr;
+  }
+  .nav-cards {
+    grid-template-columns: 1fr;
+  }
+  .tips-list {
+    grid-template-columns: 1fr;
+  }
+  .stats-pills {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .interaction-item {
+    flex-direction: column;
+  }
+  .item-number {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 }
 
@@ -1525,96 +1397,73 @@ onUnmounted(() => {
   color: var(--dm-text-primary);
 }
 
-[data-theme="dark"] .architecture-diagram {
+[data-theme="dark"] .section-desc {
+  color: var(--dm-text-secondary);
+}
+
+[data-theme="dark"] .arch-card,
+[data-theme="dark"] .content-card,
+[data-theme="dark"] .custom-card,
+[data-theme="dark"] .config-code,
+[data-theme="dark"] .animation-main,
+[data-theme="dark"] .animation-side,
+[data-theme="dark"] .interaction-item,
+[data-theme="dark"] .metric-item,
+[data-theme="dark"] .optimization-tips-box,
+[data-theme="dark"] .challenge-box,
+[data-theme="dark"] .nav-card {
   background: var(--dm-bg-card);
   border-color: var(--dm-border);
 }
 
-[data-theme="dark"] .arch-layer {
-  background: var(--dm-bg-hover);
-  border-left-color: var(--dm-accent);
-}
-
-[data-theme="dark"] .layer-header h3 {
+[data-theme="dark"] .arch-header h3,
+[data-theme="dark"] .content-card h3,
+[data-theme="dark"] .custom-card h3,
+[data-theme="dark"] .config-code h3,
+[data-theme="dark"] .animation-main h3,
+[data-theme="dark"] .animation-side h3,
+[data-theme="dark"] .item-content h3,
+[data-theme="dark"] .optimization-tips-box h3,
+[data-theme="dark"] .challenge-box h3,
+[data-theme="dark"] .nav-card h3 {
   color: var(--dm-text-primary);
 }
 
-[data-theme="dark"] .layer-content p {
+[data-theme="dark"] .arch-desc,
+[data-theme="dark"] .card-desc,
+[data-theme="dark"] .custom-desc,
+[data-theme="dark"] .code-desc,
+[data-theme="dark"] .anim-desc,
+[data-theme="dark"] .item-content p,
+[data-theme="dark"] .challenge-box p {
   color: var(--dm-text-secondary);
 }
 
-[data-theme="dark"] .layer-content li {
+[data-theme="dark"] .arch-list li,
+[data-theme="dark"] .feature-list li,
+[data-theme="dark"] .custom-list li,
+[data-theme="dark"] .optimization-list li,
+[data-theme="dark"] .tips-list li {
   color: var(--dm-text-secondary);
 }
 
-[data-theme="dark"] .data-card {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .data-card h3 {
+[data-theme="dark"] .arch-list li strong,
+[data-theme="dark"] .feature-list li strong,
+[data-theme="dark"] .custom-list li strong,
+[data-theme="dark"] .optimization-list li strong,
+[data-theme="dark"] .tips-list li strong,
+[data-theme="dark"] .challenge-box p strong {
   color: var(--dm-text-primary);
 }
 
-[data-theme="dark"] .code-snippet {
+[data-theme="dark"] .code-block,
+[data-theme="dark"] .code-snippet-small {
   background: #0f172a;
 }
 
-[data-theme="dark"] .code-snippet code {
+[data-theme="dark"] .code-block code,
+[data-theme="dark"] .code-snippet-small code {
   color: #e2e8f0;
-}
-
-[data-theme="dark"] .data-card li {
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .data-card li strong {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .color-swatch {
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .anim-card {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .anim-card h3 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .interaction-details {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .interaction-step {
-  border-bottom-color: var(--dm-border);
-}
-
-[data-theme="dark"] .step-content h3 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .step-content p {
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .code-snippet.small {
-  background: #0f172a;
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .performance-metrics {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .metric-card {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
 }
 
 [data-theme="dark"] .metric-value {
@@ -1629,51 +1478,8 @@ onUnmounted(() => {
   color: var(--dm-text-muted);
 }
 
-[data-theme="dark"] .optimization-tips h3 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .optimization-tips li {
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .optimization-tips li:before {
-  color: #34d399;
-}
-
-[data-theme="dark"] .optimization-tips li strong {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .challenge-card {
-  background: var(--dm-bg-card);
+[data-theme="dark"] .color-swatch {
   border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .challenge-card h3 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .challenge-card p {
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .nav-card {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .nav-card:hover {
-  border-color: var(--dm-accent);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .nav-card h3 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .nav-card p {
-  color: var(--dm-text-muted);
 }
 
 [data-theme="dark"] .minimal-back-btn {
@@ -1692,5 +1498,18 @@ onUnmounted(() => {
 [data-theme="dark"] .back-to-top-btn:hover {
   background: var(--dm-accent-hover);
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="dark"] .nav-card:hover {
+  border-color: var(--dm-accent);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .nav-card p {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tips-list li:before {
+  color: #34d399;
 }
 </style>

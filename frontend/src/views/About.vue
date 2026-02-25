@@ -131,7 +131,7 @@
     </section>
 
     <!-- === 3. 技术文档导航 === -->
-    <section class="section-block" v-animate>
+    <section class="section-block" id="tech-docs" v-animate>
       <h2 class="section-heading">深度技术文档</h2>
       <p class="section-sub">点击下方卡片深入理解项目核心技术原理</p>
 
@@ -622,6 +622,19 @@ onMounted(() => {
 
   // 点击外部关闭展开的节点
   document.addEventListener("click", handleOutsideClick);
+
+  // 处理从 Tech 文档返回时的滚动
+  const state = window.history.state;
+  if (state && state.scrollTarget === "tech-docs") {
+    setTimeout(() => {
+      const element = document.getElementById("tech-docs");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      // 清除 state 避免重复触发
+      window.history.replaceState({ ...state, scrollTarget: null }, "");
+    }, 100);
+  }
 });
 
 onUnmounted(() => {

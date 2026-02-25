@@ -374,18 +374,18 @@ function stopAutoPlay() {
 }
 
 function handleKeydown(e) {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
   switch (e.key) {
-    case 'ArrowLeft':
+    case "ArrowLeft":
       e.preventDefault();
       prevStep();
       break;
-    case 'ArrowRight':
+    case "ArrowRight":
       e.preventDefault();
       nextStep();
       break;
-    case ' ':
+    case " ":
       e.preventDefault();
       toggleAutoPlay();
       break;
@@ -393,11 +393,11 @@ function handleKeydown(e) {
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown);
+  window.addEventListener("keydown", handleKeydown);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown);
+  window.removeEventListener("keydown", handleKeydown);
   stopAutoPlay();
 });
 

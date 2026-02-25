@@ -378,7 +378,7 @@ const vAnimate = {
 
 // 返回 About 页面
 const goBackToAbout = () => {
-  router.push("/about");
+  router.push({ path: "/about", state: { scrollTarget: "tech-docs" } });
 };
 
 // 返回顶部
