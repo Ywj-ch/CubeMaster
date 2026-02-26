@@ -43,18 +43,16 @@ jobs:
       - name: Install dependencies
         run: cd frontend && npm ci
       
-      - name: Run tests
-        run: cd frontend && npm run test
-      
-      - name: Run coverage
+      - name: Run tests with coverage
         run: cd frontend && npm run test:coverage
       
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./frontend/coverage/coverage-final.json
-          flags: frontend
-          fail_ci_if_error: false
+      # TODO: Configure Codecov integration later
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: ./frontend/coverage/coverage-final.json
+      #     flags: frontend
+      #     fail_ci_if_error: false
 
   backend-test:
     runs-on: ubuntu-latest
@@ -73,15 +71,16 @@ jobs:
           pip install -r backend/requirements.txt
           pip install pytest pytest-cov pytest-asyncio
       
-      - name: Run tests
+      - name: Run tests with coverage
         run: cd backend && pytest --cov=. --cov-report=xml --cov-report=term
       
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./backend/coverage.xml
-          flags: backend
-          fail_ci_if_error: false
+      # TODO: Configure Codecov integration later
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: ./backend/coverage.xml
+      #     flags: backend
+      #     fail_ci_if_error: false
 
   frontend-build:
     runs-on: ubuntu-latest
