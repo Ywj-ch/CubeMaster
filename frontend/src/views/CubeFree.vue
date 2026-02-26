@@ -2,45 +2,39 @@
   <div class="cube-free-page">
     <!-- 顶部计时器 -->
     <div class="timer-container-hybrid">
-      <div class="timer-label-small">ELAPSED TIME</div>
+      <div class="timer-label-small">用时</div>
 
-      <div class="flip-clock-row">
-        <!-- 分钟 (翻页) -->
-        <DigitRoll :val="minStr" />
+        <div class="flip-clock-row">
+          <!-- 分钟 (翻页) -->
+          <DigitRoll :val="minStr" />
 
-        <span class="colon">:</span>
+          <span class="colon">:</span>
 
-        <!-- 秒 (翻页) -->
-        <DigitRoll :val="secStr" />
+          <!-- 秒 (翻页) -->
+          <DigitRoll :val="secStr" />
 
-        <span class="dot">.</span>
+          <span class="dot">.</span>
 
-        <!-- 毫秒 (数字跳动) -->
-        <div class="ms-card">
-          {{ msStr }}
+          <!-- 毫秒 (数字跳动) -->
+          <div class="ms-card">
+            {{ msStr }}
+           </div>
+         </div>
+     </div>
+     
+    <!-- 帮助按钮 -->
+    <div class="hint-wrapper">
+      <div class="hint" data-position="1" @click="showHelp = true">
+        <span class="hint-dot">?</span>
+        <div class="hint-content">
+          <p>操作指南</p>
         </div>
       </div>
     </div>
 
-    <!-- 帮助按钮 -->
-    <div class="help-btn-wrapper">
-      <button class="faq-button" @click="showHelp = true">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-        >
-          <path
-            d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
-          />
-        </svg>
-        <span class="tooltip">操作指南</span>
-      </button>
-    </div>
-
     <!-- 头部区域：标题 -->
     <div class="header-section">
-      <h2 class="mode-title gradient-text">自由探索</h2>
+      <h2 class="mode-title gradient-text">自由练习</h2>
     </div>
 
     <!-- 状态指示器 -->
@@ -49,6 +43,7 @@
       <span class="status-text">{{ statusText }}</span>
     </div>
 
+    <!-- 主显示区 -->
     <div class="main-display-area">
       <div class="cube-container-box">
         <!-- 3D 视图组件 -->
@@ -63,6 +58,7 @@
       </div>
     </div>
 
+    <!-- 底部控制栏 -->
     <div class="bottom-controls">
       <div class="action-buttons">
         <button
@@ -82,7 +78,7 @@
               d="M12,2L4.5,6.3V15.7L12,20L19.5,15.7V6.3L12,2M12,4.1L17.5,7.3L12,10.5L6.5,7.3L12,4.1M6.5,17.4V9.6L11,12.2V20L6.5,17.4M13,20V12.2L17.5,9.6V17.4L13,20Z"
             />
           </svg>
-          <span class="go-text">Go!</span>
+          <span class="go-text">开始！</span>
           <span class="start-text">开始游戏</span>
         </button>
 
@@ -102,7 +98,7 @@
       </div>
 
       <div class="sequence-display">
-        <div class="seq-label">SEQUENCE</div>
+        <div class="seq-label">序列</div>
         <el-scrollbar ref="scrollRef">
           <div class="seq-items">
             <transition-group name="slide">
@@ -112,13 +108,16 @@
             </transition-group>
             <div v-if="history.length === 0" class="seq-empty">
               {{
-                isGameStarted ? "请开始你的操作..." : "点击“开始挑战”进行计时"
+                isGameStarted ? "请开始你的操作..." : '点击"开始游戏"进行计时'
               }}
             </div>
           </div>
         </el-scrollbar>
       </div>
     </div>
+
+    <!-- 统计面板 -->
+    <StatsPanel />
 
     <!-- 操作指南弹窗 -->
     <el-dialog
@@ -169,7 +168,7 @@
               <span class="value">{{ history.length }}</span>
             </div>
             <div class="stat-item">
-              <span class="label">TPS (手速)</span>
+              <span class="label">TPS (步数/秒)</span>
               <span class="value">{{ tps }}</span>
             </div>
           </div>
@@ -180,7 +179,7 @@
               @click="scrambleWithAnimation"
               >再来一局</el-button
             >
-            <el-button size="large" @click="isVictory = false">关闭</el-button>
+            <el-button size="large" @click="isVictory = false">完成</el-button>
           </div>
         </div>
       </div>
@@ -191,8 +190,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 import Cube3DView from "../components/Cube3DView.vue";
+import StatsPanel from "../components/StatsPanel.vue";
 import { createCubeFromJson } from "../utils/cubeState";
 import { applyMove, invertMove } from "../utils/cubeMoves";
+import { useRecords } from "../composables/useRecords.js";
 import {
   Timer,
   Refresh,
@@ -223,6 +224,9 @@ const showHelp = ref(false);
 const isVictory = ref(false);
 const finalTimeStr = ref("00:00.00");
 const tps = ref("0.00");
+const scrambleSequence = ref("");
+
+const { addRecord } = useRecords();
 
 // --- 状态计算属性 ---
 const statusText = computed(() => {
@@ -318,6 +322,14 @@ function handleVictory() {
     seconds > 0 ? (history.value.length / seconds).toFixed(2) : "0.00";
   isVictory.value = true;
   triggerConfetti();
+
+  // Save record to localStorage
+  addRecord({
+    time: currentTime.value,
+    scramble: scrambleSequence.value || "",
+    moves: history.value.length,
+    tps: parseFloat(tps.value),
+  });
 }
 
 function triggerConfetti() {
@@ -371,6 +383,7 @@ async function scrambleWithAnimation() {
   stopTimer();
   currentTime.value = 0;
   history.value = [];
+  scrambleSequence.value = "";
   isAutoOperating.value = true;
   const moves = [
     "R",
@@ -386,14 +399,17 @@ async function scrambleWithAnimation() {
     "F'",
     "B'",
   ];
+  const scrambleMoves = [];
   for (let i = 0; i < 2; i++) {
     const randomMove = moves[Math.floor(Math.random() * moves.length)];
+    scrambleMoves.push(randomMove);
     if (cubeRef.value) {
       await cubeRef.value.playMove(randomMove);
       applyMove(cubeState.value, randomMove);
       await new Promise((r) => setTimeout(r, 150));
     }
   }
+  scrambleSequence.value = scrambleMoves.join(" ");
   isAutoOperating.value = false;
 }
 
@@ -435,6 +451,7 @@ onUnmounted(() => {
 
 <style scoped>
 .cube-free-page {
+  position: relative;
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -447,13 +464,13 @@ onUnmounted(() => {
 
 /* 计时器 */
 .timer-container-hybrid {
-  position: absolute;
+  position: fixed;
   top: 100px;
   right: 60px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* 右对齐 */
-  z-index: 100;
+  align-items: flex-end;
+  z-index: 50;
 }
 
 .timer-label-small {
@@ -529,7 +546,7 @@ onUnmounted(() => {
   font-weight: 600;
   width: fit-content;
   transition: all 0.3s ease;
-  z-index: 100;
+  z-index: 150;
 }
 
 .status-dot {
@@ -666,112 +683,106 @@ onUnmounted(() => {
   font-size: 14px;
 }
 
-/* === 帮助按钮 === */
-.help-btn-wrapper {
+/* === 帮助按钮 - 现代化设计 === */
+.hint-wrapper {
   position: absolute;
   top: 120px;
-  left: 180px;
-  z-index: 100;
+  left: 160px;
+  z-index: 9999;
 }
 
-.faq-button {
-  width: 26px;
-  height: 26px;
-  margin-top: 4px;
-  min-width: 26px;
-  flex-shrink: 0;
+.hint {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* 扩散光圈 - 已移除 */
+.hint-radius {
+  display: none;
+}
+
+/* 按钮圆点 - 32px */
+.hint-dot {
+  z-index: 3;
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
-  border: none;
-  outline: none;
-  background: transparent;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  position: relative;
-  transition:
-    transform 0.3s,
-    opacity 0.3s;
+  transform: scale(0.95);
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.35);
 }
 
-.faq-button:focus-visible {
-  outline: 2px solid #64748b;
-  outline-offset: 2px;
+.hint:hover .hint-dot {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: scale(1);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.45);
 }
 
-.faq-button svg {
-  width: 22px;
-  height: 22px;
-  color: #64748b;
-  flex-shrink: 0;
-}
-.faq-button:hover {
-  transform: translateY(-2px);
-  opacity: 0.8;
-}
-.faq-button:hover svg {
-  animation: jello-vertical 0.7s both;
-}
-
-@keyframes jello-vertical {
-  0% {
-    transform: scale3d(1, 1, 1);
-  }
-  30% {
-    transform: scale3d(0.75, 1.25, 1);
-  }
-  40% {
-    transform: scale3d(1.25, 0.75, 1);
-  }
-  50% {
-    transform: scale3d(0.85, 1.15, 1);
-  }
-  65% {
-    transform: scale3d(1.05, 0.95, 1);
-  }
-  75% {
-    transform: scale3d(0.95, 1.05, 1);
-  }
-  100% {
-    transform: scale3d(1, 1, 1);
-  }
-}
-
-.tooltip {
+/* Tooltip内容 - 仅保留文字 */
+.hint[data-position="1"] .hint-content {
   position: absolute;
-  top: -10px;
+  top: -28px;
   left: 50%;
   transform: translateX(-50%);
   opacity: 0;
-  background-color: #2563eb;
-  background-image: linear-gradient(147deg, #2563eb 0%, #06b6d4 74%);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition-duration: 0.3s;
+  visibility: hidden;
+  transition: all 0.3s ease;
   pointer-events: none;
+}
+
+/* 文字样式 */
+.hint-content p {
+  margin: 0;
+  padding: 0;
+  color: #64748b;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.25s ease;
 }
-.tooltip::before {
-  position: absolute;
-  content: "";
-  width: 8px;
-  height: 8px;
-  background-color: #06b6d4;
-  transform: rotate(45deg);
-  bottom: -4px;
-  left: 50%;
-  margin-left: -4px;
-}
-.faq-button:hover .tooltip {
-  top: -45px;
+
+/* Hover状态 - 仅显示文字 */
+.hint:hover .hint-content {
   opacity: 1;
+  visibility: visible;
+}
+
+.hint:hover .hint-content p {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .hint-dot {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 3px 10px rgba(96, 165, 250, 0.35);
+}
+
+[data-theme="dark"] .hint:hover .hint-dot {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 5px 15px rgba(96, 165, 250, 0.45);
+}
+
+[data-theme="dark"] .hint-radius {
+  background-color: rgba(96, 165, 250, 0.2);
+}
+
+[data-theme="dark"] .hint-content p {
+  color: #94a3b8;
 }
 
 /* === 弹窗深度美化 === */
@@ -1034,6 +1045,66 @@ onUnmounted(() => {
   background-color: var(--dm-bg-page);
 }
 
+/* 弹窗暗色模式适配 - 参考Learning.vue实现 */
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog) {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  outline: none !important;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog__header) {
+  border-bottom: 1px solid #334155 !important;
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog__title) {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .cube-free-page :deep(.el-dialog__body) {
+  background: #1e293b !important;
+}
+
+[data-theme="dark"] .help-content {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .help-section h4 {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .key-map-grid {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+[data-theme="dark"] .key-item {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .key {
+  background: #334155;
+  border-color: #475569;
+  border-bottom-color: #64748b;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .key-item:hover .key {
+  background: #1e293b;
+  border-bottom-color: #475569;
+}
+
+[data-theme="dark"] .tip-text {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .help-section p {
+  color: #cbd5e1;
+}
+
 /* 计时器 */
 [data-theme="dark"] .timer-label-small {
   color: var(--dm-text-muted);
@@ -1142,264 +1213,6 @@ onUnmounted(() => {
 
 [data-theme="dark"] .seq-empty {
   color: var(--dm-text-muted);
-}
-
-/* 帮助按钮 */
-[data-theme="dark"] .faq-button svg {
-  color: var(--dm-text-muted);
-}
-
-[data-theme="dark"] .faq-button:focus-visible {
-  outline-color: var(--dm-text-muted);
-}
-
-html[data-theme="dark"] .cube-free-page :deep(.el-dialog) {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  outline: none !important;
-}
-
-html[data-theme="dark"] .cube-free-page :deep(.el-dialog__header) {
-  border-bottom: 1px solid #334155 !important;
-}
-
-html[data-theme="dark"] .cube-free-page :deep(.el-dialog__body) {
-  background: #1e293b !important;
-}
-
-html[data-theme="dark"] .cube-free-page :deep(.el-overlay) {
-  background-color: rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: none !important;
-}
-
-html[data-theme="dark"] .cube-free-page :deep(.el-dialog__wrapper) {
-  background: transparent !important;
-}
-
-[data-theme="dark"] :deep(.el-dialog__title) {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .help-section h4 {
-  color: var(--dm-accent);
-}
-
-[data-theme="dark"] .help-section p {
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .key {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
-  border-bottom-color: var(--dm-border-hover);
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .key-item:hover .key {
-  background: var(--dm-bg-card);
-}
-
-[data-theme="dark"] .tip-text {
-  color: var(--dm-text-muted);
-}
-
-[data-theme="dark"] .help-content {
-  background: transparent;
-}
-
-[data-theme="dark"] .help-section {
-  background: var(--dm-bg-hover);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  border: 1px solid var(--dm-border);
-}
-
-[data-theme="dark"] .key-map-grid {
-  background: var(--dm-bg-card);
-  border-radius: 8px;
-  padding: 8px;
-}
-
-[data-theme="dark"] .key-item {
-  color: var(--dm-text-secondary);
-}
-
-/* 胜利结算 */
-[data-theme="dark"] .victory-overlay {
-  background: rgba(0, 0, 0, 0.6);
-}
-
-[data-theme="dark"] .victory-card {
-  background: var(--dm-bg-card);
-  border: 1px solid var(--dm-border);
-}
-
-[data-theme="dark"] .victory-card h3 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .stat-item .label {
-  color: var(--dm-text-muted);
-}
-
-[data-theme="dark"] .stat-item .value {
-  color: var(--dm-accent);
-}
-
-/* 页面标题 */
-[data-theme="dark"] .page-header h1 {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .page-header .subtitle {
-  color: var(--dm-text-muted);
-}
-
-/* 主卡片 */
-[data-theme="dark"] .main-card {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-  box-shadow: var(--dm-shadow-md);
-}
-
-/* 3D视图区域 */
-[data-theme="dark"] .cube-view-section {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
-}
-
-/* 控制面板 */
-[data-theme="dark"] .control-panel {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .panel-title {
-  color: var(--dm-text-primary);
-}
-
-/* 方向按钮 */
-[data-theme="dark"] .dir-btn {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .dir-btn:hover:not(:disabled) {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border-hover);
-  color: var(--dm-accent);
-}
-
-[data-theme="dark"] .dir-btn.active {
-  background: var(--dm-accent);
-  border-color: var(--dm-accent);
-  color: #0f172a;
-}
-
-/* 操作按钮 */
-[data-theme="dark"] .action-btn {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .action-btn:hover:not(:disabled) {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border-hover);
-  color: var(--dm-accent);
-}
-
-[data-theme="dark"] .action-btn.primary {
-  background: var(--dm-accent);
-  border-color: var(--dm-accent);
-  color: #0f172a;
-}
-
-[data-theme="dark"] .action-btn.primary:hover {
-  background: var(--dm-accent-hover);
-  border-color: var(--dm-accent-hover);
-}
-
-/* 次级按钮 */
-[data-theme="dark"] .btn-secondary {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-  color: var(--dm-text-muted);
-  box-shadow: var(--dm-shadow-sm);
-}
-
-[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
-  background: var(--dm-bg-hover);
-  box-shadow: var(--dm-shadow-md);
-}
-
-[data-theme="dark"] .scramble-btn:hover:not(:disabled) {
-  color: var(--dm-accent);
-  border-color: var(--dm-border-hover);
-}
-
-[data-theme="dark"] .reset-btn:hover {
-  color: var(--dm-accent-error) !important;
-  background-color: rgba(248, 113, 113, 0.1) !important;
-  border-color: rgba(248, 113, 113, 0.3) !important;
-}
-
-/* 状态指示器 */
-[data-theme="dark"] .status-indicator {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .status-text {
-  color: var(--dm-text-muted);
-}
-
-/* 统计信息 */
-[data-theme="dark"] .stats-container {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .stat-label {
-  color: var(--dm-text-muted);
-}
-
-[data-theme="dark"] .stat-value {
-  color: var(--dm-text-primary);
-}
-
-/* 计时器 */
-[data-theme="dark"] .timer-display {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .timer-label {
-  color: var(--dm-text-muted);
-}
-
-/* 操作历史 */
-[data-theme="dark"] .history-panel {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .history-title {
-  color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .history-item {
-  background: var(--dm-bg-card);
-  border-color: var(--dm-border);
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .history-item:hover {
-  background: var(--dm-bg-hover);
-  border-color: var(--dm-border-hover);
 }
 
 /* 提示信息 */
