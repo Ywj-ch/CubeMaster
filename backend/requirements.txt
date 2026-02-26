@@ -38,9 +38,11 @@ setuptools==70.2.0
 six==1.17.0
 starlette==0.50.0
 sympy==1.13.1
-torch==2.6.0+cu124
-torchaudio==2.6.0+cu124
-torchvision==0.21.0+cu124
+# PyTorch (CPU version for CI/CD, GPU version for local development)
+# For local GPU development, reinstall with: pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+torch==2.6.0
+torchaudio==2.6.0
+torchvision==0.21.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 ultralytics==8.4.6
