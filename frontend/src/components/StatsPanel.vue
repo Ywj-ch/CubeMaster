@@ -50,17 +50,21 @@
             </div>
             <div class="stat-card ao5">
               <div class="stat-label">平均5次</div>
-              <div class="stat-value">{{ averageOf5 ? formatTime(averageOf5) : '-' }}</div>
+              <div class="stat-value">
+                {{ averageOf5 ? formatTime(averageOf5) : "-" }}
+              </div>
             </div>
             <div class="stat-card ao12">
               <div class="stat-label">平均12次</div>
-              <div class="stat-value">{{ averageOf12 ? formatTime(averageOf12) : '-' }}</div>
+              <div class="stat-value">
+                {{ averageOf12 ? formatTime(averageOf12) : "-" }}
+              </div>
             </div>
             <div class="stat-card practice">
-               <div class="stat-label">练习时长</div>
-               <div class="stat-value">{{ formatPracticeTime }}</div>
-             </div>
-           </div>
+              <div class="stat-label">练习时长</div>
+              <div class="stat-value">{{ formatPracticeTime }}</div>
+            </div>
+          </div>
 
           <div class="chart-section">
             <div class="section-header">
@@ -72,7 +76,7 @@
                 :key="index"
                 class="chart-bar"
                 :style="{ height: getBarHeight(day.count) }"
-                   :title="`${day.date}: ${day.count}次还原`"
+                :title="`${day.date}: ${day.count}次还原`"
               >
                 <span v-if="day.count > 0" class="bar-count">{{
                   day.count
@@ -94,11 +98,7 @@
             <div class="section-header">
               <span class="section-title">最近记录</span>
               <div class="header-actions">
-                <button
-                  class="action-btn"
-                  @click="exportRecords"
-                   title="导出"
-                >
+                <button class="action-btn" @click="exportRecords" title="导出">
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path
                       d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"
@@ -108,7 +108,7 @@
                 <button
                   class="action-btn danger"
                   @click="confirmClear"
-                   title="清空记录"
+                  title="清空记录"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor">
                     <path
@@ -184,15 +184,15 @@ function formatTime(ms) {
 }
 
 function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now - date;
-    
-    if (diff < 60000) return "刚刚";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
-    return date.toLocaleDateString();
-  }
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now - date;
+
+  if (diff < 60000) return "刚刚";
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
+  return date.toLocaleDateString();
+}
 
 const formatPracticeTime = computed(() => {
   const totalMs =
@@ -218,8 +218,8 @@ function getDayLabel(dateStr) {
 }
 
 function confirmClear() {
-  if (confirm('确定要删除所有记录吗？此操作无法撤销。')) {
-    clearAllRecords()
+  if (confirm("确定要删除所有记录吗？此操作无法撤销。")) {
+    clearAllRecords();
   }
 }
 </script>

@@ -68,7 +68,6 @@ yolo_train/runs/
 /twophase/conj_twist
 /twophase/conj_ud_edges
 /AGENTS.md
-/Export-GitLogs.ps1
 /twophase/fs_classidx
 /twophase/fs_rep
 /twophase/fs_sym
@@ -80,6 +79,5 @@ yolo_train/runs/
 /twophase/move_u_edges
 /twophase/move_ud_edges
 
-/scripts/Export-GitLogs.ps1
 /scripts/project_context.md
 /scripts/Project_Dev_Context.md

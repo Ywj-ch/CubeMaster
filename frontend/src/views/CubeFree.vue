@@ -4,24 +4,24 @@
     <div class="timer-container-hybrid">
       <div class="timer-label-small">用时</div>
 
-        <div class="flip-clock-row">
-          <!-- 分钟 (翻页) -->
-          <DigitRoll :val="minStr" />
+      <div class="flip-clock-row">
+        <!-- 分钟 (翻页) -->
+        <DigitRoll :val="minStr" />
 
-          <span class="colon">:</span>
+        <span class="colon">:</span>
 
-          <!-- 秒 (翻页) -->
-          <DigitRoll :val="secStr" />
+        <!-- 秒 (翻页) -->
+        <DigitRoll :val="secStr" />
 
-          <span class="dot">.</span>
+        <span class="dot">.</span>
 
-          <!-- 毫秒 (数字跳动) -->
-          <div class="ms-card">
-            {{ msStr }}
-           </div>
-         </div>
-     </div>
-     
+        <!-- 毫秒 (数字跳动) -->
+        <div class="ms-card">
+          {{ msStr }}
+        </div>
+      </div>
+    </div>
+
     <!-- 帮助按钮 -->
     <div class="hint-wrapper">
       <div class="hint" data-position="1" @click="showHelp = true">
@@ -1222,5 +1222,32 @@ html[data-theme="dark"] .cube-free-page :deep(.el-dialog__body) {
 
 [data-theme="dark"] .hint-text .highlight {
   color: var(--dm-accent);
+}
+
+/* 胜利弹窗暗色模式适配 */
+[data-theme="dark"] .victory-overlay {
+  background: rgba(15, 23, 42, 0.7);
+}
+
+[data-theme="dark"] .victory-card {
+  background: var(--dm-bg-card);
+  border: 1px solid var(--dm-border);
+  box-shadow: var(--dm-shadow-xl);
+}
+
+[data-theme="dark"] .victory-card h3 {
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .stat-item .label {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .stat-item .value {
+  color: var(--dm-accent);
+}
+
+[data-theme="dark"] .stat-item .value.time {
+  color: var(--dm-accent-success);
 }
 </style>
