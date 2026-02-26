@@ -81,3 +81,41 @@ yolo_train/runs/
 
 /scripts/project_context.md
 /scripts/Project_Dev_Context.md
+
+# ==========================
+# 5. 构建分析工具
+# ==========================
+frontend/stats.html
+
+# ==========================
+# 6. 测试临时文件
+# ==========================
+backend/test_images/
+
+# ==========================
+# 7. YOLO 训练产物
+# ==========================
+yolo_train/yolov8n.pt
+
+# ==========================
+# 8. .opencode 工具依赖
+# ==========================
+.opencode/node_modules/
+.opencode/bun.lock
+.opencode/package.json
+
+# ==========================
+# 9. 前端构建压缩产物
+# ==========================
+frontend/dist/*.gz
+frontend/dist/*.br
+
+# ==========================
+# 10. 完善现有规则
+# ==========================
+# 后端临时图片目录
+backend/images/
+
+# 环境变量文件（改用.env.example 模板）
+frontend/.env.development
+frontend/.env.production
