@@ -78,9 +78,9 @@ function initTheme() {
 
 // 学习中心课程标题映射
 const courseTitles = {
-  "basics": "基础入门",
-  "lbl": "LBL 教学",
-  "advanced": "进阶技巧"
+  basics: "基础入门",
+  lbl: "LBL 教学",
+  advanced: "进阶技巧",
 };
 
 /**
@@ -101,7 +101,9 @@ router.beforeEach((to, from, next) => {
   }
   // 处理 CFOP 算法库动态标题
   else if (to.name === "CfopLibrary") {
-    const stepTitle = to.params.step ? `F${to.params.step} ${to.meta.title}` : to.meta.title;
+    const stepTitle = to.params.step
+      ? `F${to.params.step} ${to.meta.title}`
+      : to.meta.title;
     updatePageTitle(stepTitle);
   }
   // 其他页面使用路由配置的 meta.title
