@@ -1792,6 +1792,29 @@ html[data-theme="dark"] .customizer-page .upload-hint {
   color: var(--dm-text-muted);
 }
 
+/* 修复材质类型选择器在黑夜模式下的样式 */
+[data-theme="dark"] .full-width :deep(.el-select__wrapper) {
+  background-color: var(--dm-bg-card) !important;
+  border-color: var(--dm-border) !important;
+}
+
+[data-theme="dark"] .full-width :deep(.el-select__placeholder) {
+  color: var(--dm-text-primary) !important;
+}
+
+[data-theme="dark"] .full-width :deep(.el-select__caret) {
+  color: var(--dm-text-muted) !important;
+}
+
+[data-theme="dark"] .full-width :deep(.el-select__wrapper:hover) {
+  border-color: var(--dm-accent) !important;
+}
+
+[data-theme="dark"] .full-width :deep(.el-select__wrapper.is-focused) {
+  border-color: var(--dm-accent) !important;
+  box-shadow: 0 0 0 1px var(--dm-accent) !important;
+}
+
 /* 使用说明卡片 */
 [data-theme="dark"] .instructions-card {
   background: var(--dm-bg-card);

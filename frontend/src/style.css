@@ -630,3 +630,92 @@ button:focus-visible {
 [data-theme="dark"] .el-sub-menu__title:hover {
   background-color: var(--dm-bg-hover);
 }
+
+/* ============================================
+   5. Customizer 页面 Element Plus 组件修复
+   使用 !important 确保优先级覆盖默认样式
+   ============================================ */
+
+/* 阶段 1: el-select 下拉框输入框 */
+html[data-theme="dark"] .el-select .el-input__wrapper {
+  background-color: var(--dm-bg-card) !important;
+  border-color: var(--dm-border) !important;
+  box-shadow: 0 0 0 1px var(--dm-border) inset !important;
+}
+
+html[data-theme="dark"] .el-select .el-input__inner {
+  color: var(--dm-text-primary) !important;
+}
+
+html[data-theme="dark"] .el-select .el-input__wrapper:hover {
+  border-color: var(--dm-border-hover) !important;
+  box-shadow: 0 0 0 1px var(--dm-border-hover) inset !important;
+}
+
+html[data-theme="dark"] .el-select .el-input__wrapper.is-focus {
+  border-color: var(--dm-accent) !important;
+  box-shadow: 0 0 0 1px var(--dm-accent) inset !important;
+}
+
+/* el-select 下拉菜单 */
+html[data-theme="dark"] .el-select-dropdown {
+  background-color: var(--dm-bg-card) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html[data-theme="dark"] .el-select-dropdown__item {
+  background-color: var(--dm-bg-card) !important;
+  color: var(--dm-text-primary) !important;
+}
+
+html[data-theme="dark"] .el-select-dropdown__item:hover,
+html[data-theme="dark"] .el-select-dropdown__item.is-hovering {
+  background-color: var(--dm-bg-hover) !important;
+}
+
+html[data-theme="dark"] .el-select-dropdown__item.selected {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+  color: var(--dm-accent) !important;
+}
+
+/* 阶段 2: el-input-number 输入框和按钮 */
+html[data-theme="dark"] .el-input-number .el-input__wrapper {
+  background-color: var(--dm-bg-card) !important;
+}
+
+html[data-theme="dark"] .el-input-number .el-input__inner {
+  color: var(--dm-text-primary) !important;
+}
+
+html[data-theme="dark"] .el-input-number__decrease,
+html[data-theme="dark"] .el-input-number__increase {
+  background-color: var(--dm-bg-hover) !important;
+  border-color: var(--dm-border) !important;
+  color: var(--dm-text-secondary) !important;
+}
+
+html[data-theme="dark"] .el-input-number__decrease:hover,
+html[data-theme="dark"] .el-input-number__increase:hover {
+  background-color: var(--dm-bg-hover) !important;
+  border-color: var(--dm-border-hover) !important;
+  color: var(--dm-text-primary) !important;
+}
+
+/* 阶段 3: el-upload 上传区域 */
+html[data-theme="dark"] .el-upload-dragger {
+  background-color: var(--dm-bg-card) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html[data-theme="dark"] .el-upload-dragger:hover {
+  border-color: var(--dm-accent) !important;
+  background-color: var(--dm-bg-hover) !important;
+}
+
+html[data-theme="dark"] .el-upload-dragger .el-icon--upload {
+  color: var(--dm-text-muted) !important;
+}
+
+html[data-theme="dark"] .el-upload-dragger .el-upload__text {
+  color: var(--dm-text-secondary) !important;
+}
