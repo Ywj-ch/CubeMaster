@@ -72,6 +72,50 @@ function initTheme() {
   });
 }
 
+// ============================================
+// 动态标签页标题管理
+// ============================================
+
+// 学习中心课程标题映射
+const courseTitles = {
+  "basics": "基础入门",
+  "lbl": "LBL 教学",
+  "advanced": "进阶技巧"
+};
+
+/**
+ * 更新浏览器标签页标题
+ * @param {string} pageTitle - 页面标题（不含后缀）
+ */
+function updatePageTitle(pageTitle) {
+  const title = pageTitle ? `${pageTitle} - CubeMaster` : "CubeMaster";
+  document.title = title;
+}
+
+// 路由前置守卫 - 监听路由变化并更新标题
+router.beforeEach((to, from, next) => {
+  // 处理学习中心动态标题
+  if (to.name === "Learning") {
+    const courseTitle = courseTitles[to.params.courseId] || "学习中心";
+    updatePageTitle(courseTitle);
+  }
+  // 处理 CFOP 算法库动态标题
+  else if (to.name === "CfopLibrary") {
+    const stepTitle = to.params.step ? `F${to.params.step} ${to.meta.title}` : to.meta.title;
+    updatePageTitle(stepTitle);
+  }
+  // 其他页面使用路由配置的 meta.title
+  else if (to.meta.title) {
+    updatePageTitle(to.meta.title);
+  }
+  // 兜底处理
+  else {
+    updatePageTitle("");
+  }
+
+  next();
+});
+
 // 初始化主题
 initTheme();
 
