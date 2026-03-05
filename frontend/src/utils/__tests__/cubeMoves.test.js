@@ -21,10 +21,10 @@ describe("cubeMoves", () => {
     it("should have correct center colors", () => {
       expect(SOLVED_STATE.faces.U[4]).toBe("white");
       expect(SOLVED_STATE.faces.D[4]).toBe("yellow");
-      expect(SOLVED_STATE.faces.F[4]).toBe("red");
-      expect(SOLVED_STATE.faces.B[4]).toBe("orange");
-      expect(SOLVED_STATE.faces.L[4]).toBe("blue");
-      expect(SOLVED_STATE.faces.R[4]).toBe("green");
+      expect(SOLVED_STATE.faces.F[4]).toBe("green");
+      expect(SOLVED_STATE.faces.B[4]).toBe("blue");
+      expect(SOLVED_STATE.faces.L[4]).toBe("orange");
+      expect(SOLVED_STATE.faces.R[4]).toBe("red");
     });
   });
 
@@ -57,13 +57,13 @@ describe("cubeMoves", () => {
       applyMove(state, "R");
 
       // 右面应该旋转（中心块不变）
-      expect(state.faces.R[4]).toBe("green");
+      expect(state.faces.R[4]).toBe("red");
 
       // 相邻面应该变化
       expect(state.faces.U[2]).not.toBe("white");
-      expect(state.faces.F[2]).not.toBe("red");
+      expect(state.faces.F[2]).not.toBe("green");
       expect(state.faces.D[2]).not.toBe("yellow");
-      expect(state.faces.B[6]).not.toBe("orange");
+      expect(state.faces.B[6]).not.toBe("blue");
     });
 
     it("should apply R prime move correctly", () => {
@@ -71,7 +71,7 @@ describe("cubeMoves", () => {
       applyMove(state, "R'");
 
       // 右面中心不变
-      expect(state.faces.R[4]).toBe("green");
+      expect(state.faces.R[4]).toBe("red");
 
       // 相邻面变化方向与 R 相反
       expect(state.faces.U[8]).not.toBe("white");

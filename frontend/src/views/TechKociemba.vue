@@ -1265,7 +1265,7 @@ onUnmounted(() => {
 .hero-content {
   position: relative;
   z-index: 1;
-  text-align: left;
+  text-align: center;
 }
 
 .badge-pill {
@@ -1305,6 +1305,7 @@ onUnmounted(() => {
   line-height: 1.1;
   margin-bottom: 20px;
   color: #0f172a;
+  text-align: center;
 }
 
 .gradient-text {
@@ -1317,13 +1318,14 @@ onUnmounted(() => {
   font-size: 1.25rem;
   color: #64748b;
   max-width: 700px;
-  margin: 0 0 32px;
+  margin: 0 auto 32px;
   line-height: 1.6;
+  text-align: center;
 }
 
 .stats-pills {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -1367,6 +1369,7 @@ onUnmounted(() => {
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 32px;
+  text-align: left;
 }
 
 .subsection-heading {
@@ -1374,6 +1377,7 @@ onUnmounted(() => {
   font-weight: 600;
   color: #1e293b;
   margin: 28px 0 16px;
+  text-align: left;
 }
 
 /* 内容卡片 */
@@ -1383,12 +1387,14 @@ onUnmounted(() => {
   padding: 32px;
   margin-bottom: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-align: left;
 }
 
 .paragraph {
   color: #475569;
   line-height: 1.7;
   margin-bottom: 16px;
+  text-align: left;
 }
 
 .paragraph strong {
@@ -1455,6 +1461,7 @@ onUnmounted(() => {
   line-height: 1.8;
   white-space: pre-wrap;
   margin: 16px 0;
+  text-align: left;
 }
 
 /* 表格 */
@@ -1470,7 +1477,7 @@ onUnmounted(() => {
 }
 
 .feature-table th {
-  text-align: left;
+  text-align: center;
   padding: 14px 16px;
   background: #f8fafc;
   color: #1e293b;
@@ -1479,6 +1486,7 @@ onUnmounted(() => {
 }
 
 .feature-table td {
+  text-align: center;
   padding: 14px 16px;
   border-bottom: 1px solid #e2e8f0;
   color: #475569;
@@ -1593,6 +1601,15 @@ onUnmounted(() => {
 .method-list span {
   color: #64748b;
   font-size: 14px;
+}
+
+/* 阶段标题 */
+.phase-section h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 24px 0 12px;
+  text-align: left;
 }
 
 /* 学习路径时间线 - Roadmap 风格 */

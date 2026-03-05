@@ -19,16 +19,16 @@ export const SOLVED_STATE = {
   faces: {
     U: Array(9).fill("white"),
     D: Array(9).fill("yellow"),
-    F: Array(9).fill("red"),
-    B: Array(9).fill("orange"),
-    L: Array(9).fill("blue"),
-    R: Array(9).fill("green"),
+    F: Array(9).fill("green"),
+    B: Array(9).fill("blue"),
+    L: Array(9).fill("orange"),
+    R: Array(9).fill("red"),
   },
 };
 
 /**
  * 复原状态的魔方（数字数组格式）
- * 索引顺序: 0=U(白), 1=D(黄), 2=F(红), 3=B(橙), 4=L(蓝), 5=R(绿)
+ * 索引顺序: 0=U(白), 1=D(黄), 2=F(绿), 3=B(蓝), 4=L(橙), 5=R(红)
  * @constant {number[][]}
  */
 export const SOLVED_STATE_NUMERIC = [
@@ -114,11 +114,25 @@ export function stateToColors(cube) {
 
 /**
  * 将数字数组状态转换为颜色字符串数组
- * @param {number[][]} state - 数字数组状态
- * @returns {string[][]} 颜色字符串数组
+ * @param {number[][]} state - 数字数组状态（顺序：U, D, F, B, L, R）
+ * @returns {string[][]} 颜色字符串数组（顺序：U, R, F, D, L, B）适配 Cube3DView
  */
 export function numericToColors(state) {
-  return state.map((face) => face.map((colorIdx) => COLOR_NAMES[colorIdx]));
+  // 将数字索引转换为颜色名称
+  const colorArrays = state.map((face) =>
+    face.map((colorIdx) => COLOR_NAMES[colorIdx])
+  );
+
+  // 转换为 Cube3DView 期望的顺序：[U, R, F, D, L, B]
+  // 原始顺序：[0:U, 1:D, 2:F, 3:B, 4:L, 5:R]
+  return [
+    colorArrays[0], // U (索引0)
+    colorArrays[5], // R (索引5)
+    colorArrays[2], // F (索引2)
+    colorArrays[1], // D (索引1)
+    colorArrays[4], // L (索引4)
+    colorArrays[3], // B (索引3)
+  ];
 }
 
 /**

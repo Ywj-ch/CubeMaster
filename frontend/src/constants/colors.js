@@ -31,10 +31,10 @@ export const COLOR_MAP = {
 export const COLOR_NAMES = [
   "white",
   "yellow",
-  "red",
-  "orange",
-  "blue",
   "green",
+  "blue",
+  "orange",
+  "red",
 ];
 
 /**
@@ -44,10 +44,10 @@ export const COLOR_NAMES = [
 export const COLOR_INDEX = {
   white: 0,
   yellow: 1,
-  red: 2,
-  orange: 3,
-  blue: 4,
-  green: 5,
+  green: 2,
+  blue: 3,
+  orange: 4,
+  red: 5,
 };
 
 /**
