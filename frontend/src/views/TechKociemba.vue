@@ -643,7 +643,7 @@
               <div class="stat-label">多线程加速</div>
             </div>
             <div class="stat-card">
-              <div class="stat-value">18-19</div>
+              <div class="stat-value">18-20</div>
               <div class="stat-label">平均步数</div>
             </div>
           </div>
@@ -730,40 +730,9 @@
         </div>
       </section>
 
-      <!-- 第8节：常见问题 -->
-      <section id="faq" class="section-block" v-animate>
-        <h2 class="section-heading">8. 常见问题</h2>
-
-        <div class="faq-list-container">
-          <el-collapse
-            v-model="activeFaq"
-            accordion
-            class="custom-modern-collapse"
-          >
-            <el-collapse-item
-              v-for="(faq, index) in faqs"
-              :key="faq.id"
-              :name="faq.id"
-              class="faq-item"
-            >
-              <template #title>
-                <div class="faq-header-content">
-                  <span class="faq-index">0{{ index + 1 }}</span>
-                  <span class="faq-question">{{ faq.title }}</span>
-                </div>
-              </template>
-
-              <div class="faq-answer-content">
-                {{ faq.content }}
-              </div>
-            </el-collapse-item>
-          </el-collapse>
-        </div>
-      </section>
-
-      <!-- 第9节：参考资源 -->
+      <!-- 第8节：参考资源 -->
       <section id="resources" class="section-block" v-animate>
-        <h2 class="section-heading">9. 参考资源</h2>
+        <h2 class="section-heading">8. 参考资源</h2>
 
         <div class="resource-grid">
           <a
@@ -823,6 +792,37 @@
             <h3>系统架构</h3>
             <p>前后端分离设计与数据流</p>
           </router-link>
+        </div>
+      </section>
+
+      <!-- 第9节：常见问题 -->
+      <section id="faq" class="section-block" v-animate>
+        <h2 class="section-heading">9. 常见问题</h2>
+
+        <div class="faq-list-container">
+          <el-collapse
+            v-model="activeFaq"
+            accordion
+            class="custom-modern-collapse"
+          >
+            <el-collapse-item
+              v-for="(faq, index) in faqs"
+              :key="faq.id"
+              :name="faq.id"
+              class="faq-item"
+            >
+              <template #title>
+                <div class="faq-header-content">
+                  <span class="faq-index">0{{ index + 1 }}</span>
+                  <span class="faq-question">{{ faq.title }}</span>
+                </div>
+              </template>
+
+              <div class="faq-answer-content">
+                {{ faq.content }}
+              </div>
+            </el-collapse-item>
+          </el-collapse>
         </div>
       </section>
 
@@ -1070,8 +1070,8 @@ const sections = ref([
   { id: "code-analysis", title: "代码解析" },
   { id: "performance", title: "性能分析" },
   { id: "practice", title: "实践建议" },
-  { id: "faq", title: "常见问题" },
   { id: "resources", title: "参考资源" },
+  { id: "faq", title: "常见问题" },
 ]);
 
 // 返回 About 页面
@@ -2152,17 +2152,20 @@ onUnmounted(() => {
 }
 
 [data-theme="dark"] .paragraph,
+[data-theme="dark"] .paragraph strong,
 [data-theme="dark"] .feature-list li,
 [data-theme="dark"] .checklist li,
 [data-theme="dark"] .method-list span,
 [data-theme="dark"] .timeline-duration,
 [data-theme="dark"] .stat-label,
+[data-theme="dark"] .info-box h4,
 [data-theme="dark"] .info-box p,
 [data-theme="dark"] .info-box li,
 [data-theme="dark"] .practice-item p,
+[data-theme="dark"] .practice-item h4,
 [data-theme="dark"] .faq-answer,
 [data-theme="dark"] .resource-card p {
-  color: #94a3b8;
+  color: #e2e8f0;
 }
 
 [data-theme="dark"] .code-block-text {

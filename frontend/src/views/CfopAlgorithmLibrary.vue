@@ -297,7 +297,11 @@ const openDemo = (item) => {
 const handlePlay = () => tutorialCubeRef.value?.play();
 const copyAlgo = (text) => {
   navigator.clipboard.writeText(text);
-  ElMessage.success("已复制");
+  ElMessage.success({
+    message: "公式已复制到剪贴板",
+    duration: 2000,
+    showClose: true,
+  });
 };
 </script>
 

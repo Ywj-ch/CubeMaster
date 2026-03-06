@@ -401,7 +401,11 @@ const handlePlay = (caseId) => {
 const copyAlgo = (text) => {
   if (!text) return;
   navigator.clipboard.writeText(text);
-  ElMessage.success("公式已复制");
+  ElMessage.success({
+    message: "公式已复制到剪贴板",
+    duration: 2000,
+    showClose: true,
+  });
 };
 
 const resetView = () => {

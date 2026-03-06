@@ -106,29 +106,11 @@
           <div class="content-card">
             <h3>几何表示</h3>
             <p class="card-desc">3x3 离散点阵坐标系生成基础魔方块位置</p>
-            <div class="code-block">
-              <pre><code>// 生成基础 3x3 离散点阵坐标系
-const generateBaseCubies = () => {
-  const positions = [];
-  for (let x = -1; x <= 1; x++) {
-    for (let y = -1; y <= 1; y++) {
-      for (let z = -1; z <= 1; z++) {
-        positions.push({ x, y, z, type: getCubieType(x, y, z) });
-      }
-    }
-  }
-  return positions;
-};
-
-// 小方块类型分类
-const getCubieType = (x, y, z) => {
-  const sum = Math.abs(x) + Math.abs(y) + Math.abs(z);
-  if (sum === 3) return 'corner';     // 角块
-  if (sum === 2) return 'edge';       // 棱块
-  if (sum === 1) return 'center';     // 中心块
-  return 'core';                      // 核心块
-};</code></pre>
-            </div>
+            <CodeBlock
+              language="javascript"
+              title="魔方几何生成"
+              :code="generateCubiesCode"
+            />
           </div>
 
           <div class="content-card">
@@ -137,7 +119,7 @@ const getCubieType = (x, y, z) => {
             <ul class="feature-list">
               <li>
                 <strong>标准配色</strong
-                >：白(U)、红(R)、蓝(L)、橙(F)、绿(B)、黄(D)
+                >：白(U)、红(R)、橙(L)、绿(F)、蓝(B)、黄(D)
               </li>
               <li>
                 <strong>材质系统</strong>：每个面独立 Material，支持高光和反光
@@ -150,9 +132,9 @@ const getCubieType = (x, y, z) => {
             <div class="color-preview">
               <div class="color-swatch" style="background: #ffffff">U</div>
               <div class="color-swatch" style="background: #b71234">R</div>
-              <div class="color-swatch" style="background: #0046ad">L</div>
-              <div class="color-swatch" style="background: #ff5800">F</div>
-              <div class="color-swatch" style="background: #009b48">B</div>
+              <div class="color-swatch" style="background: #ff5800">L</div>
+              <div class="color-swatch" style="background: #009b48">F</div>
+              <div class="color-swatch" style="background: #0046ad">B</div>
               <div class="color-swatch" style="background: #ffd500">D</div>
             </div>
           </div>
@@ -222,28 +204,11 @@ const getCubieType = (x, y, z) => {
           <p class="code-desc">
             使用 localStorage 保存用户配置，刷新页面后自动恢复
           </p>
-          <div class="code-block">
-            <pre><code>// useCubeCustomization.js
-export function useCubeCustomization() {
-  const config = ref(loadConfig()); // 从 localStorage 加载
-  
-  // 自动保存（防抖）
-  watch(config, () => {
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-      saveConfig(config.value);
-    }, 1000);
-  }, { deep: true });
-  
-  return {
-    config,
-    updateConfig,
-    resetToDefault,
-    uploadCustomTexture,
-    // ... 其他方法
-  };
-}</code></pre>
-          </div>
+          <CodeBlock
+            language="javascript"
+            title="useCubeCustomization.js"
+            :code="customizationCode"
+          />
         </div>
       </section>
 
@@ -254,44 +219,11 @@ export function useCubeCustomization() {
           <div class="animation-main">
             <h3>旋转动画实现</h3>
             <p class="anim-desc">基于 requestAnimationFrame 的高性能旋转动画</p>
-            <div class="code-block">
-              <pre><code>// 执行单层旋转动画
-async function rotateLayer(layer, direction, angle = 90) {
-  // 1. 确定受影响的小块
-  const affectedCubies = getCubiesInLayer(layer);
-  
-  // 2. 创建父容器，统一变换
-  const container = new THREE.Group();
-  affectedCubies.forEach(cubie => container.add(cubie));
-  scene.add(container);
-  
-  // 3. 执行动画
-  return new Promise(resolve => {
-    const duration = 300; // 毫秒
-    const startTime = performance.now();
-    
-    function animate(currentTime) {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutCubic(progress);
-      
-      const currentAngle = angle * eased * (direction === 'clockwise' ? 1 : -1);
-      const axis = getAxisForLayer(layer);
-      container.rotation[axis] = THREE.MathUtils.degToRad(currentAngle);
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        updateCubeStateAfterRotation(layer, direction);
-        scene.remove(container);
-        resolve();
-      }
-    }
-    
-    requestAnimationFrame(animate);
-  });
-}</code></pre>
-            </div>
+            <CodeBlock
+              language="javascript"
+              title="旋转动画实现"
+              :code="rotateLayerCode"
+            />
           </div>
 
           <div class="animation-side">
@@ -323,15 +255,12 @@ async function rotateLayer(layer, direction, angle = 90) {
                 使用 Raycaster
                 从鼠标位置发射射线，与魔方块求交，确定点击的面和层。
               </p>
-              <div class="code-snippet-small">
-                <pre><code>const raycaster = new THREE.Raycaster();
-raycaster.setFromCamera(mouse, camera);
-const intersects = raycaster.intersectObjects(cubies);
-if (intersects.length > 0) {
-  const clickedCubie = intersects[0].object;
-  const faceNormal = getClickedFace(intersects[0].face);
-}</code></pre>
-              </div>
+              <CodeBlock
+                language="javascript"
+                title="点击检测"
+                :foldable="false"
+                :code="raycasterCode"
+              />
             </div>
           </div>
 
@@ -340,16 +269,12 @@ if (intersects.length > 0) {
             <div class="item-content">
               <h3>拖动识别</h3>
               <p>跟踪鼠标移动向量，确定旋转方向和层，阈值处理避免误操作。</p>
-              <div class="code-snippet-small">
-                <pre><code>const dragVector = new THREE.Vector2(
-  currentMouse.x - startMouse.x,
-  currentMouse.y - startMouse.y
-);
-if (dragVector.length() > DRAG_THRESHOLD) {
-  const axis = determineRotationAxis(dragVector, clickedFace);
-  rotateLayer(getLayerFromAxisAndFace(axis, clickedFace), direction);
-}</code></pre>
-              </div>
+              <CodeBlock
+                language="javascript"
+                title="拖动识别"
+                :foldable="false"
+                :code="dragVectorCode"
+              />
             </div>
           </div>
 
@@ -358,27 +283,12 @@ if (dragVector.length() > DRAG_THRESHOLD) {
             <div class="item-content">
               <h3>动画队列</h3>
               <p>顺序执行旋转动画，支持撤销/重做，确保状态一致性。</p>
-              <div class="code-snippet-small">
-                <pre><code>class AnimationQueue {
-  constructor() {
-    this.queue = [];
-    this.isAnimating = false;
-  }
-  
-  async add(animation) {
-    this.queue.push(animation);
-    if (!this.isAnimating) this.process();
-  }
-  
-  async process() {
-    this.isAnimating = true;
-    while (this.queue.length > 0) {
-      await this.queue.shift()();
-    }
-    this.isAnimating = false;
-  }
-}</code></pre>
-              </div>
+              <CodeBlock
+                language="javascript"
+                title="动画队列"
+                :foldable="false"
+                :code="animationQueueCode"
+              />
             </div>
           </div>
         </div>
@@ -501,9 +411,127 @@ if (dragVector.length() > DRAG_THRESHOLD) {
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import CodeBlock from "../components/CodeBlock.vue";
 
 const router = useRouter();
 const showBackToTop = ref(false);
+
+const generateCubiesCode = `// 生成基础 3x3 离散点阵坐标系
+const generateBaseCubies = () => {
+  const positions = [];
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
+      for (let z = -1; z <= 1; z++) {
+        positions.push({ x, y, z, type: getCubieType(x, y, z) });
+      }
+    }
+  }
+  return positions;
+};
+
+// 小方块类型分类
+const getCubieType = (x, y, z) => {
+  const sum = Math.abs(x) + Math.abs(y) + Math.abs(z);
+  if (sum === 3) return 'corner';     // 角块
+  if (sum === 2) return 'edge';       // 棱块
+  if (sum === 1) return 'center';     // 中心块
+  return 'core';                      // 核心块
+};`;
+
+const customizationCode = `// useCubeCustomization.js
+export function useCubeCustomization() {
+  const config = ref(loadConfig()); // 从 localStorage 加载
+  
+  // 自动保存（防抖）
+  watch(config, () => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveConfig(config.value);
+    }, 1000);
+  }, { deep: true });
+  
+  return {
+    config,
+    updateConfig,
+    resetToDefault,
+    uploadCustomTexture,
+    // ... 其他方法
+  };
+}`;
+
+const rotateLayerCode = `// 执行单层旋转动画
+async function rotateLayer(layer, direction, angle = 90) {
+  // 1. 确定受影响的小块
+  const affectedCubies = getCubiesInLayer(layer);
+  
+  // 2. 创建父容器，统一变换
+  const container = new THREE.Group();
+  affectedCubies.forEach(cubie => container.add(cubie));
+  scene.add(container);
+  
+  // 3. 执行动画
+  return new Promise(resolve => {
+    const duration = 300; // 毫秒
+    const startTime = performance.now();
+    
+    function animate(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+      
+      const currentAngle = angle * eased * (direction === 'clockwise' ? 1 : -1);
+      const axis = getAxisForLayer(layer);
+      container.rotation[axis] = THREE.MathUtils.degToRad(currentAngle);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        updateCubeStateAfterRotation(layer, direction);
+        scene.remove(container);
+        resolve();
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  });
+}`;
+
+const raycasterCode = `const raycaster = new THREE.Raycaster();
+raycaster.setFromCamera(mouse, camera);
+const intersects = raycaster.intersectObjects(cubies);
+if (intersects.length > 0) {
+  const clickedCubie = intersects[0].object;
+  const faceNormal = getClickedFace(intersects[0].face);
+}`;
+
+const dragVectorCode = `const dragVector = new THREE.Vector2(
+  currentMouse.x - startMouse.x,
+  currentMouse.y - startMouse.y
+);
+if (dragVector.length() > DRAG_THRESHOLD) {
+  const axis = determineRotationAxis(dragVector, clickedFace);
+  rotateLayer(getLayerFromAxisAndFace(axis, clickedFace), direction);
+}`;
+
+const animationQueueCode = `class AnimationQueue {
+  constructor() {
+    this.queue = [];
+    this.isAnimating = false;
+  }
+  
+  async add(animation) {
+    this.queue.push(animation);
+    if (!this.isAnimating) this.process();
+  }
+  
+  async process() {
+    this.isAnimating = true;
+    while (this.queue.length > 0) {
+      await this.queue.shift()();
+    }
+    this.isAnimating = false;
+  }
+}`;
 
 // 滚动动画指令
 const vAnimate = {
@@ -836,27 +864,6 @@ onUnmounted(() => {
   color: #1e293b;
 }
 
-/* 代码块 */
-.code-block {
-  background: #0f172a;
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 16px 0;
-}
-
-.code-block pre {
-  margin: 0;
-  padding: 20px;
-  overflow-x: auto;
-}
-
-.code-block code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 13px;
-  color: #e2e8f0;
-  line-height: 1.5;
-}
-
 /* 颜色预览 */
 .color-preview {
   display: flex;
@@ -1053,25 +1060,6 @@ onUnmounted(() => {
 .item-content p {
   color: #64748b;
   margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.code-snippet-small {
-  background: #0f172a;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.code-snippet-small pre {
-  margin: 0;
-  padding: 16px;
-  overflow-x: auto;
-}
-
-.code-snippet-small code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  color: #e2e8f0;
   line-height: 1.5;
 }
 
@@ -1454,16 +1442,6 @@ onUnmounted(() => {
 [data-theme="dark"] .tips-list li strong,
 [data-theme="dark"] .challenge-box p strong {
   color: var(--dm-text-primary);
-}
-
-[data-theme="dark"] .code-block,
-[data-theme="dark"] .code-snippet-small {
-  background: #0f172a;
-}
-
-[data-theme="dark"] .code-block code,
-[data-theme="dark"] .code-snippet-small code {
-  color: #e2e8f0;
 }
 
 [data-theme="dark"] .metric-value {

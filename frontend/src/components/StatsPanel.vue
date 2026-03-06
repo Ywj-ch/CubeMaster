@@ -372,7 +372,7 @@ function confirmClear() {
 }
 
 [data-theme="dark"] .stat-card.best {
-  background: linear-gradient(135deg, #166534 0%, #14532d 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
 .stat-label {
@@ -391,6 +391,10 @@ function confirmClear() {
   color: #16a34a;
 }
 
+[data-theme="dark"] .stat-card.best .stat-label {
+  color: #dcfce7;
+}
+
 .stat-value {
   font-size: 16px;
   font-weight: 700;
@@ -403,6 +407,10 @@ function confirmClear() {
 
 .stat-card.best .stat-value {
   color: #15803d;
+}
+
+[data-theme="dark"] .stat-card.best .stat-value {
+  color: #ffffff;
 }
 
 .chart-section {
@@ -557,7 +565,7 @@ function confirmClear() {
 }
 
 [data-theme="dark"] .history-item.best {
-  background: linear-gradient(135deg, #166534 0%, #14532d 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
 .item-time {
@@ -575,6 +583,10 @@ function confirmClear() {
   color: #15803d;
 }
 
+[data-theme="dark"] .history-item.best .item-time {
+  color: #ffffff;
+}
+
 .item-details {
   flex: 1;
   display: flex;
@@ -590,6 +602,15 @@ function confirmClear() {
 .item-tps {
   font-size: 11px;
   color: #6366f1;
+}
+
+/* 深色模式下最佳记录的详情文字颜色 */
+[data-theme="dark"] .history-item.best .item-date {
+  color: #dcfce7;
+}
+
+[data-theme="dark"] .history-item.best .item-tps {
+  color: #ffffff;
 }
 
 .delete-btn {

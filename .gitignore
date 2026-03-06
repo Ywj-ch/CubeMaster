@@ -100,9 +100,7 @@ yolo_train/yolov8n.pt
 # ==========================
 # 8. .opencode 工具依赖
 # ==========================
-.opencode/node_modules/
-.opencode/bun.lock
-.opencode/package.json
+.opencode/
 
 # ==========================
 # 9. 前端构建压缩产物

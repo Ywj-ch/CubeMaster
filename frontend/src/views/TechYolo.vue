@@ -544,30 +544,11 @@
       <section class="section-block" v-animate>
         <h2 class="section-heading">CubeMaster 后端集成</h2>
         <div class="integration-card">
-          <div class="code-snippet">
-            <div class="snippet-header">Python · FastAPI 端点</div>
-            <pre><code>@app.post("/api/detect")
-async def detect_cube_faces(images_data: dict):
-    """接收6个面的base64图像，返回魔方状态字符串"""
-    
-    # 1. 保存临时图像文件
-    image_paths = save_base64_images(images_data)
-    
-    # 2. 加载YOLOv8模型
-    model = YOLO("models/best.pt")
-    
-    # 3. 批量推理六个面
-    face_results = []
-    for img_path in image_paths:
-        results = model(img_path, conf=0.7)
-        colors = extract_colors_from_results(results)
-        face_results.append(colors)
-    
-    # 4. 验证和转换状态
-    cube_state = validate_and_convert(face_results)
-    
-    return {"status": "success", "cube_state": cube_state}</code></pre>
-          </div>
+          <CodeBlock
+            language="python"
+            title="FastAPI 端点"
+            :code="detectApiCode"
+          />
           <div class="integration-note">
             <h4>关键设计决策</h4>
             <ul>
@@ -685,11 +666,34 @@ async def detect_cube_faces(images_data: dict):
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import CodeBlock from "../components/CodeBlock.vue";
 
 const router = useRouter();
 const showBackToTop = ref(false);
 const showImageModal = ref(false);
 const currentImageSrc = ref("");
+
+const detectApiCode = `@app.post("/api/detect")
+async def detect_cube_faces(images_data: dict):
+    """接收6个面的base64图像，返回魔方状态字符串"""
+    
+    # 1. 保存临时图像文件
+    image_paths = save_base64_images(images_data)
+    
+    # 2. 加载YOLOv8模型
+    model = YOLO("models/best.pt")
+    
+    # 3. 批量推理六个面
+    face_results = []
+    for img_path in image_paths:
+        results = model(img_path, conf=0.7)
+        colors = extract_colors_from_results(results)
+        face_results.append(colors)
+    
+    # 4. 验证和转换状态
+    cube_state = validate_and_convert(face_results)
+    
+    return {"status": "success", "cube_state": cube_state}`;
 
 // 滚动动画指令
 const vAnimate = {
@@ -1142,36 +1146,6 @@ onUnmounted(() => {
   gap: 30px;
 }
 
-.code-snippet {
-  background: #0f172a;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.snippet-header {
-  background: #1e293b;
-  color: #cbd5e1;
-  padding: 16px 24px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.code-snippet pre {
-  margin: 0;
-  padding: 24px;
-  overflow-x: auto;
-  text-align: left;
-}
-
-.code-snippet code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  color: #e2e8f0;
-  line-height: 1.6;
-  text-align: left;
-  display: block;
-}
-
 .integration-note {
   background: #f8fafc;
   border-radius: 12px;
@@ -1209,34 +1183,6 @@ onUnmounted(() => {
 
 .integration-note li strong {
   color: #1e293b;
-}
-
-.code-snippet {
-  background: #0f172a;
-  border-radius: 16px;
-  overflow: hidden;
-  text-align: left;
-}
-
-.snippet-header {
-  background: #1e293b;
-  color: #cbd5e1;
-  padding: 16px 24px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.code-snippet pre {
-  margin: 0;
-  padding: 24px;
-  overflow-x: auto;
-}
-
-.code-snippet code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  color: #e2e8f0;
-  line-height: 1.6;
 }
 
 .integration-note h3 {

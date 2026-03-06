@@ -1219,9 +1219,27 @@ async function resetCube() {
   color: var(--dm-text-muted);
 }
 
+/* 速度控制按钮深色模式 */
+[data-theme="dark"] .speed-radios :deep(.el-radio-button__inner) {
+  background: var(--dm-bg-card);
+  border-color: var(--dm-border);
+  color: var(--dm-text-primary);
+}
+
+[data-theme="dark"] .speed-radios :deep(.el-radio-button.is-active .el-radio-button__inner) {
+  background: var(--dm-accent);
+  border-color: var(--dm-accent);
+  color: #0f172a;
+  box-shadow: -1px 0 0 0 var(--dm-accent);
+}
+
 [data-theme="dark"] .nav-btn {
   border-color: var(--dm-border);
   color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .nav-btn.el-button {
+  background: var(--dm-bg-card);
 }
 
 [data-theme="dark"] .nav-btn:not(:disabled):hover {

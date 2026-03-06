@@ -165,22 +165,12 @@
                   <strong>职责</strong>：处理图像上传，运行 YOLOv8
                   推理，返回颜色检测结果
                 </p>
-                <div class="code-snippet small">
-                  <pre><code>POST /api/detect
-Content-Type: multipart/form-data
-
-{
-  "images": ["base64_front", "base64_right", ...],
-  "confidence_threshold": 0.7
-}
-
-Response:
-{
-  "status": "success",
-  "cube_state": "UUUUUUUUURRR...",
-  "processing_time": 0.15
-}</code></pre>
-                </div>
+                <CodeBlock
+                  language="bash"
+                  title="视觉识别 API"
+                  :foldable="false"
+                  :code="detectApiCode"
+                />
                 <p>
                   <strong>技术栈</strong>：FastAPI, PyTorch, OpenCV, Ultralytics
                   YOLOv8
@@ -198,23 +188,12 @@ Response:
                   <strong>职责</strong>：接收魔方状态，调用 Kociemba
                   算法，返回解法步骤
                 </p>
-                <div class="code-snippet small">
-                  <pre><code>POST /api/solve
-Content-Type: application/json
-
-{
-  "cube_state": "UUUUUUUUURRR...",
-  "max_depth": 24,
-  "timeout": 5
-}
-
-Response:
-{
-  "solution": "U R' F2 D2 L",
-  "move_count": 19,
-  "solve_time": 0.08
-}</code></pre>
-                </div>
+                <CodeBlock
+                  language="bash"
+                  title="求解引擎 API"
+                  :foldable="false"
+                  :code="solveApiCode"
+                />
                 <p>
                   <strong>技术栈</strong>：FastAPI, Python, twophase (Kociemba),
                   缓存机制
@@ -231,15 +210,12 @@ Response:
                 <p>
                   <strong>挑战</strong>：云端部署时图像存储压力与多用户并发冲突
                 </p>
-                <div class="code-snippet small">
-                  <pre><code># 解决方案架构
-1. 图片上传流程：
-    前端 → 后端临时内存/磁盘存储 → 识别 → 自动清理
-
-2. 并发处理机制：
-    每个请求生成唯一 session_id
-    线程安全处理，避免状态污染</code></pre>
-                </div>
+                <CodeBlock
+                  language="bash"
+                  title="解决方案架构"
+                  :foldable="false"
+                  :code="solutionArchCode"
+                />
                 <p><strong>解决方案</strong>：</p>
                 <ul>
                   <li>
@@ -492,11 +468,51 @@ Response:
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import CodeBlock from "../components/CodeBlock.vue";
 
 const router = useRouter();
 const showBackToTop = ref(false);
 const showImageModal = ref(false);
 const currentImageSrc = ref("");
+
+const detectApiCode = `POST /api/detect
+Content-Type: multipart/form-data
+
+{
+  "images": ["base64_front", "base64_right", ...],
+  "confidence_threshold": 0.7
+}
+
+Response:
+{
+  "status": "success",
+  "cube_state": "UUUUUUUUURRR...",
+  "processing_time": 0.15
+}`;
+
+const solveApiCode = `POST /api/solve
+Content-Type: application/json
+
+{
+  "cube_state": "UUUUUUUUURRR...",
+  "max_depth": 24,
+  "timeout": 5
+}
+
+Response:
+{
+  "solution": "U R' F2 D2 L",
+  "move_count": 19,
+  "solve_time": 0.08
+}`;
+
+const solutionArchCode = `# 解决方案架构
+1. 图片上传流程：
+    前端 → 后端临时内存/磁盘存储 → 识别 → 自动清理
+
+2. 并发处理机制：
+    每个请求生成唯一 session_id
+    线程安全处理，避免状态污染`;
 
 // 滚动动画指令
 const vAnimate = {
@@ -880,33 +896,6 @@ onUnmounted(() => {
   gap: 40px;
 }
 
-.code-snippet {
-  background: #0f172a;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.snippet-header {
-  background: #1e293b;
-  color: #cbd5e1;
-  padding: 16px 24px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.code-snippet pre {
-  margin: 0;
-  padding: 24px;
-  overflow-x: auto;
-}
-
-.code-snippet code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 14px;
-  color: #e2e8f0;
-  line-height: 1.6;
-}
-
 .integration-note h3 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -1266,31 +1255,6 @@ onUnmounted(() => {
 
 .service-details li strong {
   color: #1e293b;
-}
-
-.code-snippet.small {
-  background: #0f172a;
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 16px 0;
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-}
-
-.code-snippet.small pre {
-  margin: 0;
-  padding: 16px;
-  overflow-x: auto;
-  flex: 1;
-  height: 100%;
-}
-
-.code-snippet.small code {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  color: #e2e8f0;
-  line-height: 1.5;
 }
 
 /* 数据流 */
@@ -1897,19 +1861,6 @@ onUnmounted(() => {
 [data-theme="dark"] .service-card {
   background: var(--dm-bg-hover);
   border-color: var(--dm-border);
-}
-
-[data-theme="dark"] .code-snippet {
-  background: #0f172a;
-}
-
-[data-theme="dark"] .snippet-header {
-  background: #1e293b;
-  color: var(--dm-text-secondary);
-}
-
-[data-theme="dark"] .code-snippet code {
-  color: #e2e8f0;
 }
 
 [data-theme="dark"] .data-flow-diagram {
