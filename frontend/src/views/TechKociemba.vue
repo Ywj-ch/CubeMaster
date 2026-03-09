@@ -511,7 +511,7 @@
             <div class="node-card">
               <div class="card-header">
                 <div class="header-left">
-                  <span class="step-icon">{{ stage.icon }}</span>
+                  <span class="step-icon"><component :is="stage.icon" class="w-5 h-5 inline-block" /></span>
                   <h3 class="step-title">{{ stage.title }}</h3>
                 </div>
                 <div class="header-right">
@@ -734,7 +734,7 @@
             target="_blank"
             class="resource-card"
           >
-            <div class="resource-icon">🌐</div>
+            <div class="resource-icon"><GlobeAltIcon class="w-8 h-8" /></div>
             <h4>Kociemba 官方网站</h4>
             <p>算法原作者的官方文档和 Cube Explorer 软件</p>
           </a>
@@ -744,7 +744,7 @@
             target="_blank"
             class="resource-card"
           >
-            <div class="resource-icon">📦</div>
+            <div class="resource-icon"><ArchiveBoxIcon class="w-8 h-8" /></div>
             <h4>GitHub 仓库</h4>
             <p>官方 Python 实现源码</p>
           </a>
@@ -772,12 +772,12 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon">👁️</div>
+            <div class="nav-icon"><EyeIcon class="w-12 h-12" /></div>
             <h3>YOLO 目标检测</h3>
             <p>计算机视觉魔方识别</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon">🎮</div>
+            <div class="nav-icon"><CubeIcon class="w-12 h-12" /></div>
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互</p>
           </router-link>
@@ -836,6 +836,13 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import { 
+  GlobeAltIcon,
+  ArchiveBoxIcon,
+  EyeIcon,
+  CubeIcon,
+  RocketLaunchIcon
+} from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 
 // 代码示例数据
@@ -1064,7 +1071,7 @@ const learningStages = ref([
     ],
   },
   {
-    icon: "🚀",
+    icon: RocketLaunchIcon,
     title: "阶段三：优化技术",
     duration: "2-3 天",
     path: "阅读顺序：symmetries.py（对称性处理）",
