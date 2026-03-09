@@ -151,7 +151,7 @@
 
         <div class="customization-grid">
           <div class="custom-card">
-            <div class="custom-icon">🎨</div>
+            <div class="custom-icon"><PaintBrushIcon class="w-8 h-8" /></div>
             <h3>材质系统</h3>
             <p class="custom-desc">四种材质类型，满足不同视觉效果需求</p>
             <ul class="custom-list">
@@ -175,7 +175,7 @@
           </div>
 
           <div class="custom-card">
-            <div class="custom-icon">💡</div>
+            <div class="custom-icon"><LightBulbIcon class="w-8 h-8" /></div>
             <h3>光照配置</h3>
             <p class="custom-desc">动态调节光照参数，改变魔方视觉效果</p>
             <ul class="custom-list">
@@ -341,7 +341,7 @@
         <h2 class="section-heading">技术挑战</h2>
         <div class="challenges-grid">
           <div class="challenge-box">
-            <div class="challenge-icon">📱</div>
+            <div class="challenge-icon"><DevicePhoneMobileIcon class="w-8 h-8" /></div>
             <h3>移动端适配</h3>
             <p>
               <strong>问题</strong>：移动设备 GPU 性能有限，触摸交互精度要求高
@@ -352,7 +352,7 @@
             </p>
           </div>
           <div class="challenge-box">
-            <div class="challenge-icon">🌐</div>
+            <div class="challenge-icon"><GlobeAltIcon class="w-8 h-8" /></div>
             <h3>浏览器兼容</h3>
             <p>
               <strong>问题</strong>：不同浏览器 WebGL 实现差异，扩展支持不一致
@@ -378,12 +378,12 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon">👁️</div>
+            <div class="nav-icon"><EyeIcon class="w-12 h-12" /></div>
             <h3>YOLOv8 视觉识别</h3>
             <p>魔方颜色检测技术详解</p>
           </router-link>
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon">🧩</div>
+            <div class="nav-icon"><PuzzlePieceIcon class="w-12 h-12" /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
@@ -411,6 +411,14 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import { 
+  PaintBrushIcon,
+  LightBulbIcon,
+  DevicePhoneMobileIcon,
+  GlobeAltIcon,
+  EyeIcon,
+  PuzzlePieceIcon
+} from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 
 const router = useRouter();
