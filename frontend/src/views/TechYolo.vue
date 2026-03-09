@@ -663,9 +663,24 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import { 
+  RocketLaunchIcon,
+  ChartBarIcon,
+  BullseyeIcon,
+  ArrowTrendingUpIcon,
+  CpuChipIcon,
+  LightBulbIcon,
+  WrenchScrewdriverIcon,
+  BoltIcon,
+  MoonIcon,
+  MagnifyingGlassPlusIcon,
+  PaintBrushIcon,
+  PuzzlePieceIcon,
+  CubeIcon
+} from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 
 const router = useRouter();

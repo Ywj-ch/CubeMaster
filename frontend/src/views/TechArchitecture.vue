@@ -109,7 +109,7 @@
         <div class="frontend-architecture">
           <div class="frontend-grid">
             <div class="frontend-module">
-              <h3><span class="module-icon">🎨</span> UI 框架</h3>
+              <h3><PaintBrushIcon class="module-icon w-6 h-6" /> UI 框架</h3>
               <ul>
                 <li>
                   <strong>Vue 3 Composition API</strong
@@ -122,7 +122,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><span class="module-icon">🎮</span> 3D 引擎</h3>
+              <h3><CubeIcon class="module-icon w-6 h-6" /> 3D 引擎</h3>
               <ul>
                 <li><strong>Three.js</strong>：WebGL 渲染库，核心 3D 功能</li>
                 <li><strong>自定义控件</strong>：魔方专用交互系统</li>
@@ -131,7 +131,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><span class="module-icon">🔌</span> 网络层</h3>
+              <h3><CloudIcon class="module-icon w-6 h-6" /> 网络层</h3>
               <ul>
                 <li><strong>Axios</strong>：HTTP 客户端，拦截器和错误处理</li>
                 <li><strong>请求队列</strong>：顺序处理，避免竞态条件</li>
@@ -140,7 +140,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><span class="module-icon">📱</span> 构建工具</h3>
+              <h3><CommandLineIcon class="module-icon w-6 h-6" /> 构建工具</h3>
               <ul>
                 <li><strong>Vite</strong>：极速构建工具，开发服务器</li>
                 <li><strong>Sass</strong>：CSS 预处理器，增强样式可维护性</li>
@@ -160,7 +160,9 @@
           <div class="backend-services">
             <div class="service-card">
               <div class="service-header">
-                <div class="service-icon">🔍</div>
+                <div class="service-icon">
+                <MagnifyingGlassIcon class="w-12 h-12" />
+              </div>
                 <h3>视觉识别服务</h3>
               </div>
               <div class="service-details">
@@ -183,7 +185,9 @@
 
             <div class="service-card">
               <div class="service-header">
-                <div class="service-icon">🧩</div>
+                <div class="service-icon">
+                <PuzzlePieceIcon class="w-12 h-12" />
+              </div>
                 <h3>求解引擎服务</h3>
               </div>
               <div class="service-details">
@@ -206,7 +210,9 @@
 
             <div class="service-card">
               <div class="service-header">
-                <div class="service-icon">☁️</div>
+                <div class="service-icon">
+                <CloudIcon class="w-12 h-12" />
+              </div>
                 <h3>云端存储与并发考虑</h3>
               </div>
               <div class="service-details">
@@ -295,7 +301,7 @@
         <h2 class="section-heading">部署与运维</h2>
         <div class="deployment-grid">
           <div class="deploy-card">
-            <h3><span class="deploy-icon">🚀</span> 前端部署</h3>
+            <h3><RocketLaunchIcon class="deploy-icon w-6 h-6" /> 前端部署</h3>
             <ul>
               <li><strong>开发服务器</strong>：Vite 热重载开发环境</li>
               <li><strong>静态构建</strong>：Vite 生产构建，生成静态资源</li>
@@ -305,7 +311,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><span class="deploy-icon">🛠️</span> 后端部署</h3>
+            <h3><WrenchScrewdriverIcon class="deploy-icon w-6 h-6" /> 后端部署</h3>
             <ul>
               <li>
                 <strong>开发服务器</strong>：FastAPI + Uvicorn 本地开发服务
@@ -317,7 +323,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><span class="deploy-icon">🔒</span> 安全策略</h3>
+            <h3><Lock class="deploy-icon w-6 h-6" /> 安全策略</h3>
             <ul>
               <li><strong>CORS 配置</strong>：严格限制允许的源和请求方法</li>
               <li><strong>速率限制</strong>：API 调用频率限制，防止滥用</li>
@@ -331,7 +337,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><span class="deploy-icon">📈</span> 日志与调试</h3>
+            <h3><ChartBarIcon class="deploy-icon w-6 h-6" /> 日志与调试</h3>
             <ul>
               <li><strong>日志记录</strong>：Python 标准日志，控制台输出</li>
               <li><strong>错误追踪</strong>：前端控制台日志，网络请求监控</li>
@@ -349,7 +355,7 @@
         <h2 class="section-heading">扩展性设计</h2>
         <div class="scaling-considerations">
           <div class="scaling-card">
-            <h3><span class="scaling-icon">📱</span> 用户规模扩展</h3>
+            <h3><DevicePhoneMobileIcon class="scaling-icon w-6 h-6" /> 用户规模扩展</h3>
             <p><strong>挑战</strong>：同时在线用户数从 100 扩展到 10,000+</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -361,7 +367,7 @@
           </div>
 
           <div class="scaling-card">
-            <h3><span class="scaling-icon">🧠</span> 算法功能扩展</h3>
+            <h3><CpuChipIcon class="scaling-icon w-6 h-6" /> 算法功能扩展</h3>
             <p><strong>挑战</strong>：支持更多魔方类型 (4×4, 5×5, 异形)</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -373,7 +379,7 @@
           </div>
 
           <div class="scaling-card">
-            <h3><span class="scaling-icon">🌐</span> 国际化扩展</h3>
+            <h3><GlobeAltIcon class="scaling-icon w-6 h-6" /> 国际化扩展</h3>
             <p><strong>挑战</strong>：支持多语言界面和本地化内容</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -433,17 +439,17 @@
         <h2 class="section-heading text-center">深入技术细节</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon">👁️</div>
+            <EyeIcon class="nav-icon w-12 h-12" />
             <h3>YOLOv8 视觉识别</h3>
             <p>魔方颜色检测技术详解</p>
           </router-link>
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon">🧩</div>
+            <PuzzlePieceIcon class="nav-icon w-12 h-12" />
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon">🎮</div>
+            <CubeIcon class="nav-icon w-12 h-12" />
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互实现</p>
           </router-link>
@@ -475,6 +481,23 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
+import { 
+  PaintBrushIcon,
+  CubeIcon,
+  CloudIcon,
+  CommandLineIcon,
+  MagnifyingGlassIcon,
+  PuzzlePieceIcon,
+  RocketLaunchIcon,
+  WrenchScrewdriverIcon,
+  ChartBarIcon,
+  CpuChipIcon,
+  DevicePhoneMobileIcon,
+  GlobeAltIcon,
+  EyeIcon,
+  ServerIcon
+} from "@heroicons/vue/24/solid";
+import { Lock } from "@element-plus/icons-vue";
 import CodeBlock from "../components/CodeBlock.vue";
 
 const router = useRouter();
