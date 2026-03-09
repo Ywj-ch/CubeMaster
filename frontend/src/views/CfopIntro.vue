@@ -87,14 +87,14 @@
 
           <!-- 中卡：电梯模式 -->
           <div class="decision-card blue" @click="scrollToId('full-roadmap')">
-            <div class="icon-box"><ArrowTrendingUpIcon class="w-8 h-8" /></div>
+            <div class="icon-box"><ArrowTrendingUpIcon class="w-7 h-7" /></div>
             <h3>挑战完整 CFOP</h3>
             <p>分模块攻克 F2L + OLL + PLL</p>
           </div>
 
           <!-- 右卡：查表模式 -->
           <div class="decision-card purple" @click="scrollToId('full-roadmap')">
-            <div class="icon-box"><BoltIcon class="w-8 h-8" /></div>
+            <div class="icon-box"><BoltIcon class="w-7 h-7" /></div>
             <h3>我需要快速参考</h3>
             <p>查阅算法表与指法技巧</p>
           </div>
@@ -109,7 +109,7 @@
             <div class="blob"></div>
             <div class="bg"></div>
             <div class="stat-content">
-              <div class="stat-icon"><BullseyeIcon class="w-8 h-8" /></div>
+              <div class="stat-icon"><TrophyIcon class="w-6 h-6" /></div>
               <div class="stat-num">4</div>
               <div class="stat-label">主要步骤</div>
             </div>
@@ -129,7 +129,7 @@
             <div class="blob"></div>
             <div class="bg"></div>
             <div class="stat-content">
-              <div class="stat-icon"><PuzzlePieceIcon class="w-8 h-8" /></div>
+              <div class="stat-icon"><PuzzlePieceIcon class="w-6 h-6" /></div>
               <div class="stat-num">21</div>
               <div class="stat-label">PLL 情况</div>
             </div>
@@ -317,7 +317,7 @@ import { Check, Monitor, ArrowRight } from "@element-plus/icons-vue";
 import { 
   ArrowTrendingUpIcon,
   BoltIcon,
-  BullseyeIcon,
+  TrophyIcon,
   PuzzlePieceIcon,
   Square3Stack3dIcon,
   HandshakeIcon,
@@ -432,7 +432,7 @@ const cfopSteps = [
   {
     id: "oll",
     title: "OLL (顶层定向)",
-    icon: BullseyeIcon,
+    icon: TrophyIcon,
     desc: "将顶层所有颜色统一朝上。分为 2-Look (10个公式) 和 Full (57个公式)。",
     goal: "顶面复原",
     algCount: "57",

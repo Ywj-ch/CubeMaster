@@ -107,7 +107,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon"><BullseyeIcon class="w-8 h-8" /></div>
+              <div class="principle-icon"><TrophyIcon class="w-8 h-8" /></div>
               <h3>置信度定义</h3>
               <p>
                 置信度 =
@@ -624,12 +624,12 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon"><PuzzlePieceIcon class="w-12 h-12" /></div>
+            <div class="nav-icon"><PuzzlePieceIcon class="w-10 h-10" /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon"><CubeIcon class="w-12 h-12" /></div>
+            <div class="nav-icon"><CubeIcon class="w-10 h-10" /></div>
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互实现</p>
           </router-link>
@@ -669,7 +669,7 @@ import { ArrowLeft, ArrowUp } from "@element-plus/icons-vue";
 import { 
   RocketLaunchIcon,
   ChartBarIcon,
-  BullseyeIcon,
+  TrophyIcon,
   ArrowTrendingUpIcon,
   CpuChipIcon,
   LightBulbIcon,

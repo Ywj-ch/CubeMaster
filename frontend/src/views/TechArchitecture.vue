@@ -161,7 +161,7 @@
             <div class="service-card">
               <div class="service-header">
                 <div class="service-icon">
-                <MagnifyingGlassIcon class="w-12 h-12" />
+                <MagnifyingGlassIcon class="w-8 h-8" />
               </div>
                 <h3>视觉识别服务</h3>
               </div>
@@ -186,7 +186,7 @@
             <div class="service-card">
               <div class="service-header">
                 <div class="service-icon">
-                <PuzzlePieceIcon class="w-12 h-12" />
+                <PuzzlePieceIcon class="w-8 h-8" />
               </div>
                 <h3>求解引擎服务</h3>
               </div>
@@ -211,7 +211,7 @@
             <div class="service-card">
               <div class="service-header">
                 <div class="service-icon">
-                <CloudIcon class="w-12 h-12" />
+                <CloudIcon class="w-8 h-8" />
               </div>
                 <h3>云端存储与并发考虑</h3>
               </div>
@@ -439,17 +439,17 @@
         <h2 class="section-heading text-center">深入技术细节</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <EyeIcon class="nav-icon w-12 h-12" />
+            <EyeIcon class="nav-icon w-10 h-10" />
             <h3>YOLOv8 视觉识别</h3>
             <p>魔方颜色检测技术详解</p>
           </router-link>
           <router-link to="/tech/kociemba" class="nav-card">
-            <PuzzlePieceIcon class="nav-icon w-12 h-12" />
+            <PuzzlePieceIcon class="nav-icon w-10 h-10" />
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <CubeIcon class="nav-icon w-12 h-12" />
+            <CubeIcon class="nav-icon w-10 h-10" />
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互实现</p>
           </router-link>

@@ -378,12 +378,12 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon"><EyeIcon class="w-12 h-12" /></div>
+            <div class="nav-icon"><EyeIcon class="w-10 h-10" /></div>
             <h3>YOLOv8 视觉识别</h3>
             <p>魔方颜色检测技术详解</p>
           </router-link>
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon"><PuzzlePieceIcon class="w-12 h-12" /></div>
+            <div class="nav-icon"><PuzzlePieceIcon class="w-10 h-10" /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
