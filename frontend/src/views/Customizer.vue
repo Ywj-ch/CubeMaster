@@ -3,8 +3,7 @@
     <!-- 页面标题 -->
     <div class="page-header animate-entry">
       <h1>
-        <span class="emoji">🎨</span
-        ><span class="title-text">魔方外观自定义</span>
+        <PaintBrushIcon class="w-6 h-6 inline-block align-middle mr-2" /><span class="title-text">魔方外观自定义</span>
       </h1>
       <p class="subtitle">
         自定义魔方的材质、纹理和光照效果，打造属于你的独特魔方外观
@@ -74,7 +73,7 @@
 
             <div class="preview-info">
               <div class="preview-info-group">
-                <span class="preview-emoji">🎨</span>
+                <span class="preview-emoji"><PaintBrushIcon class="w-5 h-5" /></span>
                 <div class="info-content">
                   <strong>材质设置</strong>
                   <span>{{ materialSummary }}</span>
@@ -98,7 +97,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="preview-emoji">💡</span>
+                <span class="preview-emoji"><LightBulbIcon class="w-5 h-5" /></span>
                 <div class="info-content">
                   <strong>光照环境</strong>
                   <span>{{ lightingSummary }}</span>
@@ -520,6 +519,7 @@
 import { computed, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { Upload, InfoFilled } from "@element-plus/icons-vue";
+import { PaintBrushIcon, LightBulbIcon } from "@heroicons/vue/24/solid";
 import Cube3DView from "../components/Cube3DView.vue";
 import { createCubeFromJson } from "../utils/cubeState.js";
 import { useCubeCustomization } from "../composables/useCubeCustomization.js";
