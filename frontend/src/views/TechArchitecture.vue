@@ -109,7 +109,7 @@
         <div class="frontend-architecture">
           <div class="frontend-grid">
             <div class="frontend-module">
-              <h3><PaintBrushIcon class="module-icon w-6 h-6" /> UI 框架</h3>
+              <h3><PaintBrushIcon class="w-5 h-5 inline-block align-middle mr-2" /> UI 框架</h3>
               <ul>
                 <li>
                   <strong>Vue 3 Composition API</strong
@@ -122,7 +122,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><CubeIcon class="module-icon w-6 h-6" /> 3D 引擎</h3>
+              <h3><CubeIcon class="w-5 h-5 inline-block align-middle mr-2" /> 3D 引擎</h3>
               <ul>
                 <li><strong>Three.js</strong>：WebGL 渲染库，核心 3D 功能</li>
                 <li><strong>自定义控件</strong>：魔方专用交互系统</li>
@@ -131,7 +131,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><CloudIcon class="module-icon w-6 h-6" /> 网络层</h3>
+              <h3><CloudIcon class="w-5 h-5 inline-block align-middle mr-2" /> 网络层</h3>
               <ul>
                 <li><strong>Axios</strong>：HTTP 客户端，拦截器和错误处理</li>
                 <li><strong>请求队列</strong>：顺序处理，避免竞态条件</li>
@@ -140,7 +140,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><CommandLineIcon class="module-icon w-6 h-6" /> 构建工具</h3>
+              <h3><CommandLineIcon class="w-5 h-5 inline-block align-middle mr-2" /> 构建工具</h3>
               <ul>
                 <li><strong>Vite</strong>：极速构建工具，开发服务器</li>
                 <li><strong>Sass</strong>：CSS 预处理器，增强样式可维护性</li>
@@ -301,7 +301,7 @@
         <h2 class="section-heading">部署与运维</h2>
         <div class="deployment-grid">
           <div class="deploy-card">
-            <h3><RocketLaunchIcon class="deploy-icon w-6 h-6" /> 前端部署</h3>
+            <h3><RocketLaunchIcon class="w-5 h-5 inline-block align-middle mr-2" /> 前端部署</h3>
             <ul>
               <li><strong>开发服务器</strong>：Vite 热重载开发环境</li>
               <li><strong>静态构建</strong>：Vite 生产构建，生成静态资源</li>
@@ -311,7 +311,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><WrenchScrewdriverIcon class="deploy-icon w-6 h-6" /> 后端部署</h3>
+            <h3><WrenchScrewdriverIcon class="w-5 h-5 inline-block align-middle mr-2" /> 后端部署</h3>
             <ul>
               <li>
                 <strong>开发服务器</strong>：FastAPI + Uvicorn 本地开发服务
@@ -323,7 +323,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><Lock class="deploy-icon w-6 h-6" /> 安全策略</h3>
+            <h3><Lock class="w-5 h-5 inline-block align-middle mr-2" /> 安全策略</h3>
             <ul>
               <li><strong>CORS 配置</strong>：严格限制允许的源和请求方法</li>
               <li><strong>速率限制</strong>：API 调用频率限制，防止滥用</li>
@@ -337,7 +337,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><ChartBarIcon class="deploy-icon w-6 h-6" /> 日志与调试</h3>
+            <h3><ChartBarIcon class="w-5 h-5 inline-block align-middle mr-2" /> 日志与调试</h3>
             <ul>
               <li><strong>日志记录</strong>：Python 标准日志，控制台输出</li>
               <li><strong>错误追踪</strong>：前端控制台日志，网络请求监控</li>
@@ -355,7 +355,7 @@
         <h2 class="section-heading">扩展性设计</h2>
         <div class="scaling-considerations">
           <div class="scaling-card">
-            <h3><DevicePhoneMobileIcon class="scaling-icon w-6 h-6" /> 用户规模扩展</h3>
+            <h3><DevicePhoneMobileIcon class="w-5 h-5 inline-block align-middle mr-2" /> 用户规模扩展</h3>
             <p><strong>挑战</strong>：同时在线用户数从 100 扩展到 10,000+</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -367,7 +367,7 @@
           </div>
 
           <div class="scaling-card">
-            <h3><CpuChipIcon class="scaling-icon w-6 h-6" /> 算法功能扩展</h3>
+            <h3><CpuChipIcon class="w-5 h-5 inline-block align-middle mr-2" /> 算法功能扩展</h3>
             <p><strong>挑战</strong>：支持更多魔方类型 (4×4, 5×5, 异形)</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -379,7 +379,7 @@
           </div>
 
           <div class="scaling-card">
-            <h3><GlobeAltIcon class="scaling-icon w-6 h-6" /> 国际化扩展</h3>
+            <h3><GlobeAltIcon class="w-5 h-5 inline-block align-middle mr-2" /> 国际化扩展</h3>
             <p><strong>挑战</strong>：支持多语言界面和本地化内容</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
