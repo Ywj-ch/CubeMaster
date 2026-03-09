@@ -64,7 +64,7 @@
               >：流程复杂（多阶段），各个组件需要单独训练，导致<strong>检测速度慢</strong>，难以满足实时应用需求。
             </p>
 
-            <h3><span class="background-icon">🚀</span> YOLO 的革命性突破</h3>
+            <h3><RocketLaunchIcon class="w-5 h-5 inline-block align-middle mr-2" /> YOLO 的革命性突破</h3>
             <p>
               <strong>核心思想</strong
               >：去除繁琐的候选框提取步骤，直接将整张图输入一个单独的卷积神经网络（CNN），实现<strong>统一的、实时的</strong>目标检测框架。
@@ -98,7 +98,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon">📊</div>
+              <div class="principle-icon"><ChartBarIcon class="w-8 h-8" /></div>
               <h3>预测张量 (Output Tensor)</h3>
               <p>
                 每个 Grid Cell 预测 <strong>B</strong> 个边界框（默认
@@ -107,7 +107,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon">🎯</div>
+              <div class="principle-icon"><BullseyeIcon class="w-8 h-8" /></div>
               <h3>置信度定义</h3>
               <p>
                 置信度 =
@@ -116,7 +116,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon">📈</div>
+              <div class="principle-icon"><ArrowTrendingUpIcon class="w-8 h-8" /></div>
               <h3>分类得分计算</h3>
               <p>测试阶段最终得分：</p>
               <div class="formula-inline">
@@ -151,7 +151,7 @@
           </div>
           <div class="architecture-details-grid">
             <div class="architecture-detail-item">
-              <h3><span class="detail-icon">🧠</span> 架构特点</h3>
+              <h3><CpuChipIcon class="w-5 h-5 inline-block align-middle mr-2" /> 架构特点</h3>
               <ul>
                 <li><strong>灵感来源</strong>：基于 GoogLeNet 修改</li>
                 <li><strong>层数构成</strong>：24 层卷积 + 2 层全连接</li>
@@ -260,7 +260,7 @@
             </div>
 
             <div class="formula-notes">
-              <h4>💡 关键设计解析</h4>
+              <h4><LightBulbIcon class="w-5 h-5 inline-block align-middle mr-2" /> 关键设计解析</h4>
               <ul>
                 <li>
                   <strong>宽高开根号</strong
@@ -471,7 +471,7 @@
           </div>
           <div class="workflow-arrow">→</div>
           <div class="workflow-step-h">
-            <div class="step-icon">📊</div>
+            <div class="step-icon"><ChartBarIcon class="w-8 h-8" /></div>
             <div class="step-info">
               <span class="step-num">04</span>
               <h4>空间排序</h4>
@@ -495,7 +495,7 @@
         <h2 class="section-heading">CubeMaster 模型训练</h2>
         <div class="training-details">
           <div class="detail-card">
-            <h3><span class="detail-icon">📊</span> 数据集构成</h3>
+            <h3><ChartBarIcon class="w-5 h-5 inline-block align-middle mr-2" /> 数据集构成</h3>
             <ul>
               <li>
                 <strong>200 张标注图像</strong>：涵盖不同光照、角度、背景条件
@@ -512,7 +512,7 @@
             </ul>
           </div>
           <div class="detail-card">
-            <h3><span class="detail-icon">⚡</span> 训练参数</h3>
+            <h3><BoltIcon class="w-5 h-5 inline-block align-middle mr-2" /> 训练参数</h3>
             <ul>
               <li><strong>基础模型</strong>：YOLOv8n (Nano 版本)</li>
               <li>
@@ -527,7 +527,7 @@
             </ul>
           </div>
           <div class="detail-card">
-            <h3><span class="detail-icon">📈</span> 性能指标</h3>
+            <h3><ArrowTrendingUpIcon class="w-5 h-5 inline-block align-middle mr-2" /> 性能指标</h3>
             <ul>
               <li><strong>mAP@0.5</strong>：0.982 (平均精度均值)</li>
               <li><strong>推理速度</strong>：15ms/图像 (NVIDIA RTX 3060)</li>
@@ -580,7 +580,7 @@
           </div>
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji">🔍</span>
+              <span class="challenge-emoji"><MagnifyingGlassPlusIcon class="w-8 h-8" /></span>
               <h3>小目标检测</h3>
             </div>
             <p>
@@ -593,7 +593,7 @@
           </div>
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji">🎨</span>
+              <span class="challenge-emoji"><PaintBrushIcon class="w-8 h-8" /></span>
               <h3>颜色混淆</h3>
             </div>
             <p>
@@ -605,7 +605,7 @@
           </div>
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji">⚡</span>
+              <span class="challenge-emoji"><BoltIcon class="w-8 h-8" /></span>
               <h3>实时性要求</h3>
             </div>
             <p>
@@ -624,12 +624,12 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon">🧩</div>
+            <div class="nav-icon"><PuzzlePieceIcon class="w-12 h-12" /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon">🎮</div>
+            <div class="nav-icon"><CubeIcon class="w-12 h-12" /></div>
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互实现</p>
           </router-link>
