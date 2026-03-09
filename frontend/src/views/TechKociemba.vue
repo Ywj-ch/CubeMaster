@@ -314,9 +314,6 @@
         <!-- solver.py -->
         <div class="content-card">
           <div class="file-header">
-            <div class="file-icon">
-              <span class="file-icon-text">Py</span>
-            </div>
             <div class="file-title-group">
               <h3>solver.py</h3>
               <div class="file-meta">311 行 · 算法核心</div>
@@ -357,9 +354,6 @@
         <!-- pruning.py -->
         <div class="content-card">
           <div class="file-header">
-            <div class="file-icon">
-              <span class="file-icon-text">Py</span>
-            </div>
             <div class="file-title-group">
               <h3>pruning.py</h3>
               <div class="file-meta">332 行 · 剪枝表生成</div>
@@ -399,9 +393,6 @@
         <!-- moves.py -->
         <div class="content-card">
           <div class="file-header">
-            <div class="file-icon">
-              <span class="file-icon-text">Py</span>
-            </div>
             <div class="file-title-group">
               <h3>moves.py</h3>
               <div class="file-meta">210 行 · 移动表</div>
@@ -430,14 +421,17 @@
               </li>
             </ul>
           </div>
+
+          <CodeBlock
+            language="python"
+            title="移动表数据结构"
+            :code="movesCode"
+          />
         </div>
 
         <!-- cubie.py -->
         <div class="content-card">
           <div class="file-header">
-            <div class="file-icon">
-              <span class="file-icon-text">Py</span>
-            </div>
             <div class="file-title-group">
               <h3>cubie.py</h3>
               <div class="file-meta">561 行 · 魔方块表示</div>
@@ -459,9 +453,6 @@
         <!-- coord.py -->
         <div class="content-card">
           <div class="file-header">
-            <div class="file-icon">
-              <span class="file-icon-text">Py</span>
-            </div>
             <div class="file-title-group">
               <h3>coord.py</h3>
               <div class="file-meta">223 行 · 坐标表示</div>
@@ -472,14 +463,17 @@
             coord.py 实现了魔方的坐标表示，将复杂的状态映射为数字索引，
             便于剪枝表查询和状态比较。
           </p>
+
+          <CodeBlock
+            language="python"
+            title="坐标编码函数"
+            :code="coordCode"
+          />
         </div>
 
         <!-- defs.py -->
         <div class="content-card">
           <div class="file-header">
-            <div class="file-icon">
-              <span class="file-icon-text">Py</span>
-            </div>
             <div class="file-title-group">
               <h3>defs.py</h3>
               <div class="file-meta">45 行 · 常量定义</div>
@@ -889,6 +883,29 @@ const pruningCode = `def get_flipslice_twist_depth3(ix):
 # 压缩后：约 140,893,410 ÷ 16 × 4 字节 = 约 33.6 MB
 # 节省空间：约 75%`;
 
+const movesCode = `# 移动表数据结构
+# 角块方向移动表：2187 种状态 × 18 种移动
+twist_move = [[0] * 18 for _ in range(2187)]
+
+# 棱块方向移动表：2048 种状态 × 18 种移动
+flip_move = [[0] * 18 for _ in range(2048)]
+
+# 角块位置移动表：40320 种状态 × 18 种移动
+corners_move = [[0] * 18 for _ in range(40320)]
+
+def init_move_tables():
+    """预计算所有移动表"""
+    for i in range(2187):
+        for m in range(18):
+            twist_move[i][m] = apply_twist_move(i, m)
+    
+    for i in range(2048):
+        for m in range(18):
+            flip_move[i][m] = apply_flip_move(i, m)
+    
+    # O(1) 时间查询
+    return twist_move, flip_move, corners_move`;
+
 const cubieCode = `class CubieCube:
     """魔方块层次表示"""
     def __init__(self, cp=None, co=None, ep=None, eo=None):
@@ -923,6 +940,32 @@ N_UD_EDGES = 40320       # 8! UD棱块排列数
 N_FLIPSLICE_CLASS = 64430  # 对称性约减后的类数
 N_CORNERS_CLASS = 2768     # 对称性约减后的类数
 N_SYM_D4h = 16             # D4h对称群数量`;
+
+const coordCode = `# 坐标编码函数
+def get_twist(cubie):
+    """计算角块方向坐标 (0-2186)"""
+    twist = 0
+    for i in range(7):
+        twist = twist * 3 + cubie.co[i]
+    return twist
+
+def get_flip(cubie):
+    """计算棱块方向坐标 (0-2047)"""
+    flip = 0
+    for i in range(11):
+        flip = flip * 2 + cubie.eo[i]
+    return flip
+
+def get_slice_sorted(cubie):
+    """计算中层棱块位置坐标 (0-11879)"""
+    # FR, FL, BL, BR 四个棱块的位置和排列
+    slice_edges = [Ed.FR, Ed.FL, Ed.BL, Ed.BR]
+    positions = []
+    for edge in slice_edges:
+        positions.append(cubie.ep.index(edge))
+    # 计算组合数索引
+    return compute_slice_index(positions)`;
+
 
 const phase1SearchCode = `for m in Move:  # 遍历18种移动
     # 1. 应用移动，更新坐标
@@ -1259,7 +1302,7 @@ onUnmounted(() => {
 .glow-bottom-left {
   bottom: -100px;
   left: -100px;
-  background: #8b5cf6;
+  background: #10b981;
 }
 
 .hero-content {
@@ -1309,7 +1352,7 @@ onUnmounted(() => {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -1527,22 +1570,6 @@ onUnmounted(() => {
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
-}
-
-.file-icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.file-icon-text {
-  color: white;
-  font-size: 13px;
-  font-weight: 700;
 }
 
 .file-title-group h3 {
@@ -2223,8 +2250,8 @@ onUnmounted(() => {
 }
 
 [data-theme="dark"] .method-list code {
-  background: #1e3a8a;
-  color: #60a5fa;
+  background: #334155;
+  color: #cbd5e1;
 }
 
 [data-theme="dark"] .feature-table code {

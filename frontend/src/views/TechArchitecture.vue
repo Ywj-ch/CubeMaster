@@ -117,6 +117,7 @@
                 </li>
                 <li><strong>Element Plus</strong>：企业级 UI 组件库</li>
                 <li><strong>Vue Router</strong>：SPA 路由管理，支持嵌套路由</li>
+                <li><strong>Prism.js</strong>：代码语法高亮，支持多语言</li>
               </ul>
             </div>
 
@@ -142,6 +143,8 @@
               <h3><span class="module-icon">📱</span> 构建工具</h3>
               <ul>
                 <li><strong>Vite</strong>：极速构建工具，开发服务器</li>
+                <li><strong>Sass</strong>：CSS 预处理器，增强样式可维护性</li>
+                <li><strong>Vitest</strong>：现代化单元测试框架，Vite 原生集成</li>
                 <li><strong>Prettier</strong>：代码格式化工具</li>
                 <li><strong>构建与部署</strong>：Vite 静态构建，手动部署</li>
               </ul>
@@ -393,8 +396,10 @@
               <span class="stack-tag">Vue 3</span>
               <span class="stack-tag">Vite</span>
               <span class="stack-tag">Element Plus</span>
+              <span class="stack-tag">Vue Router</span>
               <span class="stack-tag">Three.js</span>
               <span class="stack-tag">Axios</span>
+              <span class="stack-tag">Prism.js</span>
             </div>
           </div>
 
@@ -402,10 +407,12 @@
             <h3>后端技术栈</h3>
             <div class="stack-tags">
               <span class="stack-tag">FastAPI</span>
+              <span class="stack-tag">Uvicorn</span>
               <span class="stack-tag">Python 3.10</span>
               <span class="stack-tag">PyTorch</span>
               <span class="stack-tag">YOLOv8</span>
               <span class="stack-tag">OpenCV</span>
+              <span class="stack-tag">NumPy</span>
               <span class="stack-tag">Kociemba</span>
             </div>
           </div>
