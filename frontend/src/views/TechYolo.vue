@@ -1254,6 +1254,12 @@ onUnmounted(() => {
 
 .challenge-emoji {
   font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.challenge-emoji svg {
+  width: 32px;
+  height: 32px;
 }
 
 .challenge-card h3 {
@@ -1306,6 +1312,11 @@ onUnmounted(() => {
 .nav-icon {
   font-size: 2.5rem;
   margin-bottom: 16px;
+}
+
+.nav-icon svg {
+  width: 40px;
+  height: 40px;
 }
 
 .nav-card h3 {
@@ -1460,8 +1471,13 @@ onUnmounted(() => {
 }
 
 .principle-icon {
-  font-size: 2rem;
-  margin-bottom: 12px;
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.principle-icon svg {
+  width: 40px;
+  height: 40px;
 }
 
 .principle-item h3 {
@@ -1549,6 +1565,11 @@ onUnmounted(() => {
 
 .detail-icon {
   font-size: 1.5rem;
+}
+
+.detail-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .architecture-detail-item ul {

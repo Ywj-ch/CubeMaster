@@ -778,6 +778,11 @@ onMounted(() => {
   font-size: 28px;
   margin: 0 auto 20px;
 }
+
+.decision-card .icon-box svg {
+  width: 28px;
+  height: 28px;
+}
 .decision-card h3 {
   font-size: 1.2rem;
   font-weight: 700;
@@ -918,6 +923,11 @@ onMounted(() => {
   font-size: 26px;
   margin-bottom: 12px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .stat-num {
@@ -1173,6 +1183,11 @@ onMounted(() => {
 }
 .step-icon {
   font-size: 1.5rem;
+}
+
+.step-icon svg {
+  width: 24px;
+  height: 24px;
 }
 .step-title {
   font-size: 1.25rem;

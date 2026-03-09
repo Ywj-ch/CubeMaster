@@ -965,6 +965,12 @@ function handleOutsideClick(e) {
   transition: all 0.3s;
 }
 
+.marker-circle svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
 .node-card {
   flex: 0 0 auto;
   width: 400px;

@@ -1739,6 +1739,11 @@ onUnmounted(() => {
   font-size: 1.5rem;
 }
 
+.step-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
 .step-title {
   font-size: 1.25rem;
   font-weight: 800;
@@ -2012,6 +2017,11 @@ onUnmounted(() => {
   margin-bottom: 12px;
 }
 
+.resource-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
 .resource-card h4 {
   font-size: 1.1rem;
   font-weight: 600;
@@ -2103,6 +2113,11 @@ onUnmounted(() => {
 .nav-icon {
   font-size: 2.5rem;
   margin-bottom: 16px;
+}
+
+.nav-icon svg {
+  width: 40px;
+  height: 40px;
 }
 
 .nav-card h3 {

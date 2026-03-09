@@ -1039,6 +1039,11 @@ onUnmounted(() => {
   margin-bottom: 16px;
 }
 
+.nav-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
 .nav-card h3 {
   font-size: 1.25rem;
   font-weight: 700;
@@ -1247,6 +1252,11 @@ onUnmounted(() => {
 
 .service-icon {
   font-size: 2rem;
+}
+
+.service-icon svg {
+  width: 32px;
+  height: 32px;
 }
 
 .service-card h3 {
@@ -1548,6 +1558,11 @@ onUnmounted(() => {
 .nav-icon {
   font-size: 2.5rem;
   margin-bottom: 16px;
+}
+
+.nav-icon svg {
+  width: 40px;
+  height: 40px;
 }
 
 .nav-card h3 {

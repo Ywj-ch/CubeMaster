@@ -914,6 +914,11 @@ onUnmounted(() => {
   margin-bottom: 16px;
 }
 
+.custom-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
 .custom-card h3 {
   font-size: 1.125rem;
   font-weight: 700;
@@ -1219,6 +1224,11 @@ onUnmounted(() => {
 .nav-icon {
   font-size: 2.5rem;
   margin-bottom: 16px;
+}
+
+.nav-icon svg {
+  width: 40px;
+  height: 40px;
 }
 
 .nav-card h3 {

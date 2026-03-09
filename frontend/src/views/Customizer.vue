@@ -1188,6 +1188,11 @@ const handleSave = () => {
   margin-top: 2px;
 }
 
+.preview-emoji svg {
+  width: 24px;
+  height: 24px;
+}
+
 .info-content {
   flex: 1;
   display: flex;
@@ -1232,6 +1237,13 @@ const handleSave = () => {
 .page-header h1 .emoji {
   font-size: 3rem;
   line-height: 1;
+}
+
+.page-header h1 .emoji svg {
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .page-header h1 .title-text {
