@@ -87,14 +87,14 @@
 
           <!-- 中卡：电梯模式 -->
           <div class="decision-card blue" @click="scrollToId('full-roadmap')">
-            <div class="icon-box">📈</div>
+            <div class="icon-box"><ArrowTrendingUpIcon class="w-8 h-8" /></div>
             <h3>挑战完整 CFOP</h3>
             <p>分模块攻克 F2L + OLL + PLL</p>
           </div>
 
           <!-- 右卡：查表模式 -->
           <div class="decision-card purple" @click="scrollToId('full-roadmap')">
-            <div class="icon-box">⚡</div>
+            <div class="icon-box"><BoltIcon class="w-8 h-8" /></div>
             <h3>我需要快速参考</h3>
             <p>查阅算法表与指法技巧</p>
           </div>
@@ -109,7 +109,7 @@
             <div class="blob"></div>
             <div class="bg"></div>
             <div class="stat-content">
-              <div class="stat-icon">🎯</div>
+              <div class="stat-icon"><BullseyeIcon class="w-8 h-8" /></div>
               <div class="stat-num">4</div>
               <div class="stat-label">主要步骤</div>
             </div>
@@ -129,7 +129,7 @@
             <div class="blob"></div>
             <div class="bg"></div>
             <div class="stat-content">
-              <div class="stat-icon">🧩</div>
+              <div class="stat-icon"><PuzzlePieceIcon class="w-8 h-8" /></div>
               <div class="stat-num">21</div>
               <div class="stat-label">PLL 情况</div>
             </div>
@@ -202,7 +202,7 @@
             <div class="node-card">
               <div class="card-header">
                 <div class="header-left">
-                  <span class="step-icon">{{ step.icon }}</span>
+                  <span class="step-icon"><component :is="step.icon" class="w-6 h-6" /></span>
                   <h3 class="step-title">{{ step.title }}</h3>
                 </div>
                 <!-- 入口箭头 -->
@@ -314,6 +314,15 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Check, Monitor, ArrowRight } from "@element-plus/icons-vue";
+import { 
+  ArrowTrendingUpIcon,
+  BoltIcon,
+  BullseyeIcon,
+  PuzzlePieceIcon,
+  Square3Stack3dIcon,
+  HandshakeIcon,
+  FlagIcon
+} from "@heroicons/vue/24/solid";
 
 const router = useRouter();
 const activeNames = ref("1");
@@ -405,7 +414,7 @@ const cfopSteps = [
   {
     id: "cross",
     title: "十字 (Cross)",
-    icon: "🔲",
+    icon: Square3Stack3dIcon,
     desc: "通过将棱块与中心块对齐，在底层完成一个十字。重点在于规划，尽量在 8 步内完成。",
     goal: "底层十字",
     algCount: "无",
@@ -414,7 +423,7 @@ const cfopSteps = [
   {
     id: "f2l",
     title: "F2L (前两层)",
-    icon: "🤝",
+    icon: HandshakeIcon,
     desc: "同时还原底层角块和中间层棱块。这是 CFOP 中最慢但也最能提速的阶段。",
     goal: "前两层完成",
     algCount: "41",
@@ -423,7 +432,7 @@ const cfopSteps = [
   {
     id: "oll",
     title: "OLL (顶层定向)",
-    icon: "🎯",
+    icon: BullseyeIcon,
     desc: "将顶层所有颜色统一朝上。分为 2-Look (10个公式) 和 Full (57个公式)。",
     goal: "顶面复原",
     algCount: "57",
@@ -432,7 +441,7 @@ const cfopSteps = [
   {
     id: "pll",
     title: "PLL (顶层排列)",
-    icon: "🏁",
+    icon: FlagIcon,
     desc: "交换顶层块的位置以复原魔方。分为 2-Look (6个公式) 和 Full (21个公式)。",
     goal: "魔方还原",
     algCount: "21",
