@@ -52,7 +52,7 @@
         <div class="research-background-card">
           <div class="background-content">
             <h3>
-              <span class="background-icon">🔄</span> 传统目标检测方法的瓶颈
+              <TableCellsIcon class="background-icon" /> 传统目标检测方法的瓶颈
             </h3>
             <p>
               <strong>两阶段检测器（如 R-CNN 系列 / DPM）</strong>：
@@ -64,7 +64,7 @@
               >：流程复杂（多阶段），各个组件需要单独训练，导致<strong>检测速度慢</strong>，难以满足实时应用需求。
             </p>
 
-            <h3><RocketLaunchIcon class="w-5 h-5 inline-block align-middle mr-2" /> YOLO 的革命性突破</h3>
+            <h3><RocketLaunchIcon class="background-icon" /> YOLO 的革命性突破</h3>
             <p>
               <strong>核心思想</strong
               >：去除繁琐的候选框提取步骤，直接将整张图输入一个单独的卷积神经网络（CNN），实现<strong>统一的、实时的</strong>目标检测框架。
@@ -89,7 +89,7 @@
         <div class="core-principles-card">
           <div class="principles-grid">
             <div class="principle-item">
-              <div class="principle-icon">🔲</div>
+              <div class="principle-icon"><TableCellsIcon style="width: 40px; height: 40px;" /></div>
               <h3>网格划分 (Grid Cell)</h3>
               <p>
                 将输入图像（448 × 448）划分为 <strong>S × S</strong>（默认
@@ -98,7 +98,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon"><ChartBarIcon class="w-8 h-8" /></div>
+              <div class="principle-icon"><ChartBarIcon /></div>
               <h3>预测张量 (Output Tensor)</h3>
               <p>
                 每个 Grid Cell 预测 <strong>B</strong> 个边界框（默认
@@ -107,7 +107,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon"><TrophyIcon class="w-8 h-8" /></div>
+              <div class="principle-icon"><TrophyIcon /></div>
               <h3>置信度定义</h3>
               <p>
                 置信度 =
@@ -116,7 +116,7 @@
               </p>
             </div>
             <div class="principle-item">
-              <div class="principle-icon"><ArrowTrendingUpIcon class="w-8 h-8" /></div>
+              <div class="principle-icon"><ArrowTrendingUpIcon /></div>
               <h3>分类得分计算</h3>
               <p>测试阶段最终得分：</p>
               <div class="formula-inline">
@@ -151,7 +151,7 @@
           </div>
           <div class="architecture-details-grid">
             <div class="architecture-detail-item">
-              <h3><CpuChipIcon class="w-5 h-5 inline-block align-middle mr-2" /> 架构特点</h3>
+              <h3><CpuChipIcon class="detail-icon" /> 架构特点</h3>
               <ul>
                 <li><strong>灵感来源</strong>：基于 GoogLeNet 修改</li>
                 <li><strong>层数构成</strong>：24 层卷积 + 2 层全连接</li>
@@ -260,7 +260,7 @@
             </div>
 
             <div class="formula-notes">
-              <h4><LightBulbIcon class="w-5 h-5 inline-block align-middle mr-2" /> 关键设计解析</h4>
+              <h4><LightBulbIcon class="detail-icon" /> 关键设计解析</h4>
               <ul>
                 <li>
                   <strong>宽高开根号</strong
@@ -285,7 +285,7 @@
         <h2 class="section-heading">YOLOv1 优缺点分析</h2>
         <div class="advantages-limitations-card">
           <div class="advantages-section">
-            <h3><span class="advantage-icon">✅</span> 优势</h3>
+            <h3><CheckCircleIcon class="advantage-icon" /> 优势</h3>
             <div class="advantage-grid">
               <div class="advantage-item">
                 <h4>速度极快 (Extremely Fast)</h4>
@@ -444,7 +444,7 @@
         <h2 class="section-heading">CubeMaster 检测工作流程</h2>
         <div class="workflow-horizontal">
           <div class="workflow-step-h">
-            <div class="step-icon">📷</div>
+            <div class="step-icon"><CameraIcon /></div>
             <div class="step-info">
               <span class="step-num">01</span>
               <h4>图像采集</h4>
@@ -453,7 +453,7 @@
           </div>
           <div class="workflow-arrow">→</div>
           <div class="workflow-step-h">
-            <div class="step-icon">🔧</div>
+            <WrenchIcon class="step-icon" />
             <div class="step-info">
               <span class="step-num">02</span>
               <h4>预处理</h4>
@@ -462,7 +462,7 @@
           </div>
           <div class="workflow-arrow">→</div>
           <div class="workflow-step-h">
-            <div class="step-icon">🤖</div>
+            <div class="step-icon"><CpuChipIcon /></div>
             <div class="step-info">
               <span class="step-num">03</span>
               <h4>YOLOv8推理</h4>
@@ -471,7 +471,7 @@
           </div>
           <div class="workflow-arrow">→</div>
           <div class="workflow-step-h">
-            <div class="step-icon"><ChartBarIcon class="w-8 h-8" /></div>
+            <div class="step-icon"><ChartBarIcon class="workflow-step-icon" /></div>
             <div class="step-info">
               <span class="step-num">04</span>
               <h4>空间排序</h4>
@@ -480,7 +480,7 @@
           </div>
           <div class="workflow-arrow">→</div>
           <div class="workflow-step-h">
-            <div class="step-icon">✅</div>
+            <div class="step-icon"><CheckCircleIcon /></div>
             <div class="step-info">
               <span class="step-num">05</span>
               <h4>状态验证</h4>
@@ -495,7 +495,7 @@
         <h2 class="section-heading">CubeMaster 模型训练</h2>
         <div class="training-details">
           <div class="detail-card">
-            <h3><ChartBarIcon class="w-5 h-5 inline-block align-middle mr-2" /> 数据集构成</h3>
+            <h3><ChartBarIcon class="detail-icon" /> 数据集构成</h3>
             <ul>
               <li>
                 <strong>200 张标注图像</strong>：涵盖不同光照、角度、背景条件
@@ -512,7 +512,7 @@
             </ul>
           </div>
           <div class="detail-card">
-            <h3><BoltIcon class="w-5 h-5 inline-block align-middle mr-2" /> 训练参数</h3>
+            <h3><BoltIcon class="detail-icon" /> 训练参数</h3>
             <ul>
               <li><strong>基础模型</strong>：YOLOv8n (Nano 版本)</li>
               <li>
@@ -527,7 +527,7 @@
             </ul>
           </div>
           <div class="detail-card">
-            <h3><ArrowTrendingUpIcon class="w-5 h-5 inline-block align-middle mr-2" /> 性能指标</h3>
+            <h3><ArrowTrendingUpIcon class="detail-icon" /> 性能指标</h3>
             <ul>
               <li><strong>mAP@0.5</strong>：0.982 (平均精度均值)</li>
               <li><strong>推理速度</strong>：15ms/图像 (NVIDIA RTX 3060)</li>
@@ -567,7 +567,7 @@
         <div class="challenges-grid">
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji">🌓</span>
+              <span class="challenge-emoji"><SunIcon /></span>
               <h3>光照不均匀</h3>
             </div>
             <p>
@@ -580,7 +580,7 @@
           </div>
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji"><MagnifyingGlassPlusIcon class="w-8 h-8" /></span>
+              <span class="challenge-emoji"><MagnifyingGlassPlusIcon /></span>
               <h3>小目标检测</h3>
             </div>
             <p>
@@ -593,7 +593,7 @@
           </div>
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji"><PaintBrushIcon class="w-8 h-8" /></span>
+              <span class="challenge-emoji"><PaintBrushIcon /></span>
               <h3>颜色混淆</h3>
             </div>
             <p>
@@ -605,7 +605,7 @@
           </div>
           <div class="challenge-card">
             <div class="challenge-header">
-              <span class="challenge-emoji"><BoltIcon class="w-8 h-8" /></span>
+              <span class="challenge-emoji"><BoltIcon /></span>
               <h3>实时性要求</h3>
             </div>
             <p>
@@ -624,17 +624,17 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon"><PuzzlePieceIcon class="w-10 h-10" /></div>
+            <div class="nav-icon"><PuzzlePieceIcon style="width: 40px; height: 40px;" /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon"><CubeIcon class="w-10 h-10" /></div>
+            <div class="nav-icon"><CubeIcon style="width: 40px; height: 40px;" /></div>
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互实现</p>
           </router-link>
           <router-link to="/tech/architecture" class="nav-card">
-            <div class="nav-icon">🏗️</div>
+            <div class="nav-icon"><BuildingOffice2Icon style="width: 40px; height: 40px;" /></div>
             <h3>系统架构</h3>
             <p>前后端分离设计与数据流</p>
           </router-link>
@@ -674,12 +674,18 @@ import {
   CpuChipIcon,
   LightBulbIcon,
   WrenchScrewdriverIcon,
+  WrenchIcon,
   BoltIcon,
   MoonIcon,
   MagnifyingGlassPlusIcon,
   PaintBrushIcon,
   PuzzlePieceIcon,
-  CubeIcon
+  CubeIcon,
+  TableCellsIcon,
+  SunIcon,
+  BuildingOffice2Icon,
+  CheckCircleIcon,
+  CameraIcon
 } from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 
@@ -1008,8 +1014,10 @@ onUnmounted(() => {
 }
 
 .step-icon {
-  font-size: 1.8rem;
+  width: 32px;
+  height: 32px;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .step-info {
@@ -1253,13 +1261,10 @@ onUnmounted(() => {
 }
 
 .challenge-emoji {
-  font-size: 2rem;
-  margin-bottom: 12px;
-}
-
-.challenge-emoji svg {
   width: 32px;
   height: 32px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .challenge-card h3 {
@@ -1428,7 +1433,10 @@ onUnmounted(() => {
 }
 
 .background-icon {
-  font-size: 1.8rem;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  margin-right: 12px;
 }
 
 .background-content p {
@@ -1471,13 +1479,10 @@ onUnmounted(() => {
 }
 
 .principle-icon {
-  font-size: 2.5rem;
-  margin-bottom: 16px;
-}
-
-.principle-icon svg {
   width: 40px;
   height: 40px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .principle-item h3 {
@@ -1564,12 +1569,9 @@ onUnmounted(() => {
 }
 
 .detail-icon {
-  font-size: 1.5rem;
-}
-
-.detail-icon svg {
   width: 24px;
   height: 24px;
+  flex-shrink: 0;
 }
 
 .architecture-detail-item ul {
@@ -1873,7 +1875,9 @@ onUnmounted(() => {
 
 .advantage-icon,
 .limitation-icon {
-  font-size: 1.8rem;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .advantage-grid,

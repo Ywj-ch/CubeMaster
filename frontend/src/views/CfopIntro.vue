@@ -319,8 +319,8 @@ import {
   BoltIcon,
   TrophyIcon,
   PuzzlePieceIcon,
-  Square3Stack3dIcon,
-  HandshakeIcon,
+  Square3Stack3DIcon,
+  ArrowsRightLeftIcon,
   FlagIcon
 } from "@heroicons/vue/24/solid";
 
@@ -414,7 +414,7 @@ const cfopSteps = [
   {
     id: "cross",
     title: "十字 (Cross)",
-    icon: Square3Stack3dIcon,
+    icon: Square3Stack3DIcon,
     desc: "通过将棱块与中心块对齐，在底层完成一个十字。重点在于规划，尽量在 8 步内完成。",
     goal: "底层十字",
     algCount: "无",
@@ -423,7 +423,7 @@ const cfopSteps = [
   {
     id: "f2l",
     title: "F2L (前两层)",
-    icon: HandshakeIcon,
+    icon: ArrowsRightLeftIcon,
     desc: "同时还原底层角块和中间层棱块。这是 CFOP 中最慢但也最能提速的阶段。",
     goal: "前两层完成",
     algCount: "41",

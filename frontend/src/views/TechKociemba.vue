@@ -772,17 +772,17 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon"><EyeIcon class="w-10 h-10" /></div>
+            <div class="nav-icon"><EyeIcon style="width: 40px; height: 40px;" /></div>
             <h3>YOLO 目标检测</h3>
             <p>计算机视觉魔方识别</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon"><CubeIcon class="w-10 h-10" /></div>
+            <div class="nav-icon"><CubeIcon style="width: 40px; height: 40px;" /></div>
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互</p>
           </router-link>
           <router-link to="/tech/architecture" class="nav-card">
-            <div class="nav-icon">🏗️</div>
+            <div class="nav-icon"><BuildingOffice2Icon /></div>
             <h3>系统架构</h3>
             <p>前后端分离设计与数据流</p>
           </router-link>
@@ -841,7 +841,8 @@ import {
   ArchiveBoxIcon,
   EyeIcon,
   CubeIcon,
-  RocketLaunchIcon
+  RocketLaunchIcon,
+  BuildingOffice2Icon
 } from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 

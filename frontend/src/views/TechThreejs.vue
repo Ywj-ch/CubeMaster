@@ -151,7 +151,7 @@
 
         <div class="customization-grid">
           <div class="custom-card">
-            <div class="custom-icon"><PaintBrushIcon class="w-8 h-8" /></div>
+            <div class="custom-icon"><PaintBrushIcon /></div>
             <h3>材质系统</h3>
             <p class="custom-desc">四种材质类型，满足不同视觉效果需求</p>
             <ul class="custom-list">
@@ -163,7 +163,7 @@
           </div>
 
           <div class="custom-card">
-            <div class="custom-icon">🖼️</div>
+            <div class="custom-icon"><PhotoIcon /></div>
             <h3>纹理系统</h3>
             <p class="custom-desc">内置纹理与自定义上传双重支持</p>
             <ul class="custom-list">
@@ -175,7 +175,7 @@
           </div>
 
           <div class="custom-card">
-            <div class="custom-icon"><LightBulbIcon class="w-8 h-8" /></div>
+            <div class="custom-icon"><LightBulbIcon /></div>
             <h3>光照配置</h3>
             <p class="custom-desc">动态调节光照参数，改变魔方视觉效果</p>
             <ul class="custom-list">
@@ -187,7 +187,7 @@
           </div>
 
           <div class="custom-card">
-            <div class="custom-icon">🔷</div>
+            <div class="custom-icon"><CubeTransparentIcon /></div>
             <h3>几何体参数</h3>
             <p class="custom-desc">调整魔方块形状，创造不同风格</p>
             <ul class="custom-list">
@@ -341,7 +341,7 @@
         <h2 class="section-heading">技术挑战</h2>
         <div class="challenges-grid">
           <div class="challenge-box">
-            <div class="challenge-icon"><DevicePhoneMobileIcon class="w-8 h-8" /></div>
+            <div class="challenge-icon"><DevicePhoneMobileIcon /></div>
             <h3>移动端适配</h3>
             <p>
               <strong>问题</strong>：移动设备 GPU 性能有限，触摸交互精度要求高
@@ -352,7 +352,7 @@
             </p>
           </div>
           <div class="challenge-box">
-            <div class="challenge-icon"><GlobeAltIcon class="w-8 h-8" /></div>
+            <div class="challenge-icon"><GlobeAltIcon /></div>
             <h3>浏览器兼容</h3>
             <p>
               <strong>问题</strong>：不同浏览器 WebGL 实现差异，扩展支持不一致
@@ -363,7 +363,7 @@
             </p>
           </div>
           <div class="challenge-box">
-            <div class="challenge-icon">⚙️</div>
+            <div class="challenge-icon"><Cog6ToothIcon /></div>
             <h3>状态同步</h3>
             <p><strong>问题</strong>：3D 渲染状态与逻辑状态需要严格同步</p>
             <p>
@@ -378,17 +378,17 @@
         <h2 class="section-heading text-center">继续探索</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon"><EyeIcon class="w-10 h-10" /></div>
+            <div class="nav-icon"><EyeIcon /></div>
             <h3>YOLOv8 视觉识别</h3>
             <p>魔方颜色检测技术详解</p>
           </router-link>
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon"><PuzzlePieceIcon class="w-10 h-10" /></div>
+            <div class="nav-icon"><PuzzlePieceIcon /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/architecture" class="nav-card">
-            <div class="nav-icon">🏗️</div>
+            <div class="nav-icon"><BuildingOffice2Icon style="width: 40px; height: 40px;" /></div>
             <h3>系统架构</h3>
             <p>前后端分离设计与数据流</p>
           </router-link>
@@ -417,7 +417,11 @@ import {
   DevicePhoneMobileIcon,
   GlobeAltIcon,
   EyeIcon,
-  PuzzlePieceIcon
+  PuzzlePieceIcon,
+  BuildingOffice2Icon,
+  PhotoIcon,
+  CubeTransparentIcon,
+  Cog6ToothIcon
 } from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 
@@ -910,13 +914,10 @@ onUnmounted(() => {
 }
 
 .custom-icon {
-  font-size: 2rem;
-  margin-bottom: 16px;
-}
-
-.custom-icon svg {
   width: 32px;
   height: 32px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .custom-card h3 {
@@ -1172,8 +1173,10 @@ onUnmounted(() => {
 }
 
 .challenge-icon {
-  font-size: 2rem;
+  width: 32px;
+  height: 32px;
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .challenge-box h3 {
@@ -1222,8 +1225,10 @@ onUnmounted(() => {
 }
 
 .nav-icon {
-  font-size: 2.5rem;
+  width: 40px;
+  height: 40px;
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .nav-icon svg {
