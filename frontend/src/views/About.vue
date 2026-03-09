@@ -60,7 +60,7 @@
           :class="{ 'is-expanded': expandedIndex === index }"
         >
           <div class="node-marker">
-            <div class="marker-circle">{{ milestone.icon }}</div>
+            <div class="marker-circle"><component :is="milestone.icon" class="w-5 h-5" /></div>
           </div>
 
           <div class="node-content-wrapper">
@@ -363,6 +363,16 @@ import {
   Reading,
   Pointer,
 } from "@element-plus/icons-vue";
+import { 
+  RocketLaunchIcon,
+  BuildingOffice2Icon,
+  PaintBrushIcon,
+  SparklesIcon,
+  MagnifyingGlassIcon,
+  BookOpenIcon,
+  BoltIcon,
+  MoonIcon
+} from "@heroicons/vue/24/solid";
 
 const router = useRouter();
 const activeNames = ref("1");
@@ -416,7 +426,7 @@ onMounted(() => {
 const milestones = [
   {
     date: "2025-12-03",
-    icon: "🚀",
+    icon: RocketLaunchIcon,
     title: "项目初始化",
     phase: "基础搭建",
     description:
@@ -437,7 +447,7 @@ const milestones = [
   },
   {
     date: "2025-12-22",
-    icon: "🏗️",
+    icon: BuildingOffice2Icon,
     title: "前后端分离架构",
     phase: "架构设计",
     description:
@@ -459,7 +469,7 @@ const milestones = [
   },
   {
     date: "2026-01-01",
-    icon: "🎨",
+    icon: PaintBrushIcon,
     title: "3D魔方建模与渲染",
     phase: "核心功能",
     description:
@@ -477,7 +487,7 @@ const milestones = [
   },
   {
     date: "2026-01-13",
-    icon: "✨",
+    icon: SparklesIcon,
     title: "UI交互与系统架构",
     phase: "交互优化",
     description:
@@ -492,7 +502,7 @@ const milestones = [
   },
   {
     date: "2026-01-22",
-    icon: "🔍",
+    icon: MagnifyingGlassIcon,
     title: "YOLOv8视觉识别集成",
     phase: "AI能力",
     description:
@@ -507,7 +517,7 @@ const milestones = [
   },
   {
     date: "2026-01-28",
-    icon: "📚",
+    icon: BookOpenIcon,
     title: "学习模块与教学系统",
     phase: "教学系统",
     description:
@@ -522,7 +532,7 @@ const milestones = [
   },
   {
     date: "2026-02-05",
-    icon: "⚡",
+    icon: BoltIcon,
     title: "CFOP高级算法库",
     phase: "进阶功能",
     description:
@@ -538,7 +548,7 @@ const milestones = [
   },
   {
     date: "2026-02-19",
-    icon: "🌙",
+    icon: MoonIcon,
     title: "测试框架与黑夜模式",
     phase: "质量保障",
     description:
