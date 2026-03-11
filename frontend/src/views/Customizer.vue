@@ -3,7 +3,7 @@
     <!-- 页面标题 -->
     <div class="page-header animate-entry">
       <h1>
-        <PaintBrushIcon class="emoji w-5 h-5 inline-block align-middle mr-2" /><span class="title-text">魔方外观自定义</span>
+        <PaintBrushIcon class="emoji w-5 h-5 inline-block align-middle mr-2 icon-blue" /><span class="title-text">魔方外观自定义</span>
       </h1>
       <p class="subtitle">
         自定义魔方的材质、纹理和光照效果，打造属于你的独特魔方外观
@@ -73,7 +73,7 @@
 
             <div class="preview-info">
               <div class="preview-info-group">
-                <span class="preview-emoji"><PaintBrushIcon style="width: 20px; height: 20px;" /></span>
+                <span class="preview-emoji"><PaintBrushIcon class="icon-blue" style="width: 20px; height: 20px;" /></span>
                 <div class="info-content">
                   <strong>材质设置</strong>
                   <span>{{ materialSummary }}</span>
@@ -81,7 +81,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="preview-emoji"><PhotoIcon style="width: 20px; height: 20px;" /></span>
+                <span class="preview-emoji"><PhotoIcon class="icon-cyan" style="width: 20px; height: 20px;" /></span>
                 <div class="info-content">
                   <strong>纹理系统</strong>
                   <span>{{ textureLabel }}</span>
@@ -89,7 +89,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="preview-emoji"><CubeTransparentIcon style="width: 20px; height: 20px;" /></span>
+                <span class="preview-emoji"><CubeTransparentIcon class="icon-green" style="width: 20px; height: 20px;" /></span>
                 <div class="info-content">
                   <strong>几何体</strong>
                   <span>{{ geometrySummary }}</span>
@@ -97,7 +97,7 @@
               </div>
 
               <div class="preview-info-group">
-                <span class="preview-emoji"><LightBulbIcon style="width: 20px; height: 20px;" /></span>
+                <span class="preview-emoji"><LightBulbIcon class="icon-yellow" style="width: 20px; height: 20px;" /></span>
                 <div class="info-content">
                   <strong>光照环境</strong>
                   <span>{{ lightingSummary }}</span>

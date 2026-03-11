@@ -60,7 +60,7 @@
           :class="{ 'is-expanded': expandedIndex === index }"
         >
           <div class="node-marker">
-            <div class="marker-circle"><component :is="milestone.icon" class="w-5 h-5" /></div>
+            <div class="marker-circle"><component :is="milestone.icon" class="w-5 h-5" :class="milestone.iconClass" /></div>
           </div>
 
           <div class="node-content-wrapper">
@@ -427,6 +427,7 @@ const milestones = [
   {
     date: "2025-12-03",
     icon: RocketLaunchIcon,
+    iconClass: "icon-blue",
     title: "项目初始化",
     phase: "基础搭建",
     description:
@@ -448,6 +449,7 @@ const milestones = [
   {
     date: "2025-12-22",
     icon: BuildingOffice2Icon,
+    iconClass: "icon-cyan",
     title: "前后端分离架构",
     phase: "架构设计",
     description:
@@ -470,6 +472,7 @@ const milestones = [
   {
     date: "2026-01-01",
     icon: PaintBrushIcon,
+    iconClass: "icon-purple",
     title: "3D魔方建模与渲染",
     phase: "核心功能",
     description:
@@ -488,6 +491,7 @@ const milestones = [
   {
     date: "2026-01-13",
     icon: SparklesIcon,
+    iconClass: "icon-purple",
     title: "UI交互与系统架构",
     phase: "交互优化",
     description:
@@ -503,6 +507,7 @@ const milestones = [
   {
     date: "2026-01-22",
     icon: MagnifyingGlassIcon,
+    iconClass: "icon-ai",
     title: "YOLOv8视觉识别集成",
     phase: "AI能力",
     description:
@@ -518,6 +523,7 @@ const milestones = [
   {
     date: "2026-01-28",
     icon: BookOpenIcon,
+    iconClass: "icon-learning",
     title: "学习模块与教学系统",
     phase: "教学系统",
     description:
@@ -533,6 +539,7 @@ const milestones = [
   {
     date: "2026-02-05",
     icon: BoltIcon,
+    iconClass: "icon-orange",
     title: "CFOP高级算法库",
     phase: "进阶功能",
     description:
@@ -549,6 +556,7 @@ const milestones = [
   {
     date: "2026-02-19",
     icon: MoonIcon,
+    iconClass: "icon-yellow",
     title: "测试框架与黑夜模式",
     phase: "质量保障",
     description:
@@ -2018,5 +2026,54 @@ html[data-theme="dark"] .faq-answer-content {
   color: var(--dm-text-secondary);
   background-color: transparent;
   text-align: left;
+}
+
+/* === 语义图标颜色类 === */
+.icon-tech {
+  color: #3b82f6;
+}
+
+.icon-ai {
+  color: #8b5cf6;
+}
+
+.icon-3d {
+  color: #10b981;
+}
+
+.icon-performance {
+  color: #f97316;
+}
+
+.icon-learning {
+  color: #6366f1;
+}
+
+.icon-tool {
+  color: #6b7280;
+}
+
+[data-theme="dark"] .icon-tech {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .icon-ai {
+  color: #a78bfa;
+}
+
+[data-theme="dark"] .icon-3d {
+  color: #34d399;
+}
+
+[data-theme="dark"] .icon-performance {
+  color: #fb923c;
+}
+
+[data-theme="dark"] .icon-learning {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .icon-tool {
+  color: #9ca3af;
 }
 </style>

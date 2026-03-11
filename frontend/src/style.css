@@ -719,3 +719,109 @@ html[data-theme="dark"] .el-upload-dragger .el-icon--upload {
 html[data-theme="dark"] .el-upload-dragger .el-upload__text {
   color: var(--dm-text-secondary) !important;
 }
+
+/* ============================================
+   6. 图标颜色系统（语义分类 + 具体颜色）
+   ============================================ */
+
+/* 亮色主题图标颜色 */
+:root {
+  /* 语义分类颜色 */
+  --icon-tech: #3B82F6;
+  --icon-tech-light: #60A5FA;
+  --icon-ai: #8B5CF6;
+  --icon-ai-light: #A78BFA;
+  --icon-3d: #10B981;
+  --icon-3d-light: #34D399;
+  --icon-performance: #F59E0B;
+  --icon-performance-light: #FBBF24;
+  --icon-learning: #6366F1;
+  --icon-learning-light: #818CF8;
+  --icon-tool: #6B7280;
+  --icon-tool-light: #9CA3AF;
+  
+  /* 具体颜色（硬编码用） */
+  --icon-blue: #3B82F6;
+  --icon-blue-light: #60A5FA;
+  --icon-cyan: #06B6D4;
+  --icon-cyan-light: #22D3EE;
+  --icon-green: #10B981;
+  --icon-green-light: #34D399;
+  --icon-yellow: #EAB308;
+  --icon-yellow-light: #FACC15;
+  --icon-orange: #F97316;
+  --icon-orange-light: #FB923C;
+  --icon-purple: #8B5CF6;
+  --icon-purple-light: #A78BFA;
+  --icon-pink: #EC4899;
+  --icon-pink-light: #F472B6;
+  --icon-red: #EF4444;
+  --icon-red-light: #F87171;
+  --icon-gray: #6B7280;
+  --icon-gray-light: #9CA3AF;
+}
+
+/* 亮色主题：语义图标颜色类 */
+.icon-tech { color: var(--icon-tech) !important; }
+.icon-ai { color: var(--icon-ai) !important; }
+.icon-3d { color: var(--icon-3d) !important; }
+.icon-performance { color: var(--icon-performance) !important; }
+.icon-learning { color: var(--icon-learning) !important; }
+.icon-tool { color: var(--icon-tool) !important; }
+
+/* 亮色主题：具体颜色类（硬编码用） */
+.icon-blue { color: var(--icon-blue) !important; }
+.icon-cyan { color: var(--icon-cyan) !important; }
+.icon-green { color: var(--icon-green) !important; }
+.icon-yellow { color: var(--icon-yellow) !important; }
+.icon-orange { color: var(--icon-orange) !important; }
+.icon-purple { color: var(--icon-purple) !important; }
+.icon-pink { color: var(--icon-pink) !important; }
+.icon-red { color: var(--icon-red) !important; }
+.icon-gray { color: var(--icon-gray) !important; }
+
+/* 暗色主题：语义图标颜色类（提高亮度） */
+[data-theme="dark"] .icon-tech { color: var(--icon-tech-light) !important; }
+[data-theme="dark"] .icon-ai { color: var(--icon-ai-light) !important; }
+[data-theme="dark"] .icon-3d { color: var(--icon-3d-light) !important; }
+[data-theme="dark"] .icon-performance { color: var(--icon-performance-light) !important; }
+[data-theme="dark"] .icon-learning { color: var(--icon-learning-light) !important; }
+[data-theme="dark"] .icon-tool { color: var(--icon-tool-light) !important; }
+
+/* 暗色主题：具体颜色类（提高亮度） */
+[data-theme="dark"] .icon-blue { color: var(--icon-blue-light) !important; }
+[data-theme="dark"] .icon-cyan { color: var(--icon-cyan-light) !important; }
+[data-theme="dark"] .icon-green { color: var(--icon-green-light) !important; }
+[data-theme="dark"] .icon-yellow { color: var(--icon-yellow-light) !important; }
+[data-theme="dark"] .icon-orange { color: var(--icon-orange-light) !important; }
+[data-theme="dark"] .icon-purple { color: var(--icon-purple-light) !important; }
+[data-theme="dark"] .icon-pink { color: var(--icon-pink-light) !important; }
+[data-theme="dark"] .icon-red { color: var(--icon-red-light) !important; }
+[data-theme="dark"] .icon-gray { color: var(--icon-gray-light) !important; }
+
+/* SVG 图标 fill/stroke 继承颜色 */
+[class*="icon-"] svg {
+  fill: currentColor;
+}
+
+/* 图标通用样式 */
+[class*="icon-"] svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+/* 图标容器尺寸继承 - 让 SVG 填满容器 */
+.principle-icon svg,
+.background-icon svg,
+.detail-icon svg,
+.step-icon svg,
+.advantage-icon svg,
+.challenge-emoji svg,
+.custom-icon svg,
+.arch-icon svg,
+.module-icon svg,
+.service-icon svg {
+  width: 100%;
+  height: 100%;
+}

@@ -109,7 +109,7 @@
         <div class="frontend-architecture">
           <div class="frontend-grid">
             <div class="frontend-module">
-              <h3><PaintBrushIcon class="module-icon" /> UI 框架</h3>
+              <h3><PaintBrushIcon class="module-icon icon-blue" /> UI 框架</h3>
               <ul>
                 <li>
                   <strong>Vue 3 Composition API</strong
@@ -122,7 +122,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><CubeIcon class="module-icon" /> 3D 引擎</h3>
+              <h3><CubeIcon class="module-icon icon-purple" /> 3D 引擎</h3>
               <ul>
                 <li><strong>Three.js</strong>：WebGL 渲染库，核心 3D 功能</li>
                 <li><strong>自定义控件</strong>：魔方专用交互系统</li>
@@ -131,7 +131,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><CloudIcon class="module-icon" /> 网络层</h3>
+              <h3><CloudIcon class="module-icon icon-cyan" /> 网络层</h3>
               <ul>
                 <li><strong>Axios</strong>：HTTP 客户端，拦截器和错误处理</li>
                 <li><strong>请求队列</strong>：顺序处理，避免竞态条件</li>
@@ -140,7 +140,7 @@
             </div>
 
             <div class="frontend-module">
-              <h3><CommandLineIcon class="module-icon" /> 构建工具</h3>
+              <h3><CommandLineIcon class="module-icon icon-orange" /> 构建工具</h3>
               <ul>
                 <li><strong>Vite</strong>：极速构建工具，开发服务器</li>
                 <li><strong>Sass</strong>：CSS 预处理器，增强样式可维护性</li>
@@ -161,7 +161,7 @@
             <div class="service-card">
               <div class="service-header">
                 <div class="service-icon">
-                <MagnifyingGlassIcon class="service-icon" />
+                <MagnifyingGlassIcon class="service-icon icon-ai" />
               </div>
                 <h3>视觉识别服务</h3>
               </div>
@@ -186,7 +186,7 @@
             <div class="service-card">
               <div class="service-header">
                 <div class="service-icon">
-                <PuzzlePieceIcon class="service-icon" />
+                <PuzzlePieceIcon class="service-icon icon-learning" />
               </div>
                 <h3>求解引擎服务</h3>
               </div>
@@ -211,7 +211,7 @@
             <div class="service-card">
               <div class="service-header">
                 <div class="service-icon">
-                <CloudIcon class="service-icon" />
+                <CloudIcon class="service-icon icon-tech" />
               </div>
                 <h3>云端存储与并发考虑</h3>
               </div>
@@ -301,7 +301,7 @@
         <h2 class="section-heading">部署与运维</h2>
         <div class="deployment-grid">
           <div class="deploy-card">
-            <h3><RocketLaunchIcon class="deploy-card-icon" /> 前端部署</h3>
+            <h3><RocketLaunchIcon class="deploy-card-icon icon-performance" /> 前端部署</h3>
             <ul>
               <li><strong>开发服务器</strong>：Vite 热重载开发环境</li>
               <li><strong>静态构建</strong>：Vite 生产构建，生成静态资源</li>
@@ -311,7 +311,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><WrenchScrewdriverIcon class="deploy-card-icon" /> 后端部署</h3>
+            <h3><WrenchScrewdriverIcon class="deploy-card-icon icon-tool" /> 后端部署</h3>
             <ul>
               <li>
                 <strong>开发服务器</strong>：FastAPI + Uvicorn 本地开发服务
@@ -337,7 +337,7 @@
           </div>
 
           <div class="deploy-card">
-            <h3><ChartBarIcon class="deploy-card-icon" /> 日志与调试</h3>
+            <h3><ChartBarIcon class="deploy-card-icon icon-learning" /> 日志与调试</h3>
             <ul>
               <li><strong>日志记录</strong>：Python 标准日志，控制台输出</li>
               <li><strong>错误追踪</strong>：前端控制台日志，网络请求监控</li>
@@ -355,7 +355,7 @@
         <h2 class="section-heading">扩展性设计</h2>
         <div class="scaling-considerations">
           <div class="scaling-card">
-            <h3><DevicePhoneMobileIcon class="scaling-card-icon" /> 用户规模扩展</h3>
+            <h3><DevicePhoneMobileIcon class="scaling-card-icon icon-cyan" /> 用户规模扩展</h3>
             <p><strong>挑战</strong>：同时在线用户数从 100 扩展到 10,000+</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -367,7 +367,7 @@
           </div>
 
           <div class="scaling-card">
-            <h3><CpuChipIcon class="scaling-card-icon" /> 算法功能扩展</h3>
+            <h3><CpuChipIcon class="scaling-card-icon icon-purple" /> 算法功能扩展</h3>
             <p><strong>挑战</strong>：支持更多魔方类型 (4×4, 5×5, 异形)</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -379,7 +379,7 @@
           </div>
 
           <div class="scaling-card">
-            <h3><GlobeAltIcon class="scaling-card-icon" /> 国际化扩展</h3>
+            <h3><GlobeAltIcon class="scaling-card-icon icon-blue" /> 国际化扩展</h3>
             <p><strong>挑战</strong>：支持多语言界面和本地化内容</p>
             <p><strong>解决方案</strong>：</p>
             <ul>
@@ -439,17 +439,17 @@
         <h2 class="section-heading text-center">深入技术细节</h2>
         <div class="nav-cards">
           <router-link to="/tech/yolo" class="nav-card">
-            <div class="nav-icon"><EyeIcon style="width: 40px; height: 40px;" /></div>
+            <div class="nav-icon icon-ai"><EyeIcon /></div>
             <h3>YOLOv8 视觉识别</h3>
             <p>魔方颜色检测技术详解</p>
           </router-link>
           <router-link to="/tech/kociemba" class="nav-card">
-            <div class="nav-icon"><PuzzlePieceIcon style="width: 40px; height: 40px;" /></div>
+            <div class="nav-icon icon-learning"><PuzzlePieceIcon /></div>
             <h3>Kociemba 算法</h3>
             <p>魔方两阶段求解算法原理</p>
           </router-link>
           <router-link to="/tech/threejs" class="nav-card">
-            <div class="nav-icon"><CubeIcon style="width: 40px; height: 40px;" /></div>
+            <div class="nav-icon icon-3d"><CubeIcon /></div>
             <h3>Three.js 3D渲染</h3>
             <p>网页端实时3D魔方交互实现</p>
           </router-link>
