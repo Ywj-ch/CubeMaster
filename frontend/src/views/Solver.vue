@@ -4,7 +4,7 @@
       <div class="title-group">
         <h2 class="main-title">Kociemba 智能求解演示</h2>
         <p class="sub-title">
-          算法层级：二阶段缩减算法 | 最优解步数：{{ steps.length }}
+          算法层级：二阶段算法 | 最优解步数：{{ steps.length }}
         </p>
       </div>
       <div class="header-actions">

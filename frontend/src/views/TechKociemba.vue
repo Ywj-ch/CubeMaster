@@ -509,17 +509,17 @@
 
             <!-- 右侧卡片 -->
             <div class="node-card">
-              <div class="card-header">
-                <div class="header-left">
-                  <span class="step-icon"><component :is="stage.icon" class="w-5 h-5 inline-block icon-performance" /></span>
-                  <h3 class="step-title">{{ stage.title }}</h3>
-                </div>
-                <div class="header-right">
-                  <span class="meta-tag highlight"
-                    >预计 {{ stage.duration }}</span
-                  >
-                </div>
-              </div>
+          <div class="card-header">
+            <div class="header-left">
+              <span :class="['step-icon', stage.iconClass]"><component :is="stage.icon" /></span>
+              <h3 class="step-title">{{ stage.title }}</h3>
+            </div>
+            <div class="header-right">
+              <span class="meta-tag highlight"
+                >预计 {{ stage.duration }}</span
+              >
+            </div>
+          </div>
               <div class="card-body">
                 <div class="reading-path">{{ stage.path }}</div>
                 <ul class="checklist">
@@ -842,7 +842,9 @@ import {
   EyeIcon,
   CubeIcon,
   RocketLaunchIcon,
-  BuildingOffice2Icon
+  BuildingOffice2Icon,
+  BookOpenIcon,
+  CogIcon
 } from "@heroicons/vue/24/solid";
 import CodeBlock from "../components/CodeBlock.vue";
 
@@ -1049,7 +1051,8 @@ const activeFaq = ref("");
 // 学习路径数据
 const learningStages = ref([
   {
-    icon: "📚",
+    icon: BookOpenIcon,
+    iconClass: "icon-stage-1",
     title: "阶段一：基础概念",
     duration: "1-2 天",
     path: "阅读顺序：enums.py → defs.py → cubie.py（前 100 行）",
@@ -1060,7 +1063,8 @@ const learningStages = ref([
     ],
   },
   {
-    icon: "⚙️",
+    icon: CogIcon,
+    iconClass: "icon-stage-2",
     title: "阶段二：核心算法",
     duration: "3-5 天",
     path: "阅读顺序：coord.py → moves.py → pruning.py → solver.py",
@@ -1073,6 +1077,7 @@ const learningStages = ref([
   },
   {
     icon: RocketLaunchIcon,
+    iconClass: "icon-stage-3",
     title: "阶段三：优化技术",
     duration: "2-3 天",
     path: "阅读顺序：symmetries.py（对称性处理）",
@@ -1738,11 +1743,26 @@ onUnmounted(() => {
 
 .step-icon {
   font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .step-icon svg {
   width: 24px;
   height: 24px;
+}
+
+.icon-stage-1 {
+  color: #3b82f6;
+}
+
+.icon-stage-2 {
+  color: #10b981;
+}
+
+.icon-stage-3 {
+  color: #f59e0b;
 }
 
 .step-title {

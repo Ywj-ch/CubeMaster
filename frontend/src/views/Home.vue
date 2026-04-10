@@ -12,7 +12,7 @@
           <div class="text-glow"></div>
 
           <div class="badge-pill animate-entry delay-1">
-            <span class="dot"></span> 赶工中 别急......
+            <span class="dot"></span> 项目已上线 · 欢迎体验
           </div>
 
           <h1 class="main-title animate-entry delay-2">
@@ -23,7 +23,7 @@
 
           <p class="sub-title animate-entry delay-3">
             告别复杂的公式记忆。集成
-            <span class="highlight-tag">OpenCV</span> 视觉识别与
+            <span class="highlight-tag">YOLOv8</span> 视觉识别与
             <span class="highlight-tag">Kociemba</span> 算法，
             为您提供从状态捕捉到 3D 演示的一站式还原方案。
           </p>
@@ -61,11 +61,11 @@
                 alt="Three"
               />
             </el-tooltip>
-            <el-tooltip content="OpenCV" placement="top">
+            <el-tooltip content="YOLOv8" placement="top">
               <img
-                src="/icons/logo_opencv.svg"
+                src="/icons/logo_yolov8.svg"
                 class="tech-icon"
-                alt="OpenCV"
+                alt="YOLO"
               />
             </el-tooltip>
           </div>

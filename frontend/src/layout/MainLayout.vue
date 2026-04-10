@@ -181,7 +181,7 @@ onUnmounted(() => {
 }
 .nav-item {
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
   color: #64748b;
   font-weight: 600;
   position: relative;
@@ -247,7 +247,7 @@ onUnmounted(() => {
     gap: 16px;
   }
   .nav-item {
-    font-size: 13px;
+    font-size: 15px;
   }
   .site-name {
     display: none;

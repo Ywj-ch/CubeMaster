@@ -371,7 +371,8 @@ import {
   MagnifyingGlassIcon,
   BookOpenIcon,
   BoltIcon,
-  MoonIcon
+  MoonIcon,
+  DocumentTextIcon
 } from "@heroicons/vue/24/solid";
 
 const router = useRouter();
@@ -560,14 +561,30 @@ const milestones = [
     title: "测试框架与黑夜模式",
     phase: "质量保障",
     description:
-      "后端添加API健康检查与测试框架，前端实现完整黑夜模式支持，添加魔方外观定制系统。",
+      "后端添加 API 健康检查与测试框架，前端实现完整黑夜模式支持，添加魔方外观定制系统。",
     tech: ["pytest", "黑夜模式", "定制系统"],
     subNodes: [
-      { date: "02-13", title: "测试框架", desc: "添加pytest与API健康检查" },
-      { date: "02-13", title: "技术文档系统", desc: "新增4个深度技术文档页" },
+      { date: "02-13", title: "测试框架", desc: "添加 pytest 与 API 健康检查" },
+      { date: "02-13", title: "技术文档系统", desc: "新增 4 个深度技术文档页" },
       { date: "02-16", title: "架构文档", desc: "更新数据流图与布局" },
       { date: "02-18", title: "外观定制系统", desc: "材质/纹理/光照自定义" },
       { date: "02-19", title: "黑夜模式", desc: "全站暗色主题适配" },
+    ],
+  },
+  {
+    date: "2026-03-01",
+    icon: DocumentTextIcon,
+    iconClass: "icon-green",
+    title: "文档完善与代码重构",
+    phase: "代码质量",
+    description:
+      "完善技术文档体系，将全站 emoji 图标迁移为专业 SVG 组件，添加完整代码注释，优化项目架构。",
+    tech: ["Heroicons", "JSDoc", "代码规范"],
+    subNodes: [
+      { date: "02-20", title: "技术文档完善", desc: "添加 Kociemba 算法与 YOLO 论文文档" },
+      { date: "02-25", title: "图标系统重构", desc: "emoji 迁移为 Heroicons SVG 组件" },
+      { date: "02-27", title: "代码注释规范", desc: "添加 JSDoc 与 Python docstrings" },
+      { date: "03-01", title: "项目架构优化", desc: "删除冗余文件，统一颜色常量" },
     ],
   },
 ];
@@ -2053,6 +2070,30 @@ html[data-theme="dark"] .faq-answer-content {
   color: #6b7280;
 }
 
+.icon-green {
+  color: #10b981;
+}
+
+.icon-blue {
+  color: #3b82f6;
+}
+
+.icon-cyan {
+  color: #06b6d4;
+}
+
+.icon-purple {
+  color: #8b5cf6;
+}
+
+.icon-yellow {
+  color: #f59e0b;
+}
+
+.icon-orange {
+  color: #f97316;
+}
+
 [data-theme="dark"] .icon-tech {
   color: #60a5fa;
 }
@@ -2075,5 +2116,29 @@ html[data-theme="dark"] .faq-answer-content {
 
 [data-theme="dark"] .icon-tool {
   color: #9ca3af;
+}
+
+[data-theme="dark"] .icon-green {
+  color: #34d399;
+}
+
+[data-theme="dark"] .icon-blue {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .icon-cyan {
+  color: #22d3ee;
+}
+
+[data-theme="dark"] .icon-purple {
+  color: #a78bfa;
+}
+
+[data-theme="dark"] .icon-yellow {
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .icon-orange {
+  color: #fb923c;
 }
 </style>
