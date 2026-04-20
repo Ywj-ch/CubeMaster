@@ -236,6 +236,7 @@
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted, watch } from "vue";
 import { solveCube, saveCubeState } from "../api/cubeService.js";
+import { useSession } from "../composables/useSession.js";
 import { createCubeFromJson } from "../utils/cubeState";
 import { applyMove, invertMove } from "../utils/cubeMoves";
 import Face2DView from "../components/Face2DView.vue";
@@ -256,6 +257,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { useCubeCustomization } from "../composables/useCubeCustomization.js";
 
 const { config } = useCubeCustomization();
+const { ensureSession } = useSession();
 
 const loading = ref(false);
 const scanning = ref(false);
@@ -320,8 +322,16 @@ async function fetchSolution() {
   loading.value = true;
   stopAutoPlay();
   try {
-    await saveCubeState(cubeState.value.faces);
-    const res = await solveCube();
+    const sid = await ensureSession();
+    await saveCubeState(cubeState.value.faces, sid);
+    const res = await solveCube(sid);
+
+    if (!res.data.success) {
+      ElMessage.error(res.data.error || "求解失败，请检查魔方状态");
+      hasSolved.value = false;
+      return;
+    }
+
     const data = res.data.data;
 
     if (data?.raw_solution && data.raw_solution.startsWith("Error")) {

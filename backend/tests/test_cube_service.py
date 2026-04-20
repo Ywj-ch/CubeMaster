@@ -1,14 +1,13 @@
 """
 CubeService 模块测试
 
-测试魔方识别、状态保存和求解的业务逻辑
+测试魔方识别、状态保存和求解的业务逻辑，包含会话隔离功能测试
 """
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 import sys
 
-# Mock 昂贵的依赖
 mock_modules = {
     'twophase.solver': MagicMock(),
     'ultralytics': MagicMock(),
@@ -29,8 +28,7 @@ class TestCubeService:
     @patch('cube_service.save_base64_images')
     @patch('cube_service.get_detector')
     def test_recognize_cube_success(self, mock_get_detector, mock_save_images):
-        """测试魔方识别功能 - 正常情况"""
-        # 准备测试数据
+        """测试魔方识别功能 - 正常情况（无 session_id）"""
         test_images = {
             'U': 'base64_white',
             'D': 'base64_yellow',
@@ -39,26 +37,44 @@ class TestCubeService:
             'L': 'base64_orange',
             'R': 'base64_red'
         }
-        
-        # Mock 检测器返回
+
         mock_detector = Mock()
         expected_state = [['R'] * 9, ['U'] * 9, ['F'] * 9, ['B'] * 9, ['L'] * 9, ['D'] * 9]
         mock_detector.detect_all_faces.return_value = expected_state
         mock_get_detector.return_value = mock_detector
-        
-        # 执行测试
+
         result = recognize_cube(test_images)
-        
-        # 验证结果
+
         assert result == expected_state
-        mock_save_images.assert_called_once_with(test_images, output_dir='images')
-        mock_detector.detect_all_faces.assert_called_once()
+        mock_save_images.assert_called_once()
+        mock_detector.detect_all_faces.assert_called_once_with(session_id=None)
+
+    @patch('cube_service.save_base64_images')
+    @patch('cube_service.get_session_dir')
+    @patch('cube_service.get_detector')
+    def test_recognize_cube_with_session(self, mock_get_detector, mock_get_dir, mock_save_images):
+        """测试魔方识别功能 - 带 session_id"""
+        test_images = {'U': 'base64_white'}
+        session_id = "test-session-123"
+
+        mock_dir = {"images_dir": "/tmp/images/test-session-123", "results_dir": "/tmp/cube_results/test-session-123"}
+        mock_get_dir.return_value = mock_dir
+
+        mock_detector = Mock()
+        expected_state = [['R'] * 9] * 6
+        mock_detector.detect_all_faces.return_value = expected_state
+        mock_get_detector.return_value = mock_detector
+
+        result = recognize_cube(test_images, session_id=session_id)
+
+        assert result == expected_state
+        mock_get_dir.assert_called_once_with(session_id)
+        mock_detector.detect_all_faces.assert_called_once_with(session_id=session_id)
 
     def test_recognize_cube_empty_input(self):
         """测试魔方识别功能 - 空输入"""
         with pytest.raises(ValueError) as exc_info:
             recognize_cube({})
-        
         assert "未接收到图片数据" in str(exc_info.value)
 
     @patch('cube_service.get_detector')
@@ -74,46 +90,51 @@ class TestCubeService:
                 'R': ['green'] * 9
             }
         }
-        
+
         mock_detector = Mock()
         mock_get_detector.return_value = mock_detector
-        
-        # 执行测试
+
         save_cube_state(test_state)
-        
-        # 验证调用
-        mock_detector.save_cube_state_json.assert_called_once_with(test_state)
+
+        mock_detector.save_cube_state_json.assert_called_once_with(test_state, session_id=None)
+
+    @patch('cube_service.get_detector')
+    def test_save_cube_state_with_session(self, mock_get_detector):
+        """测试保存魔方状态 - 带 session_id"""
+        test_state = {'faces': {'U': ['white'] * 9}}
+        session_id = "test-session-456"
+
+        mock_detector = Mock()
+        mock_get_detector.return_value = mock_detector
+
+        save_cube_state(test_state, session_id=session_id)
+
+        mock_detector.save_cube_state_json.assert_called_once_with(test_state, session_id=session_id)
 
     def test_save_cube_state_empty_input(self):
         """测试保存魔方状态 - 空输入"""
         with pytest.raises(ValueError) as exc_info:
             save_cube_state({})
-        
         assert "状态数据为空" in str(exc_info.value)
 
     def test_save_cube_state_none_input(self):
         """测试保存魔方状态 - None 输入"""
         with pytest.raises(ValueError) as exc_info:
             save_cube_state(None)
-        
         assert "状态数据为空" in str(exc_info.value)
 
     @patch('cube_service.CubeDetector')
     def test_get_detector_singleton(self, mock_cube_detector_class):
         """测试检测器单例模式"""
-        # 重置全局变量
         import cube_service
         cube_service._detector_instance = None
-        
+
         mock_detector_instance = Mock()
         mock_cube_detector_class.return_value = mock_detector_instance
-        
-        # 第一次调用应该创建新实例
+
         detector1 = get_detector()
-        assert mock_cube_detector_class.assert_called_once
         assert mock_cube_detector_class.call_count == 1
-        
-        # 第二次调用应该返回同一实例
+
         detector2 = get_detector()
         assert detector1 is detector2
         assert mock_cube_detector_class.call_count == 1
@@ -128,15 +149,13 @@ class TestRecognizeCubeIntegration:
         """测试包含无效面名的识别请求"""
         test_images = {
             'U': 'base64_white',
-            'X': 'base64_invalid',  # 无效的面名
+            'X': 'base64_invalid',
         }
-        
+
         mock_detector = Mock()
         mock_detector.detect_all_faces.return_value = [['R'] * 9] * 6
         mock_get_detector.return_value = mock_detector
-        
-        # 应该不会抛出异常，但会保存图片
+
         result = recognize_cube(test_images)
-        
         assert len(result) == 6
         mock_save_images.assert_called_once()

@@ -104,10 +104,13 @@ import { ref, watch, nextTick, computed, onUnmounted } from "vue";
 import { Close, Aim } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { recognizeCube } from "../api/cubeService.js";
+import { useSession } from "../composables/useSession.js";
 import CubeSpinner from "./CubeSpinner.vue";
 
 const props = defineProps({ visible: Boolean });
 const emit = defineEmits(["close", "scanned"]);
+
+const { ensureSession } = useSession();
 
 const videoRef = ref(null);
 const isProcessing = ref(false);
@@ -215,11 +218,14 @@ const finishScanning = async () => {
   isRecognizing.value = true;
 
   try {
+    const sid = await ensureSession();
+
     const payload = {
       images: scannedImages.value,
+      session_id: sid,
     };
 
-    const response = await recognizeCube(payload);
+    const response = await recognizeCube({ images: scannedImages.value }, sid);
 
     if (response.data.success) {
       ElMessage.success("识别成功！");

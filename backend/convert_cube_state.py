@@ -43,12 +43,24 @@ def parse_solution_moves(raw_solution: str):
 # 状态解析与转换
 # =========================
 
-def parse_cube_state_from_file(filename='cube_results/cube_state.json'):
-    """从 JSON 文件解析魔方状态"""
-    if not os.path.exists(filename):
-        raise FileNotFoundError(f"找不到文件: {filename}")
+def parse_cube_state_from_file(filename=None, session_id=None):
+    """从 JSON 文件解析魔方状态
 
-    with open(filename, 'r', encoding='utf-8') as f:
+    Args:
+        filename: 自定义文件路径。当 session_id 存在时此参数被忽略。
+        session_id: 会话唯一标识，用于会话隔离
+    """
+    if session_id:
+        from session_manager import get_session_dir
+        dirs = get_session_dir(session_id)
+        filepath = os.path.join(dirs["results_dir"], "cube_state.json")
+    else:
+        filepath = filename or "cube_results/cube_state.json"
+
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"找不到文件: {filepath}")
+
+    with open(filepath, 'r', encoding='utf-8') as f:
         raw_data = json.load(f)
 
     cube_state = {}
@@ -152,13 +164,28 @@ def parse_raw_solution(raw_solution):
     return result
 
 
-def save_solution_results(solution, kociemba_code, output_dir='cube_results'):
-    os.makedirs(output_dir, exist_ok=True)
+def save_solution_results(solution, kociemba_code, output_dir=None, session_id=None):
+    """保存求解结果到 JSON 文件
+
+    Args:
+        solution: Kociemba 原始解法字符串
+        kociemba_code: Kociemba 编码
+        output_dir: 自定义输出目录。当 session_id 存在时此参数被忽略。
+        session_id: 会话唯一标识，用于会话隔离
+    """
+    if session_id:
+        from session_manager import get_session_dir
+        dirs = get_session_dir(session_id)
+        save_dir = dirs["results_dir"]
+    else:
+        save_dir = output_dir or "cube_results"
+
+    os.makedirs(save_dir, exist_ok=True)
 
     readable = convert_to_readable(solution)
     moves = parse_raw_solution(solution)
 
-    path = os.path.join(output_dir, 'solution.json')
+    path = os.path.join(save_dir, 'solution.json')
     with open(path, 'w', encoding='utf-8') as f:
         json.dump({
             'kociemba_code': kociemba_code,
@@ -175,8 +202,8 @@ def save_solution_results(solution, kociemba_code, output_dir='cube_results'):
 # 求解主流程（供 API 调用）
 # =========================
 
-def solve_cube_pipeline():
-    cube_state = parse_cube_state_from_file('cube_results/cube_state.json')
+def solve_cube_pipeline(session_id=None):
+    cube_state = parse_cube_state_from_file(session_id=session_id)
     kociemba_code = convert_to_kociemba_format(cube_state)
 
     valid, msg = validate_kociemba_state(kociemba_code)
@@ -184,7 +211,7 @@ def solve_cube_pipeline():
         raise RuntimeError(msg)
 
     solution = sv.solve(kociemba_code, 20, 2).replace('\n', '').strip()
-    readable, moves = save_solution_results(solution, kociemba_code)
+    readable, moves = save_solution_results(solution, kociemba_code, session_id=session_id)
 
     return {
         'kociemba_code': kociemba_code,

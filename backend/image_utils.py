@@ -50,17 +50,23 @@ def _resize_keep_ratio(img: np.ndarray, max_size: int) -> np.ndarray:
 
 # ================= 主函数 =================
 
-def save_base64_images(images_dict: dict, output_dir: str = 'images') -> dict:
+def save_base64_images(images_dict: dict, output_dir: str = 'images', session_id: str = None) -> dict:
     """
     接收前端 Base64 图片并保存为本地文件
 
     Args:
         images_dict: { 'U': 'base64...', 'F': 'base64...' }
-        output_dir: 保存目录
+        output_dir: 保存目录（当 session_id 存在时会被覆盖为会话目录）
+        session_id: 会话唯一标识，用于会话隔离
 
     Returns:
         dict: { 'U': True, 'F': False } 表示各面是否保存成功
     """
+    if session_id:
+        from session_manager import get_session_dir
+        dirs = get_session_dir(session_id)
+        output_dir = dirs["images_dir"]
+
     os.makedirs(output_dir, exist_ok=True)
     print(f"📂 正在保存图片到 {output_dir} ...")
 

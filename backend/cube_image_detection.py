@@ -151,15 +151,19 @@ class CubeDetector:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         return debug_img
 
-    def detect_all_faces(self):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        images_dir = os.path.join(base_dir, "images")
+    def detect_all_faces(self, session_id: str = None):
+        if session_id:
+            from session_manager import get_session_dir
+            dirs = get_session_dir(session_id)
+            images_dir = dirs["images_dir"]
+        else:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            images_dir = os.path.join(base_dir, "images")
 
-        # 默认全黑色
         default_matrix = [['black'] * 3 for _ in range(3)]
         cube_state = {code: default_matrix for code in self.filename_to_face.values()}
 
-        print("🔍 开始 YOLO 识别流程...")
+        print(f"🔍 开始 YOLO 识别流程...")
 
         for filename in self.target_filenames:
             path = os.path.join(images_dir, f"{filename}.png")
@@ -169,15 +173,22 @@ class CubeDetector:
                 print(f"⚠️ 文件缺失: {path}")
                 continue
 
-            # 这里 matrix 肯定有值（最差也是全灰）
             matrix, _ = self.detect_face_colors(path)
             cube_state[face_code] = matrix
             print(f"✅ {filename} -> {face_code} 处理完毕")
 
         return cube_state
 
-    def save_cube_state_json(self, cube_state, filename="cube_state.json"):
-        path = os.path.join(self.results_dir, filename)
+    def save_cube_state_json(self, cube_state, filename="cube_state.json", session_id: str = None):
+        if session_id:
+            from session_manager import get_session_dir
+            dirs = get_session_dir(session_id)
+            save_dir = dirs["results_dir"]
+        else:
+            save_dir = self.results_dir
+
+        os.makedirs(save_dir, exist_ok=True)
+        path = os.path.join(save_dir, filename)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(cube_state, f, indent=2)
 

@@ -166,6 +166,40 @@ class TestSaveBase64Images:
         
         mock_makedirs.assert_called_once_with('new_dir', exist_ok=True)
 
+    @patch('image_utils.cv2.imwrite')
+    def test_save_with_session_id(self, mock_imwrite):
+        """测试带 session_id 参数保存图片"""
+        base64_str = create_test_image_base64('white')
+        images_dict = {'U': base64_str}
+
+        mock_imwrite.return_value = True
+
+        with patch('session_manager.get_session_dir') as mock_get_dir:
+            mock_get_dir.return_value = {
+                "images_dir": "test_session_images",
+                "results_dir": "test_session_results",
+            }
+            result = save_base64_images(images_dict, session_id="test-session-123")
+
+        assert 'U' in result
+        assert result['U'] == True
+        mock_get_dir.assert_called_once_with("test-session-123")
+        mock_imwrite.assert_called()
+
+    @patch('image_utils.cv2.imwrite')
+    def test_save_without_session_id(self, mock_imwrite):
+        """测试不带 session_id 参数保存图片（兼容旧逻辑）"""
+        base64_str = create_test_image_base64('white')
+        images_dict = {'U': base64_str}
+
+        mock_imwrite.return_value = True
+
+        result = save_base64_images(images_dict, output_dir='test_images_compat')
+
+        assert 'U' in result
+        assert result['U'] == True
+        mock_imwrite.assert_called()
+
 
 class TestFaceToFilenameMapping:
     """面名到文件名映射测试"""
