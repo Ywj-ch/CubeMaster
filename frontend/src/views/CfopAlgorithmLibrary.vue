@@ -300,7 +300,6 @@ const copyAlgo = (text) => {
   ElMessage.success({
     message: "公式已复制到剪贴板",
     duration: 2000,
-    showClose: true,
   });
 };
 </script>

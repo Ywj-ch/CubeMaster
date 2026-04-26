@@ -83,3 +83,16 @@ export function recognizeCube(payload, sessionId) {
     timeout: 300000,
   });
 }
+
+/**
+ * 加载已保存的历史会话数据
+ *
+ * 直接读取后端已持久化的 cube_state.json 和 solution.json，
+ * 无需重新求解，用于回看历史会话。
+ *
+ * @param {string} sessionId - 会话唯一标识
+ * @returns {Promise<import('axios').AxiosResponse>} 包含 cube_state 和 solution 的响应
+ */
+export function loadSession(sessionId) {
+  return axios.get(`${BASE_URL}/api/session/${sessionId}/load`);
+}

@@ -29,11 +29,11 @@
         <div class="stats-pills">
           <div class="stat-pill">
             <span class="dot-indicator blue"></span>
-            <span>90+ 天开发周期</span>
+            <span>120+ 天开发周期</span>
           </div>
           <div class="stat-pill">
             <span class="dot-indicator green"></span>
-            <span>60+ 次代码提交</span>
+            <span>90+ 次代码提交</span>
           </div>
           <div class="stat-pill">
             <span class="dot-indicator purple"></span>
@@ -60,7 +60,13 @@
           :class="{ 'is-expanded': expandedIndex === index }"
         >
           <div class="node-marker">
-            <div class="marker-circle"><component :is="milestone.icon" class="w-5 h-5" :class="milestone.iconClass" /></div>
+            <div class="marker-circle">
+              <component
+                :is="milestone.icon"
+                class="w-5 h-5"
+                :class="milestone.iconClass"
+              />
+            </div>
           </div>
 
           <div class="node-content-wrapper">
@@ -363,7 +369,7 @@ import {
   Reading,
   Pointer,
 } from "@element-plus/icons-vue";
-import { 
+import {
   RocketLaunchIcon,
   BuildingOffice2Icon,
   PaintBrushIcon,
@@ -372,7 +378,7 @@ import {
   BookOpenIcon,
   BoltIcon,
   MoonIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
 } from "@heroicons/vue/24/solid";
 
 const router = useRouter();
@@ -581,10 +587,26 @@ const milestones = [
       "完善技术文档体系，将全站 emoji 图标迁移为专业 SVG 组件，添加完整代码注释，优化项目架构。",
     tech: ["Heroicons", "JSDoc", "代码规范"],
     subNodes: [
-      { date: "02-20", title: "技术文档完善", desc: "添加 Kociemba 算法与 YOLO 论文文档" },
-      { date: "02-25", title: "图标系统重构", desc: "emoji 迁移为 Heroicons SVG 组件" },
-      { date: "02-27", title: "代码注释规范", desc: "添加 JSDoc 与 Python docstrings" },
-      { date: "03-01", title: "项目架构优化", desc: "删除冗余文件，统一颜色常量" },
+      {
+        date: "02-20",
+        title: "技术文档完善",
+        desc: "添加 Kociemba 算法与 YOLO 论文文档",
+      },
+      {
+        date: "02-25",
+        title: "图标系统重构",
+        desc: "emoji 迁移为 Heroicons SVG 组件",
+      },
+      {
+        date: "02-27",
+        title: "代码注释规范",
+        desc: "添加 JSDoc 与 Python docstrings",
+      },
+      {
+        date: "03-01",
+        title: "项目架构优化",
+        desc: "删除冗余文件，统一颜色常量",
+      },
     ],
   },
 ];

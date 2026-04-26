@@ -514,8 +514,8 @@ onUnmounted(() => {
 
 /* 头部标题区 */
 .header-section {
-  margin-top: 120px;
-  margin-bottom: 20px;
+  margin-top: 70px;
+  margin-bottom: 100px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -619,7 +619,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 0;
-  transform: translateY(-10px);
+  transform: translateY(0);
 }
 
 .cube-container-box {

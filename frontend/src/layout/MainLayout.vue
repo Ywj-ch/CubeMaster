@@ -43,8 +43,8 @@
       <router-view :key="$route.fullPath" />
     </main>
 
-    <!-- Footer: 极简紧凑版 -->
-    <footer class="footer">
+    <!-- Footer: 极简紧凑版（求解器页隐藏，避免遮挡 solver-footer） -->
+    <footer v-if="route.path !== '/solver'" class="footer">
       <p class="copyright">Copyright © 2026 chippanda</p>
     </footer>
   </div>

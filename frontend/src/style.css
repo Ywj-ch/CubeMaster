@@ -561,34 +561,107 @@ button:focus-visible {
   color: var(--dm-text-primary);
 }
 
-[data-theme="dark"] .el-message {
-  background-color: var(--dm-bg-card);
-  border-color: var(--dm-border);
-  box-shadow: var(--dm-shadow-lg);
+/* ============================================
+   7. ElMessage 全局美化：右上角弹出 + 四色语义
+   ============================================ */
+
+/* 位置：右上角 */
+.el-message {
+  left: auto !important;
+  right: 24px !important;
+  top: 20px !important;
+  transform: none !important;
+  min-width: auto !important;
+  max-width: 480px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  padding: 10px 20px !important;
 }
 
-[data-theme="dark"] .el-message__content {
-  color: var(--dm-text-primary);
+.el-message__content {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* 绿色 = 成功 --- 覆盖 Element Plus 原生 CSS 变量 */
+.el-message--success {
+  --el-message-bg-color: #ecfdf5 !important;
+  --el-message-border-color: #a7f3d0 !important;
+  --el-message-text-color: #065f46 !important;
+}
+.el-message--success .el-message__icon {
+  color: #10b981 !important;
+}
+
+/* 蓝色 = 提示/信息 */
+.el-message--info {
+  --el-message-bg-color: #eff6ff !important;
+  --el-message-border-color: #bfdbfe !important;
+  --el-message-text-color: #1e40af !important;
+}
+.el-message--info .el-message__icon {
+  color: #3b82f6 !important;
+}
+
+/* 红色 = 错误 */
+.el-message--error {
+  --el-message-bg-color: #fef2f2 !important;
+  --el-message-border-color: #fecaca !important;
+  --el-message-text-color: #991b1b !important;
+}
+.el-message--error .el-message__icon {
+  color: #ef4444 !important;
+}
+
+/* 橙色 = 警告 */
+.el-message--warning {
+  --el-message-bg-color: #fffbeb !important;
+  --el-message-border-color: #fde68a !important;
+  --el-message-text-color: #92400e !important;
+}
+.el-message--warning .el-message__icon {
+  color: #f59e0b !important;
+}
+
+/* --- 暗色模式 --- */
+[data-theme="dark"] .el-message {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
 }
 
 [data-theme="dark"] .el-message--success {
-  background-color: rgba(52, 211, 153, 0.1);
-  border-color: rgba(52, 211, 153, 0.2);
+  --el-message-bg-color: rgba(52, 211, 153, 0.12) !important;
+  --el-message-border-color: rgba(52, 211, 153, 0.25) !important;
+  --el-message-text-color: #34d399 !important;
 }
-
-[data-theme="dark"] .el-message--warning {
-  background-color: rgba(251, 146, 60, 0.1);
-  border-color: rgba(251, 146, 60, 0.2);
-}
-
-[data-theme="dark"] .el-message--error {
-  background-color: rgba(248, 113, 113, 0.1);
-  border-color: rgba(248, 113, 113, 0.2);
+[data-theme="dark"] .el-message--success .el-message__icon {
+  color: #34d399 !important;
 }
 
 [data-theme="dark"] .el-message--info {
-  background-color: rgba(96, 165, 250, 0.1);
-  border-color: rgba(96, 165, 250, 0.2);
+  --el-message-bg-color: rgba(96, 165, 250, 0.12) !important;
+  --el-message-border-color: rgba(96, 165, 250, 0.25) !important;
+  --el-message-text-color: #60a5fa !important;
+}
+[data-theme="dark"] .el-message--info .el-message__icon {
+  color: #60a5fa !important;
+}
+
+[data-theme="dark"] .el-message--error {
+  --el-message-bg-color: rgba(248, 113, 113, 0.12) !important;
+  --el-message-border-color: rgba(248, 113, 113, 0.25) !important;
+  --el-message-text-color: #f87171 !important;
+}
+[data-theme="dark"] .el-message--error .el-message__icon {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .el-message--warning {
+  --el-message-bg-color: rgba(251, 191, 36, 0.12) !important;
+  --el-message-border-color: rgba(251, 191, 36, 0.25) !important;
+  --el-message-text-color: #fbbf24 !important;
+}
+[data-theme="dark"] .el-message--warning .el-message__icon {
+  color: #fbbf24 !important;
 }
 
 [data-theme="dark"] .el-notification {

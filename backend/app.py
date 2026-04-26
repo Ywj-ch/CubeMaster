@@ -101,6 +101,50 @@ def close_session(session_id: str):
         return {"success": False, "error": "会话销毁失败"}
 
 
+@app.get("/api/session/{session_id}/load")
+def load_session(session_id: str):
+    """加载已保存的会话数据（魔方状态 + 求解结果）。
+
+    直接读取 cube_results/{session_id}/ 下的 cube_state.json 和 solution.json，
+    无需重新求解。用于回看历史会话。
+
+    Args:
+        session_id: 会话唯一标识
+
+    Returns:
+        dict: 包含 cube_state（六面颜色数组）和 solution（求解步骤）的字典
+    """
+    try:
+        import os
+        import json
+        from session_manager import RESULTS_ROOT
+
+        results_dir = os.path.join(RESULTS_ROOT, session_id)
+        cube_path = os.path.join(results_dir, "cube_state.json")
+        solution_path = os.path.join(results_dir, "solution.json")
+
+        if not os.path.exists(cube_path):
+            return {"success": False, "error": "会话不存在或无保存的状态数据"}
+
+        with open(cube_path, "r", encoding="utf-8") as f:
+            cube_state = json.load(f)
+
+        result = {"cube_state": cube_state}
+
+        if os.path.exists(solution_path):
+            with open(solution_path, "r", encoding="utf-8") as f:
+                solution = json.load(f)
+            result["solution"] = {
+                "readable_solution": solution.get("readable_solution", []),
+                "moves": solution.get("moves", []),
+                "step_count": solution.get("step_count", 0),
+            }
+
+        return {"success": True, "data": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 @app.post("/api/solve")
 def solve(payload: dict = Body(...)):
     """求解魔方接口。

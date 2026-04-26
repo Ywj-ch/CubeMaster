@@ -45,6 +45,12 @@
           <el-icon><RefreshLeft /></el-icon>
           重置
         </button>
+
+        <!-- 4. 加载历史记录 -->
+        <button class="btn-load-minimal" @click="openLoadDialog">
+          <el-icon><FolderOpened /></el-icon>
+          加载记录
+        </button>
       </div>
     </div>
 
@@ -235,7 +241,8 @@
 
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted, watch } from "vue";
-import { solveCube, saveCubeState } from "../api/cubeService.js";
+import { useRoute, useRouter } from "vue-router";
+import { solveCube, saveCubeState, loadSession } from "../api/cubeService.js";
 import { useSession } from "../composables/useSession.js";
 import { createCubeFromJson } from "../utils/cubeState";
 import { applyMove, invertMove } from "../utils/cubeMoves";
@@ -252,12 +259,15 @@ import {
   VideoPlay,
   VideoPause,
   Loading,
+  FolderOpened,
 } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useCubeCustomization } from "../composables/useCubeCustomization.js";
 
 const { config } = useCubeCustomization();
 const { ensureSession } = useSession();
+const route = useRoute();
+const router = useRouter();
 
 const loading = ref(false);
 const scanning = ref(false);
@@ -294,7 +304,7 @@ const handleScannedResult = (result) => {
   const newCube = createCubeFromJson(result);
   cubeState.value.cubies = newCube.cubies;
   cubeState.value.faces = newCube.faces;
-  ElMessage.success("扫描成功，请点击 2D 图纠正可能的识别错误");
+  ElMessage.info("扫描成功，请点击 2D 图纠正可能的识别错误");
 };
 
 const toggleColor = (faceKey, index) => {
@@ -345,9 +355,49 @@ async function fetchSolution() {
     currentStep.value = 0;
     hasSolved.value = true;
     ElMessage.success("求解成功！");
+    router.replace({ query: { session: sid } });
   } catch (e) {
     console.error(e);
     ElMessage.error("请求失败，请检查网络");
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function loadSessionData(sessionId) {
+  loading.value = true;
+  try {
+    const res = await loadSession(sessionId);
+
+    if (!res.data.success) {
+      ElMessage.error(res.data.error || "加载会话失败");
+      router.replace({ query: {} });
+      return;
+    }
+
+    const data = res.data.data;
+
+    if (data.cube_state) {
+      const newCube = createCubeFromJson(data.cube_state);
+      cubeState.value.cubies = newCube.cubies;
+      cubeState.value.faces = newCube.faces;
+    }
+
+    if (data.solution?.moves?.length) {
+      steps.value = data.solution.readable_solution || [];
+      solutionMoves.value = data.solution.moves || [];
+      currentStep.value = 0;
+      hasSolved.value = true;
+      ElMessage.success(
+        `已加载会话 ${sessionId.slice(0, 8)}...，共 ${data.solution.step_count || 0} 步`
+      );
+    } else {
+      ElMessage.info('会话中无求解步骤，请点击"智能求解"');
+    }
+  } catch (e) {
+    console.error(e);
+    ElMessage.error("加载会话失败");
+    router.replace({ query: {} });
   } finally {
     loading.value = false;
   }
@@ -404,6 +454,11 @@ function handleKeydown(e) {
 
 onMounted(() => {
   window.addEventListener("keydown", handleKeydown);
+
+  const sessionParam = route.query.session;
+  if (sessionParam) {
+    loadSessionData(sessionParam);
+  }
 });
 
 onUnmounted(() => {
@@ -460,6 +515,11 @@ function prevStep() {
     setTimeout(() => {
       is3DBusy.value = false;
     }, demoSpeed.value + 20);
+    nextTick(() => {
+      const activeNode = document.querySelector(".step-node.is-active");
+      if (activeNode)
+        activeNode.scrollIntoView({ behavior: "smooth", inline: "center" });
+    });
   }
 }
 
@@ -499,6 +559,29 @@ async function resetCube() {
     activeColor.value = "white";
     ElMessage.success("魔方已重置，可以开始新的扫描");
   } catch (error) {
+    // 用户点击取消
+  }
+}
+
+async function openLoadDialog() {
+  try {
+    const { value } = await ElMessageBox.prompt(
+      "请输入要加载的历史会话 ID",
+      "加载记录",
+      {
+        confirmButtonText: "加载",
+        cancelButtonText: "取消",
+        inputPlaceholder: "粘贴 session_id，如 ab893a15-...",
+        inputType: "text",
+        customClass: "load-session-dialog",
+      }
+    );
+    if (value && value.trim()) {
+      const id = value.trim();
+      router.replace({ query: { session: id } });
+      await loadSessionData(id);
+    }
+  } catch {
     // 用户点击取消
   }
 }
@@ -705,6 +788,28 @@ async function resetCube() {
   transform: translateY(-1px);
 }
 
+/* --- 4. 加载记录按钮 (极简蓝框) --- */
+.btn-load-minimal {
+  padding: 0 24px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid #c7d2fe;
+  border-radius: 50px;
+  color: #6366f1;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+.btn-load-minimal:hover {
+  background: #eef2ff;
+  border-color: #6366f1;
+  transform: translateY(-1px);
+}
+
 /* --- 中间内容区 (关键修改：限制高度，允许内部滚动) --- */
 .solver-content-wrapper {
   flex: 1; /* 占据剩余高度 */
@@ -881,8 +986,9 @@ async function resetCube() {
 .solver-footer {
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.5);
-  border-radius: 30px 30px 0 0;
+  border-radius: 30px;
   padding: 24px 40px 35px;
+  margin-bottom: 24px;
   box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.04);
   z-index: 10;
 }
@@ -1053,6 +1159,18 @@ async function resetCube() {
 [data-theme="dark"] .btn-reset-minimal:hover {
   background: rgba(248, 113, 113, 0.1);
   border-color: var(--dm-accent-error);
+}
+
+/* 加载记录按钮 */
+[data-theme="dark"] .btn-load-minimal {
+  background: transparent;
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .btn-load-minimal:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: #a5b4fc;
 }
 
 /* 3D 视图区域 */
@@ -1325,7 +1443,6 @@ async function resetCube() {
 
 .reset-confirm-dialog .el-message-box__header {
   padding: 20px 20px 10px !important;
-  background: linear-gradient(135deg, #fef3f2 0%, #fff 100%);
   border-bottom: 1px solid #fee2e2;
 }
 
@@ -1336,7 +1453,13 @@ async function resetCube() {
 }
 
 .reset-confirm-dialog .el-message-box__content {
-  padding: 20px !important;
+  padding: 16px 20px !important;
+}
+
+.reset-confirm-dialog .el-message-box__container {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
 }
 
 .reset-confirm-dialog .el-message-box__message {
@@ -1344,6 +1467,8 @@ async function resetCube() {
   font-size: 14px !important;
   line-height: 1.7 !important;
   white-space: pre-line !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .reset-confirm-dialog .el-message-box__btns {
@@ -1385,7 +1510,10 @@ async function resetCube() {
 }
 
 .reset-confirm-dialog .el-message-box__status {
-  font-size: 24px !important;
+  font-size: 20px !important;
+  flex-shrink: 0 !important;
+  margin-top: 1px !important;
+  color: #ef4444 !important;
 }
 
 /* 黑夜模式适配 */
@@ -1396,11 +1524,6 @@ async function resetCube() {
 }
 
 [data-theme="dark"] .reset-confirm-dialog .el-message-box__header {
-  background: linear-gradient(
-    135deg,
-    rgba(239, 68, 68, 0.1) 0%,
-    transparent 100%
-  );
   border-bottom-color: rgba(239, 68, 68, 0.2);
 }
 
@@ -1414,6 +1537,10 @@ async function resetCube() {
 
 [data-theme="dark"] .reset-confirm-dialog .el-message-box__message {
   color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .reset-confirm-dialog .el-message-box__status {
+  color: #f87171 !important;
 }
 
 [data-theme="dark"] .reset-confirm-dialog .el-button--primary {
@@ -1432,6 +1559,152 @@ async function resetCube() {
 }
 
 [data-theme="dark"] .reset-confirm-dialog .el-button--default:hover {
+  background: #475569 !important;
+  border-color: #64748b !important;
+  color: #f1f5f9 !important;
+}
+
+/* ==============================
+   加载会话弹窗美化
+   ============================== */
+.load-session-dialog {
+  border-radius: 16px !important;
+  padding: 8px !important;
+  overflow: hidden;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+.load-session-dialog .el-message-box__header {
+  padding: 20px 20px 10px !important;
+  border-bottom: 1px solid #c7d2fe;
+}
+
+.load-session-dialog .el-message-box__title {
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  color: #3730a3 !important;
+}
+
+.load-session-dialog .el-message-box__content {
+  padding: 20px !important;
+}
+
+.load-session-dialog .el-message-box__message {
+  color: #64748b !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+}
+
+.load-session-dialog .el-message-box__input {
+  padding-top: 12px !important;
+}
+
+.load-session-dialog .el-input__wrapper {
+  border-radius: 10px !important;
+  padding: 4px 14px !important;
+  box-shadow: 0 0 0 1px #e2e8f0 inset !important;
+}
+
+.load-session-dialog .el-input__inner {
+  font-family: "JetBrains Mono", monospace !important;
+  font-size: 13px !important;
+}
+
+.load-session-dialog .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) inset !important;
+}
+
+.load-session-dialog .el-message-box__btns {
+  padding: 15px 20px 20px !important;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.load-session-dialog .el-message-box__btns button {
+  border-radius: 10px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.load-session-dialog .el-button--primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+}
+
+.load-session-dialog .el-button--primary:hover {
+  background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4) !important;
+}
+
+.load-session-dialog .el-button--default {
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+  background: #fff !important;
+}
+
+.load-session-dialog .el-button--default:hover {
+  border-color: #cbd5e1 !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+}
+
+.load-session-dialog .el-message-box__status {
+  font-size: 24px !important;
+}
+
+/* 暗色模式 */
+[data-theme="dark"] .load-session-dialog {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-message-box__header {
+  border-bottom-color: rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="dark"] .load-session-dialog .el-message-box__title {
+  color: #c7d2fe !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-message-box__message {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-input__wrapper {
+  background-color: #0f172a !important;
+  box-shadow: 0 0 0 1px #334155 inset !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) inset !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-input__inner {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-button--primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-button--primary:hover {
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5) !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-button--default {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .load-session-dialog .el-button--default:hover {
   background: #475569 !important;
   border-color: #64748b !important;
   color: #f1f5f9 !important;

@@ -658,7 +658,6 @@ const handleSave = () => {
         message: "设置保存成功！",
         type: "success",
         duration: 2000,
-        showClose: true,
       });
     }
   }, 50);
