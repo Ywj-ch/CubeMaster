@@ -12,6 +12,7 @@
 
 * **AI 视觉识别**：集成 YOLOv8 深度学习模型，支持复杂光照下的色块识别，内置智能网格映射算法，有效消除拍摄角度偏差异常。
 * **毫秒级求解**：后端搭载 Kociemba 算法，可在 20 步内解决任意打乱状态，响应时间 < 100ms。
+* **会话隔离机制**：基于 UUID 实现多用户并发访问，每个用户拥有独立的文件存储目录，保障数据互不干扰。
 * **3D 直观演示**：基于 Three.js 开发的高保真 3D 魔方组件，支持鼠标交互旋转、公式动画演示、视角自由缩放。
 * **交互式教程**：完整全面的魔方还原教学公式，配合实时 3D 动画，让步骤清晰易懂。
 * **深色模式**：完整的深色主题适配，支持跟随系统偏好自动切换。
@@ -74,7 +75,7 @@
 
 ### 系统整体框架图
 
-> <img src="docs/images/系统整体框架图.png" alt="系统整体框架图" style="width: 100%;" />
+> <img src="docs/images/系统整体架构图.png" alt="系统整体架构图" style="width: 100%;" />
 
 ### 求解器数据流图
 
@@ -100,6 +101,7 @@
 CubeMaster/
 ├── backend/                      # 后端服务
 │   ├── app.py                    # FastAPI 入口文件
+│   ├── session_manager.py        # 会话管理模块（UUID 隔离）
 │   ├── cube_image_detection.py   # YOLOv8 识别核心逻辑
 │   ├── convert_cube_state.py     # 状态转换与 Kociemba 桥接
 │   ├── cube_service.py           # 业务逻辑层
@@ -107,18 +109,23 @@ CubeMaster/
 │   ├── verify_3d_data.py         # 求解结果数据验证模块
 │   ├── requirements.txt          # Python 依赖清单
 │   ├── models/                   # YOLO 模型文件
+│   ├── images/                   # 用户上传图片（按会话隔离）
 │   ├── cube_results/             # 识别和求解结果存储
 │   └── tests/                    # 测试文件
-│
+
 ├── frontend/                     # 前端应用
 │   ├── index.html                # 入口 HTML
 │   ├── vite.config.js            # Vite 构建配置
 │   ├── src/
 │   │   ├── components/           # 可复用组件
 │   │   │   ├── Cube3DView.vue    # 3D魔方渲染核心组件
+│   │   │   ├── CubeScanner.vue   # 摄像头扫描采集组件
 │   │   │   ├── Face2DView.vue    # 2D魔方展开图组件
-│   │   │   ├── LoadingCube.vue   # 3D魔方旋转加载动画
-│   │   │   └── ThemeSwitch.vue   # 主题切换组件
+│   │   │   ├── CubeSpinner.vue   # 3D魔方旋转加载动画
+│   │   │   ├── ThemeSwitch.vue   # 主题切换组件
+│   │   │   ├── CodeBlock.vue     # 代码高亮展示组件
+│   │   │   ├── DigitRoll.vue     # 数字滚动动画组件
+│   │   │   └── StatsPanel.vue    # 统计数据面板组件
 │   │   ├── views/                # 页面视图
 │   │   │   ├── Home.vue          # 首页
 │   │   │   ├── Solver.vue        # 求解器
@@ -131,12 +138,13 @@ CubeMaster/
 │   │   │   └── Tech*.vue         # 技术文档页面
 │   │   ├── layout/               # 布局组件
 │   │   ├── composables/          # 组合式函数
+│   │   │   ├── useSession.js     # 会话管理
 │   │   │   ├── useTheme.js       # 主题管理
 │   │   │   └── useCubeCustomization.js  # 外观自定义
 │   │   ├── utils/                # 工具函数
 │   │   ├── api/                  # API 接口封装
 │   │   └── data/                 # 教程静态数据
-│
+
 ├── scripts/                      # 工具脚本
 └── yolo_train/                   # 模型训练相关
 ```
@@ -198,7 +206,7 @@ npm run dev
 
 ### 2. 二维视角
 
-<img src="docs/images/2D魔方展开图.png" alt="2D魔方展开图" style="zoom:60%;" />
+<img src="docs/images/2D魔方展开图.png" alt="2D魔方展开图" style="zoom: 50%;" />
 
 ### 3. 面位缩写
 - **U (Up)**：顶面（白色中心）  
@@ -212,6 +220,8 @@ npm run dev
 
 魔方状态数据按以下面位顺序读取/存储： 
 `U（顶面）→ R（右面）→ F（前面）→ D（底面）→ L（左面）→ B（后面）` 
+
+<img src="docs\images\kociemba编码.png" alt="kociemba编码" style="zoom: 120%;"  />
 
 ---
 
@@ -230,4 +240,4 @@ npm run dev
 
 ---
 
-*最后更新: 2026-02-23*
+*最后更新: 2026-04-28*
